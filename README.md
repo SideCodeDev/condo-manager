@@ -31,9 +31,8 @@ This project is an **MVP (Minimum Viable Product)** focused on solving real-worl
 
 - **Frontend & Backend**: Next.js
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS + Shadcn
 - **Database**: PostgreSQL
-- **ORM**: Prisma
-- **Auth**: NextAuth / custom auth
-- **Infrastructure**: Docker
-- **Deployment**: Vercel (planned)
+- **ORM**: Drizzle ORM
+- **Auth**: TBD
+- **Deployment**: Vercel
