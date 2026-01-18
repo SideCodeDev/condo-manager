@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/server/db/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Condo {
+  id          String    @id @default(cuid())
+  orgId       String
+  address     String?
+  name        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  members     CondoMember[]
+}
+
+enum CondoMemberRole {
+  resident
+  admin
+}
+
+model CondoMember {
+  condoId     String
+  userId      String
+  role        CondoMemberRole @default(resident)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  condo       Condo @relation(fields: [condoId], references: [id], onDelete: Cascade)
+
+  @@id([condoId, userId])
+}

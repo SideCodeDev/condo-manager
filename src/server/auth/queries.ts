@@ -12,6 +12,7 @@ export async function getActiveSubscription(): Promise<SubscriptionPlan | null> 
   if (!isAuthenticated || !orgId) return null;
 
   const client = await clerkClient();
+
   const billing =
     await client.billing.getOrganizationBillingSubscription(orgId);
 
