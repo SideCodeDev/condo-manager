@@ -11,15 +11,17 @@ export async function POST(req: NextRequest) {
       `Received webhook with ID ${id} and event type of ${eventType}`,
     );
 
-    if (eventType === "user.updated") {
-      const { id, first_name, last_name, email_addresses } = evt.data;
+    switch (eventType) {
+      case "user.updated":
+        const { id, first_name, last_name, email_addresses } = evt.data;
 
-      await mutations.upsertUser(
-        id,
-        email_addresses[0].email_address,
-        first_name,
-        last_name,
-      );
+        await mutations.upsertUser(
+          id,
+          email_addresses[0].email_address,
+          first_name,
+          last_name,
+        );
+        break;
     }
 
     return new Response("Webhook received", { status: 200 });
