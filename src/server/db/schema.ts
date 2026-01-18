@@ -1,26 +1,48 @@
 import { sql } from "drizzle-orm";
-import { index, pgTableCreator, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTableCreator,
+  timestamp,
+  primaryKey,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 
 export const createTable = pgTableCreator((name) => name);
 
 const baseTableColumns = {
+  createdAt: timestamp("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .$onUpdate(() => sql`CURRENT_TIMESTAMP`)
+    .notNull(),
   // deleted: boolean().default(false).notNull(), // might be useful for soft deletes, but not needed yet
-  createdAt: timestamp()
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: timestamp()
-    .default(sql`CURRENT_TIMESTAMP`)
-    .$onUpdate(() => new Date())
-    .notNull(),
   // deletedAt: timestamp(), // might be useful for soft deletes, but not needed yet
 };
 
-export const user = createTable(
-  "user",
+export const condoTable = createTable("condo", (d) => ({
+  id: d.uuid("id").defaultRandom().primaryKey(),
+  orgId: d.text("org_id").notNull(),
+  address: d.text("address"),
+  name: d.text("name"),
+  ...baseTableColumns,
+}));
+
+export const condoMemberRoleEnum = pgEnum("condo_member_role", [
+  "resident",
+  "admin",
+]);
+
+export const condoMembersTable = createTable(
+  "condo_members",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
-    name: d.text(),
+    condoId: d
+      .uuid("condo_id")
+      .notNull()
+      .references(() => condoTable.id),
+    userId: d.text("user_id").notNull(),
+    role: condoMemberRoleEnum("role").notNull().default("resident"),
     ...baseTableColumns,
   }),
-  (t) => [index("name_idx").on(t.name)]
+  (t) => [primaryKey({ columns: [t.condoId, t.userId] })],
 );

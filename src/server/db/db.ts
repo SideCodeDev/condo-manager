@@ -13,7 +13,7 @@ const globalForDb = globalThis as unknown as {
   client: Pool | undefined;
 };
 
-export const client =
+const client =
   globalForDb.client ?? new Pool({ connectionString: env.DATABASE_URL });
 if (env.NODE_ENV !== "production") globalForDb.client = client;
 
