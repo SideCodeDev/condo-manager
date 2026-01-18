@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import "./globals.css";
+import { getI18n } from "@/i18n/server";
+import { I18nContextProvider } from "@/i18n/client";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,20 +21,23 @@ export const metadata: Metadata = {
   description: "Manage your condominium with ease.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { currentLocale } = await getI18n();
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <I18nContextProvider locale={currentLocale}>
+      <ClerkProvider>
+        <html lang={currentLocale}>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            {children}
+          </body>
+        </html>
+      </ClerkProvider>
+    </I18nContextProvider>
   );
 }
