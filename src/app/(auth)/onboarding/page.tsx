@@ -1,5 +1,7 @@
 "use client";
 
+import { onboardUser } from "@/server/actions";
+import { mutations } from "@/server/db";
 import { useOrganizationList, useUser } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,6 +34,14 @@ export default function OnboardingPage() {
       const created = await orgs.createOrganization({ name });
 
       await orgs.setActive({ organization: created.id });
+
+      await onboardUser(
+        user.id,
+        user.emailAddresses[0]?.emailAddress,
+        user.firstName,
+        user.lastName,
+      );
+
       router.replace(redirectTo);
     })();
   }, [user, orgs.isLoaded, validating]);

@@ -20,3 +20,25 @@ export function createCondoMember(
     data: { condoId, userId, role },
   });
 }
+
+export function upsertUser(
+  clerkId: string,
+  email: string,
+  firstName: string | null,
+  lastName: string | null,
+) {
+  return db.user.upsert({
+    where: { clerkId },
+    update: {
+      email,
+      firstName,
+      lastName,
+    },
+    create: {
+      email,
+      firstName,
+      lastName,
+      clerkId,
+    },
+  });
+}

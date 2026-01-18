@@ -25,3 +25,12 @@ export async function createCondo(name: string, address: string) {
   await mutations.createCondoMember(condo.id, userId!, "admin");
   return condo;
 }
+
+export async function onboardUser(
+  id: string,
+  email: string,
+  firstName: string | null,
+  lastName: string | null,
+) {
+  await mutations.upsertUser(id, email, firstName, lastName);
+}
