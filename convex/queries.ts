@@ -1,4 +1,4 @@
-import { Infer, v } from "convex/values";
+import { Infer } from "convex/values";
 import { query, QueryCtx } from "./_generated/server";
 import { Plan, planSchema } from "./schema";
 
