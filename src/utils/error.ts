@@ -5,4 +5,8 @@ export class ApplicationError extends Error {
   }
 }
 
-export type ErrorCode = "unauthenticated" | "unauthorized" | "unknown_error";
+export type ErrorCode =
+  | "unauthenticated"
+  | "unauthorized"
+  | "unknown_error"
+  | "max_condos_reached";

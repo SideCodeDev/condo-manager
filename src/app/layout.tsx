@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { getI18n } from "@/i18n/server";
 import { I18nContextProvider } from "@/i18n/client";
+import ConvexClientProvider from "@/convex.provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,13 +31,15 @@ export default async function RootLayout({
   return (
     <I18nContextProvider locale={currentLocale}>
       <ClerkProvider>
-        <html lang={currentLocale}>
-          <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-          >
-            {children}
-          </body>
-        </html>
+        <ConvexClientProvider>
+          <html lang={currentLocale}>
+            <body
+              className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            >
+              {children}
+            </body>
+          </html>
+        </ConvexClientProvider>
       </ClerkProvider>
     </I18nContextProvider>
   );

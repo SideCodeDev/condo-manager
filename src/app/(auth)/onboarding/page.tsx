@@ -32,6 +32,14 @@ export default function OnboardingPage() {
       const created = await orgs.createOrganization({ name });
 
       await orgs.setActive({ organization: created.id });
+
+      // await onboardUser(
+      //   user.id,
+      //   user.emailAddresses[0]?.emailAddress,
+      //   user.firstName,
+      //   user.lastName,
+      // );
+
       router.replace(redirectTo);
     })();
   }, [user, orgs.isLoaded, validating]);

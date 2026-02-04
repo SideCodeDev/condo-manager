@@ -1,12 +1,11 @@
-import { authQueries } from "@/server/auth";
+"use client";
 import { SignedIn, UserButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
+import { api } from "@convex/api";
+import { useQuery } from "convex/react";
 import Link from "next/link";
 
-export default async function Home() {
-  await auth.protect();
-
-  const subscription = await authQueries.getActiveSubscription();
+export default function Home() {
+  const subscription = useQuery(api.queries.getActiveSubscription);
 
   return (
     <main className="p-3 grid gap-3">
