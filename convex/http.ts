@@ -27,13 +27,13 @@ http.route({
       switch (eventType) {
         case "organizationMembership.created":
         case "organizationMembership.deleted":
-          await ctx.runMutation(internal.mutations.syncOrgsToUser, {
+          await ctx.runMutation(internal.auth.syncOrgsToUser, {
             clerkId: evt.data.public_user_data.user_id,
             orgId: evt.data.organization.id,
           });
           break;
         case "subscriptionItem.active":
-          await ctx.runMutation(internal.mutations.upsertOrg, {
+          await ctx.runMutation(internal.auth.upsertOrg, {
             orgId: evt.data.payer?.organization_id ?? "",
             status: evt.data.status,
             subscriptionPlan: evt.data.plan?.slug,
@@ -53,7 +53,7 @@ http.route({
             break;
           }
 
-          await ctx.runMutation(internal.mutations.upsertUser, {
+          await ctx.runMutation(internal.auth.upsertUser, {
             clerkId: id,
             email: email,
             firstName: first_name ?? undefined,
@@ -75,7 +75,7 @@ http.route({
             );
             break;
           }
-          await ctx.runMutation(internal.mutations.deleteUserByClerkId, {
+          await ctx.runMutation(internal.auth.deleteUserByClerkId, {
             clerkId: evt.data.id,
           });
       }

@@ -8,9 +8,10 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
+import type * as billing from "../billing.js";
+import type * as errors from "../errors.js";
 import type * as http from "../http.js";
-import type * as mutations from "../mutations.js";
-import type * as queries from "../queries.js";
 
 import type {
   ApiFromModules,
@@ -19,9 +20,10 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
+  billing: typeof billing;
+  errors: typeof errors;
   http: typeof http;
-  mutations: typeof mutations;
-  queries: typeof queries;
 }>;
 
 /**

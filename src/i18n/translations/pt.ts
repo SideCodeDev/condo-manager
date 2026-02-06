@@ -1,1 +1,5 @@
-export const pt = {} as const;
+export const pt = {
+  home: {
+    welcome: "Bem-vindo",
+  },
+} as const;

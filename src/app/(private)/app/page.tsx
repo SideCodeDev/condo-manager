@@ -5,7 +5,7 @@ import { useQuery } from "convex/react";
 import Link from "next/link";
 
 export default function Home() {
-  const subscription = useQuery(api.queries.getActiveSubscription);
+  const subscription = useQuery(api.billing.getActiveSubscription);
 
   return (
     <main className="p-3 grid gap-3">

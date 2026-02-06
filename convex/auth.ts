@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { internalMutation } from "./_generated/server";
+import { internalMutation, QueryCtx } from "./_generated/server";
+import { ApplicationError } from "./errors";
 
 export const upsertUser = internalMutation({
   args: {
@@ -118,3 +119,16 @@ export const upsertOrg = internalMutation({
     return await ctx.db.insert("organization", { ...patch, createdAt: now });
   },
 });
+
+export async function getCurrentUser(ctx: QueryCtx) {
+  const userIdentity = await ctx.auth.getUserIdentity();
+  if (!userIdentity) throw new ApplicationError("unauthenticated");
+  console.log("User Identity:", userIdentity);
+  const id = userIdentity.subject;
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_clerk_id", (q) => q.eq("clerkId", id))
+    .unique();
+  if (!user) throw new ApplicationError("unknown_error");
+  return user;
+}
