@@ -1,3 +1,4 @@
+import { Id } from "@convex/dataModel";
 import { defineSchema, defineTable } from "convex/server";
 import { Infer, v } from "convex/values";
 
@@ -10,35 +11,31 @@ const planSchema = v.union(
 
 const authTables = {
   users: defineTable({
-    clerkId: v.string(),
+    authProviderId: v.string(),
     email: v.string(),
     firstName: v.optional(v.string()),
     lastName: v.optional(v.string()),
     imageUrl: v.optional(v.string()),
-    createdAt: v.number(),
     updatedAt: v.number(),
     orgs: v.array(v.string()),
-  }).index("by_clerk_id", ["clerkId"]),
+  }).index("by_auth_provider_id", ["authProviderId"]),
   organization: defineTable({
-    orgId: v.string(),
-    plan: planSchema,
-    createdAt: v.number(),
-    updatedAt: v.number(),
-    status: v.union(
-      v.literal("abandoned"),
-      v.literal("active"),
-      v.literal("canceled"),
-      v.literal("ended"),
-      v.literal("expired"),
-      v.literal("incomplete"),
-      v.literal("past_due"),
-      v.literal("upcoming"),
-    ),
-  }).index("by_org_id", ["orgId"]),
+    name: v.string(),
+  }),
+  organizationMembership: defineTable({
+    orgId: v.id("organization"),
+    userId: v.id("users"),
+    role: v.union(v.literal("owner"), v.literal("admin"), v.literal("member")),
+  })
+    .index("by_user_id", ["userId"])
+    .index("by_org_id", ["orgId"]),
   plans: defineTable({
     slug: planSchema,
+    priceId: v.optional(v.string()),
     maxNumberOfCondos: v.union(v.number(), v.literal("unlimited")),
-  }).index("by_slug", ["slug"]),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_price_id", ["priceId"]),
 };
 
 const applicationTables = {
@@ -73,7 +70,7 @@ type TableSchema<
   K extends keyof (typeof authTables & typeof applicationTables),
   T extends typeof authTables & typeof applicationTables = typeof authTables &
     typeof applicationTables,
-> = Infer<T[K]["validator"]>;
+> = Infer<T[K]["validator"]> & { _id: Id<K>; _creationTime: number };
 
 export type User = TableSchema<"users">;
 export type UserSettings = TableSchema<"userSettings">;
@@ -82,3 +79,4 @@ export type Plan = TableSchema<"plans">;
 export type PlanSlug = Plan["slug"];
 export type Condo = TableSchema<"condo">;
 export type CondoMember = TableSchema<"condoMember">;
+export type OrganizationMembership = TableSchema<"organizationMembership">;

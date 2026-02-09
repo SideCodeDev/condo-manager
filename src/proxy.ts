@@ -1,15 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
 import { getLocalizedResponse } from "./i18n/proxy";
 
-const isPublicRoute = createRouteMatcher([
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/onboarding",
-  "/",
-]);
-
-const apiEndpoints = createRouteMatcher(["/api(.*)", "/trpc(.*)"]);
+const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)", "/"]);
 
 export default clerkMiddleware(async (auth, req) => {
   const res = getLocalizedResponse(req);
@@ -18,15 +10,6 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   await auth.protect();
-
-  if (apiEndpoints(req)) {
-    return res;
-  }
-
-  const { orgId } = await auth();
-  if (!orgId) {
-    return NextResponse.redirect(new URL("/onboarding", req.url));
-  }
   return res;
 });
 
