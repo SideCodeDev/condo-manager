@@ -1,7 +1,7 @@
-import { internalMutation, internalQuery } from "@convex/server";
+import { internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { ApplicationError } from "./errors";
-import { createOrganizationForUser } from "./organizaton";
+import { createOrganizationForUser } from "./organization";
 
 export const upsertUser = internalMutation({
   args: {

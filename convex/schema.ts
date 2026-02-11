@@ -1,4 +1,4 @@
-import { Id } from "@convex/dataModel";
+import { Id } from "./_generated/dataModel";
 import { defineSchema, defineTable } from "convex/server";
 import { Infer, v } from "convex/values";
 
@@ -31,7 +31,7 @@ const authTables = {
     .index("by_org_id", ["orgId"]),
   plans: defineTable({
     slug: planSchema,
-    priceId: v.optional(v.string()),
+    priceId: v.string(),
     maxNumberOfCondos: v.union(v.number(), v.literal("unlimited")),
   })
     .index("by_slug", ["slug"])

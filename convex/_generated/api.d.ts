@@ -11,7 +11,7 @@
 import type * as billing from "../billing.js";
 import type * as errors from "../errors.js";
 import type * as http from "../http.js";
-import type * as organizaton from "../organizaton.js";
+import type * as organization from "../organization.js";
 import type * as stripe from "../stripe.js";
 import type * as user from "../user.js";
 
@@ -25,7 +25,7 @@ declare const fullApi: ApiFromModules<{
   billing: typeof billing;
   errors: typeof errors;
   http: typeof http;
-  organizaton: typeof organizaton;
+  organization: typeof organization;
   stripe: typeof stripe;
   user: typeof user;
 }>;
