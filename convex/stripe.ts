@@ -11,7 +11,7 @@ export const createSubscriptionCheckout = action({
   args: { planId: v.id("plans") },
   handler: async (ctx, arg) => {
     const user = await ctx.runQuery(internal.user.getUser);
-    const orgs = await ctx.runQuery(internal.organizaton.getUserOrganization, {
+    const orgs = await ctx.runQuery(internal.organization.getUserOrganization, {
       userId: user._id,
     });
     const plan = await ctx.runQuery(internal.billing.getPlan, {
