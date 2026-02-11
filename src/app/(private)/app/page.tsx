@@ -1,11 +1,11 @@
 "use client";
 import { SignedIn, UserButton } from "@clerk/nextjs";
-import { api } from "@convex/api";
+import { api } from "@be/api";
 import { useQuery } from "convex/react";
 import Link from "next/link";
 
 export default function Home() {
-  const subscription = useQuery(api.billing.getActiveSubscription);
+  const subscription = useQuery(api.organization.getCurrentFeatureSet);
 
   return (
     <main className="p-3 grid gap-3">

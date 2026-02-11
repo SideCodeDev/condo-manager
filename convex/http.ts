@@ -1,8 +1,9 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { internal, components } from "./_generated/api";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import type { NextRequest } from "next/server";
+import { registerRoutes } from "@convex-dev/stripe";
 
 const http = httpRouter();
 
@@ -25,20 +26,6 @@ http.route({
       );
 
       switch (eventType) {
-        case "organizationMembership.created":
-        case "organizationMembership.deleted":
-          await ctx.runMutation(internal.auth.syncOrgsToUser, {
-            clerkId: evt.data.public_user_data.user_id,
-            orgId: evt.data.organization.id,
-          });
-          break;
-        case "subscriptionItem.active":
-          await ctx.runMutation(internal.auth.upsertOrg, {
-            orgId: evt.data.payer?.organization_id ?? "",
-            status: evt.data.status,
-            subscriptionPlan: evt.data.plan?.slug,
-          });
-          break;
         case "user.updated":
         case "user.created":
           const { id, first_name, last_name, email_addresses, image_url } =
@@ -53,8 +40,8 @@ http.route({
             break;
           }
 
-          await ctx.runMutation(internal.auth.upsertUser, {
-            clerkId: id,
+          await ctx.runMutation(internal.user.upsertUser, {
+            authProviderId: id,
             email: email,
             firstName: first_name ?? undefined,
             lastName: last_name ?? undefined,
@@ -75,8 +62,8 @@ http.route({
             );
             break;
           }
-          await ctx.runMutation(internal.auth.deleteUserByClerkId, {
-            clerkId: evt.data.id,
+          await ctx.runMutation(internal.user.deleteUserByClerkId, {
+            authProviderId: evt.data.id,
           });
       }
 
@@ -86,6 +73,10 @@ http.route({
       return new Response("Error processing webhook", { status: 500 });
     }
   }),
+});
+
+registerRoutes(http, components.stripe, {
+  webhookPath: "/stripe/webhook",
 });
 
 export default http;
