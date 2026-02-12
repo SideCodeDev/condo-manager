@@ -13,7 +13,7 @@ export default function PricingPage() {
           <h2>Plan {p.slug}</h2>
           <button
             onClick={async () => {
-              const { url } = await subscribe({ planId: p._id });
+              const url = await subscribe({ planId: p._id });
               if (url) {
                 window.location.href = url;
               }
