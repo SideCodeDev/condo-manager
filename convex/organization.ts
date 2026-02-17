@@ -98,10 +98,7 @@ async function getUserOrgs(ctx: QueryCtx, userId: Id<"users">) {
   const orgs = [];
 
   for (const membership of orgMembership) {
-    const org = await ctx.db
-      .query("organization")
-      .withIndex("by_id", (q) => q.eq("_id", membership.orgId))
-      .unique();
+    const org = await ctx.db.get("organization", membership.orgId);
     if (org) {
       let plan = (await ctx.db
         .query("plans")

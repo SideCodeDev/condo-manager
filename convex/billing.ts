@@ -8,9 +8,5 @@ export const getPlan = internalQuery({
   args: {
     id: v.id("plans"),
   },
-  handler: (ctx, { id }) =>
-    ctx.db
-      .query("plans")
-      .withIndex("by_id", (q) => q.eq("_id", id))
-      .unique(),
+  handler: (ctx, { id }) => ctx.db.get("plans", id),
 });
