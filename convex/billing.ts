@@ -2,7 +2,11 @@ import { v } from "convex/values";
 import { internalQuery, query } from "./_generated/server";
 
 export const getPlans = query({
-  handler: (ctx) => ctx.db.query("plans").collect(),
+  handler: (ctx) =>
+    ctx.db
+      .query("plans")
+      .filter((fb) => fb.neq(fb.field("slug"), "free"))
+      .collect(),
 });
 export const getPlan = internalQuery({
   args: {
