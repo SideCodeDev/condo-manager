@@ -32,6 +32,7 @@ const authTables = {
   plans: defineTable({
     slug: planSchema,
     priceId: v.string(),
+    priceMonth: v.number(),
     maxNumberOfCondos: v.union(v.number(), v.literal("unlimited")),
   })
     .index("by_slug", ["slug"])
