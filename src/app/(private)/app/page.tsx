@@ -1,12 +1,23 @@
 "use client";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import { api } from "@be/api";
-import { useQuery } from "convex/react";
 import Link from "next/link";
+import { useAuthenticatedQuery } from "@/lib/data-utils";
 
 export default function Home() {
-  const subscription = useQuery(api.organization.getCurrentFeatureSet);
+  const {
+    data: subscription,
+    status,
+    error,
+  } = useAuthenticatedQuery(api.organization.getCurrentFeatureSet);
 
+  if (status === "pending") return <div>Loading...</div>;
+  if (status === "error")
+    return (
+      <div>
+        Error loading subscription info: {JSON.stringify(error, null, 2)}
+      </div>
+    );
   return (
     <main className="p-3 grid gap-3">
       <SignedIn>

@@ -28,7 +28,7 @@ export default async function RootLayout({
   const { currentLocale } = await getI18n();
   return (
     <I18nContextProvider locale={currentLocale}>
-      <ClerkProvider>
+      <ClerkProvider signInUrl="/sign-in">
         <ConvexClientProvider>
           <html lang={currentLocale} className={montserrat.variable}>
             <body className="antialiased">{children}</body>

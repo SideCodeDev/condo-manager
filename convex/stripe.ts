@@ -9,7 +9,7 @@ const stripeClient = new StripeSubscriptions(components.stripe, {});
 // Create a checkout session for a subscription
 export const createSubscriptionCheckout = action({
   returns: v.string(),
-  args: { planId: v.id("plans") },
+  args: { planId: v.id("plans"), path: v.optional(v.string()) },
   handler: async (ctx, arg) => {
     const user = await ctx.runQuery(internal.user.getUser);
     const orgs = await ctx.runQuery(internal.organization.getUserOrganization, {
@@ -39,7 +39,10 @@ export const createSubscriptionCheckout = action({
       );
       const stripeRes = await stripeClient.createCustomerPortalSession(ctx, {
         customerId: existingSubscription.stripeCustomerId,
-        returnUrl: "http://localhost:3000/app",
+        returnUrl: new URL(
+          arg.path ?? "/app",
+          "http://localhost:3000",
+        ).toString(),
       });
       return stripeRes.url;
     }

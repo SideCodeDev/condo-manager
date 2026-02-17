@@ -62,7 +62,7 @@ http.route({
             );
             break;
           }
-          await ctx.runMutation(internal.user.deleteUserByClerkId, {
+          await ctx.runMutation(internal.user.deleteUserByAuthProviderId, {
             authProviderId: evt.data.id,
           });
       }

@@ -57,7 +57,7 @@ export const getUser = internalQuery({
   },
 });
 
-export const deleteUserByClerkId = internalMutation({
+export const deleteUserByAuthProviderId = internalMutation({
   args: {
     authProviderId: v.string(),
   },
