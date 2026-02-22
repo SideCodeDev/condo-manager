@@ -40,7 +40,7 @@ http.route({
             break;
           }
 
-          await ctx.runMutation(internal.user.upsertUser, {
+          await ctx.runMutation(internal.modules.users.mutations.upsertUser, {
             authProviderId: id,
             email: email,
             firstName: first_name ?? undefined,
@@ -62,9 +62,12 @@ http.route({
             );
             break;
           }
-          await ctx.runMutation(internal.user.deleteUserByAuthProviderId, {
-            authProviderId: evt.data.id,
-          });
+          await ctx.runMutation(
+            internal.modules.users.mutations.deleteUserByAuthProviderId,
+            {
+              authProviderId: evt.data.id,
+            },
+          );
       }
 
       return new Response("Webhook received", { status: 200 });

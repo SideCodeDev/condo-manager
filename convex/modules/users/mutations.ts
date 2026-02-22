@@ -1,8 +1,7 @@
-import { internalMutation, internalQuery } from "./_generated/server";
-import { v } from "convex/values";
-import { ApplicationError } from "./errors";
-import { createOrganizationForUser } from "./organization";
 import { internal } from "@be/api";
+import { internalMutation } from "@be/server";
+import { v } from "convex/values";
+import { createOrganizationForUser } from "../organizations/mutations";
 
 export const upsertUser = internalMutation({
   args: {
@@ -44,25 +43,14 @@ export const upsertUser = internalMutation({
       id,
       `${firstName}'s Organization`,
     );
-    await ctx.runMutation(internal.userSettings.createUserSettings, {
-      userId: id,
-      orgId,
-    });
+    await ctx.runMutation(
+      internal.modules.userSettings.mutations.createUserSettings,
+      {
+        userId: id,
+        orgId,
+      },
+    );
     return id;
-  },
-});
-
-export const getUser = internalQuery({
-  handler: async (ctx) => {
-    const userIdentity = await ctx.auth.getUserIdentity();
-    if (!userIdentity) throw new ApplicationError("unauthenticated");
-    const id = userIdentity.subject;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_auth_provider_id", (q) => q.eq("authProviderId", id))
-      .unique();
-    if (!user) throw new ApplicationError("unknown_error");
-    return user;
   },
 });
 

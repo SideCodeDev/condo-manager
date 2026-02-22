@@ -15,4 +15,6 @@ export type ErrorCode =
   | "plan_not_found"
   | "user_has_no_orgs"
   | "org_not_found"
-  | "checkout_session_failed";
+  | "checkout_session_failed"
+  | "user_settings_not_found"
+  | "cannot_create_condo";

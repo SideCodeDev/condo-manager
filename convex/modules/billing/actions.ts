@@ -1,8 +1,8 @@
+import { components, internal } from "@be/api";
+import { action } from "@be/server";
 import { StripeSubscriptions } from "@convex-dev/stripe";
 import { v } from "convex/values";
-import { components, internal } from "./_generated/api";
-import { action } from "./_generated/server";
-import { ApplicationError } from "./errors";
+import { ApplicationError } from "../../lib/errors";
 
 const stripeClient = new StripeSubscriptions(components.stripe, {});
 
@@ -11,15 +11,17 @@ export const createSubscriptionCheckout = action({
   returns: v.string(),
   args: { planId: v.id("plans"), path: v.optional(v.string()) },
   handler: async (ctx, arg) => {
-    const user = await ctx.runQuery(internal.user.getUser);
-    const orgs = await ctx.runQuery(internal.organization.getUserOrganization, {
-      userId: user._id,
-    });
-    const org = orgs?.[0];
+    const user = await ctx.runQuery(internal.modules.users.queries.getUser);
+    const org = await ctx.runQuery(
+      internal.modules.organizations.queries.getCurrentOrganization,
+      {
+        userId: user._id,
+      },
+    );
     if (!org) throw new ApplicationError("org_not_found");
     const id = org._id;
 
-    const plan = await ctx.runQuery(internal.billing.getPlan, {
+    const plan = await ctx.runQuery(internal.modules.billing.queries.getPlan, {
       id: arg.planId,
     });
     if (!plan) throw new ApplicationError("plan_not_found");

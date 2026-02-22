@@ -1,5 +1,5 @@
+import { internalQuery, query } from "@be/server";
 import { v } from "convex/values";
-import { internalQuery, query } from "./_generated/server";
 
 export const getPlans = query({
   handler: (ctx) =>

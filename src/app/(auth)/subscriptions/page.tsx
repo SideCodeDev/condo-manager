@@ -13,12 +13,12 @@ export default function PricingPage() {
     isPending,
     isError,
     error,
-  } = useUnauthenticatedQuery(api.billing.getPlans);
+  } = useUnauthenticatedQuery(api.modules.billing.queries.getPlans);
   const { data: subscription } = useAuthenticatedQuery(
-    api.organization.getCurrentFeatureSet,
+    api.modules.organizations.queries.getCurrentFeatureSet,
   );
   const { execute: subscribe } = useAction(
-    api.stripe.createSubscriptionCheckout,
+    api.modules.billing.actions.createSubscriptionCheckout,
     {
       onSuccess: (url) => {
         if (url) {

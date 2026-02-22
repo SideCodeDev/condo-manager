@@ -50,7 +50,7 @@ export function useMutation<
   mutation: Mutation,
   opts?: {
     onSuccess?: (result: T, args: Args) => void;
-    onError?: (args: Args, error: unknown) => void;
+    onError?: (error: unknown, args: Args) => void;
   },
 ) {
   const [isPending, setIsPending] = useState(false);
@@ -61,7 +61,7 @@ export function useMutation<
       const result = await convexMutation(...args);
       opts?.onSuccess?.(result, args as Args);
     } catch (error) {
-      opts?.onError?.(args as Args, error);
+      opts?.onError?.(error, args as Args);
     } finally {
       setIsPending(false);
     }
