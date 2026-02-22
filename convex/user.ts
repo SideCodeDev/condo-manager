@@ -2,6 +2,7 @@ import { internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { ApplicationError } from "./errors";
 import { createOrganizationForUser } from "./organization";
+import { internal } from "@be/api";
 
 export const upsertUser = internalMutation({
   args: {
@@ -38,7 +39,15 @@ export const upsertUser = internalMutation({
       return existing._id;
     }
     const id = await ctx.db.insert("users", { ...patch });
-    await createOrganizationForUser(ctx, id, `${firstName}'s Organization`);
+    const orgId = await createOrganizationForUser(
+      ctx,
+      id,
+      `${firstName}'s Organization`,
+    );
+    await ctx.runMutation(internal.userSettings.createUserSettings, {
+      userId: id,
+      orgId,
+    });
     return id;
   },
 });

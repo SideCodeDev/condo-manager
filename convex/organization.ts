@@ -104,11 +104,11 @@ async function getUserOrgs(ctx: QueryCtx, userId: Id<"users">) {
         .query("plans")
         .withIndex("by_slug", (q) => q.eq("slug", "free"))
         .unique())!;
-      const subscriptions = await ctx.runQuery(
-        components.stripe.public.listSubscriptionsByUserId,
-        { userId: org._id },
-      );
-      const subscription = subscriptions.find((s) => s.status === "active");
+      const subscription = await ctx
+        .runQuery(components.stripe.public.getSubscriptionByOrgId, {
+          orgId: org._id,
+        })
+        .then((sub) => (sub?.status === "active" ? sub : null));
       if (subscription) {
         const priceId = subscription.priceId;
         plan =

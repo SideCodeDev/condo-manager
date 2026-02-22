@@ -5,6 +5,27 @@ import Link from "next/link";
 import { useAuthenticatedQuery } from "@/lib/data-utils";
 
 export default function Home() {
+  return (
+    <main className="p-3 grid gap-3">
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+      <h1>
+        Welcome to Condo Manager&apos;s app!. Esta pagina corresponde a estar
+        logado e dentro a app para fazer coisas
+      </h1>
+      <Content />
+      <Link
+        href="/subscriptions"
+        className="px-6 py-3 bg-primary text-primary-foreground rounded-lg w-fit"
+      >
+        See subscription plans
+      </Link>
+    </main>
+  );
+}
+
+function Content() {
   const {
     data: subscription,
     status,
@@ -19,21 +40,11 @@ export default function Home() {
       </div>
     );
   return (
-    <main className="p-3 grid gap-3">
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
-      <h1>
-        Welcome to Condo Manager&apos;s app!. Esta pagina corresponde a estar
-        logado e dentro a app para fazer coisas
-      </h1>
-      <pre>{JSON.stringify(subscription, null, 2)}</pre>
-      <Link
-        href="/subscriptions"
-        className="px-6 py-3 bg-primary text-primary-foreground rounded-lg w-fit"
-      >
-        See subscription plans
-      </Link>
-    </main>
+    <div className="grid gap-2">
+      <pre>{JSON.stringify(subscription, null, 2)}</pre>;
+      <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg w-fit">
+        Create Condo
+      </button>
+    </div>
   );
 }

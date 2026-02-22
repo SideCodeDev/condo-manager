@@ -42,8 +42,9 @@ const authTables = {
 const applicationTables = {
   userSettings: defineTable({
     userId: v.id("users"),
-    activeOrg: v.optional(v.string()),
-  }),
+    activeOrg: v.optional(v.id("organization")),
+    activeCondo: v.optional(v.id("condo")),
+  }).index("by_user_id", ["userId"]),
   condo: defineTable({
     orgId: v.string(),
     address: v.string(),

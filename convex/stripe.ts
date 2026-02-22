@@ -24,12 +24,12 @@ export const createSubscriptionCheckout = action({
     });
     if (!plan) throw new ApplicationError("plan_not_found");
 
-    const subs = await ctx.runQuery(
-      components.stripe.public.listSubscriptionsByUserId,
-      { userId: id },
+    const sub = await ctx.runQuery(
+      components.stripe.public.getSubscriptionByOrgId,
+      { orgId: id },
     );
 
-    const existingSubscription = subs.find((s) => s.status === "active");
+    const existingSubscription = sub?.status === "active" ? sub : null;
 
     // If there's an existing subscription, redirect to customer portal
     // This allows users to upgrade/downgrade/cancel safely
@@ -49,7 +49,7 @@ export const createSubscriptionCheckout = action({
 
     // No subscription exists, create a new one
     const customer = await stripeClient.getOrCreateCustomer(ctx, {
-      userId: id,
+      userId: org._id,
     });
 
     console.log(
@@ -63,7 +63,7 @@ export const createSubscriptionCheckout = action({
       mode: "subscription",
       successUrl: "http://localhost:3000/app",
       cancelUrl: "http://localhost:3000/app",
-      subscriptionMetadata: { userId: org._id },
+      subscriptionMetadata: { orgId: org._id, trial_period_days: "14" },
     });
     if (!stripeRes.url) throw new ApplicationError("checkout_session_failed");
     return stripeRes.url;
