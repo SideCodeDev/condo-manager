@@ -14,4 +14,7 @@ export type ErrorCode =
   | "max_condos_reached"
   | "plan_not_found"
   | "user_has_no_orgs"
-  | "org_not_found";
+  | "org_not_found"
+  | "checkout_session_failed"
+  | "user_settings_not_found"
+  | "cannot_create_condo";

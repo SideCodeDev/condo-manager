@@ -1,13 +1,7 @@
 import { Id } from "./_generated/dataModel";
 import { defineSchema, defineTable } from "convex/server";
 import { Infer, v } from "convex/values";
-
-const planSchema = v.union(
-  v.literal("free"),
-  v.literal("basic"),
-  v.literal("pro"),
-  v.literal("enterprise"),
-);
+import { planSchema } from "./lib/validators";
 
 const authTables = {
   users: defineTable({
@@ -32,6 +26,7 @@ const authTables = {
   plans: defineTable({
     slug: planSchema,
     priceId: v.string(),
+    priceMonth: v.number(),
     maxNumberOfCondos: v.union(v.number(), v.literal("unlimited")),
   })
     .index("by_slug", ["slug"])
@@ -41,21 +36,18 @@ const authTables = {
 const applicationTables = {
   userSettings: defineTable({
     userId: v.id("users"),
-    activeOrg: v.optional(v.string()),
-  }),
+    activeOrg: v.id("organization"),
+    activeCondo: v.optional(v.id("condo")),
+  }).index("by_user_id", ["userId"]),
   condo: defineTable({
     orgId: v.string(),
     address: v.string(),
     name: v.string(),
-    createdAt: v.number(),
-    updatedAt: v.number(),
   }).index("by_org_id", ["orgId"]),
   condoMember: defineTable({
     condoId: v.id("condo"),
     userId: v.id("users"),
     role: v.union(v.literal("admin"), v.literal("member")),
-    createdAt: v.number(),
-    updatedAt: v.number(),
   })
     .index("by_condo_id", ["condoId"])
     .index("by_user_id", ["userId"]),

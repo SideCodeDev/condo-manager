@@ -1,7 +1,7 @@
-import { internalMutation, internalQuery } from "./_generated/server";
+import { internal } from "@be/api";
+import { internalMutation } from "@be/server";
 import { v } from "convex/values";
-import { ApplicationError } from "./errors";
-import { createOrganizationForUser } from "./organization";
+import { createOrganizationForUser } from "../organizations/mutations";
 
 export const upsertUser = internalMutation({
   args: {
@@ -38,26 +38,23 @@ export const upsertUser = internalMutation({
       return existing._id;
     }
     const id = await ctx.db.insert("users", { ...patch });
-    await createOrganizationForUser(ctx, id, `${firstName}'s Organization`);
+    const orgId = await createOrganizationForUser(
+      ctx,
+      id,
+      `${firstName}'s Organization`,
+    );
+    await ctx.runMutation(
+      internal.modules.userSettings.mutations.createUserSettings,
+      {
+        userId: id,
+        orgId,
+      },
+    );
     return id;
   },
 });
 
-export const getUser = internalQuery({
-  handler: async (ctx) => {
-    const userIdentity = await ctx.auth.getUserIdentity();
-    if (!userIdentity) throw new ApplicationError("unauthenticated");
-    const id = userIdentity.subject;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_auth_provider_id", (q) => q.eq("authProviderId", id))
-      .unique();
-    if (!user) throw new ApplicationError("unknown_error");
-    return user;
-  },
-});
-
-export const deleteUserByClerkId = internalMutation({
+export const deleteUserByAuthProviderId = internalMutation({
   args: {
     authProviderId: v.string(),
   },

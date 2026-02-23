@@ -8,12 +8,21 @@
  * @module
  */
 
-import type * as billing from "../billing.js";
-import type * as errors from "../errors.js";
 import type * as http from "../http.js";
-import type * as organization from "../organization.js";
-import type * as stripe from "../stripe.js";
-import type * as user from "../user.js";
+import type * as lib_errors from "../lib/errors.js";
+import type * as lib_validators from "../lib/validators.js";
+import type * as modules_billing_actions from "../modules/billing/actions.js";
+import type * as modules_billing_queries from "../modules/billing/queries.js";
+import type * as modules_condo_helpers from "../modules/condo/helpers.js";
+import type * as modules_condo_mutations from "../modules/condo/mutations.js";
+import type * as modules_condo_queires from "../modules/condo/queires.js";
+import type * as modules_organizations_helpers from "../modules/organizations/helpers.js";
+import type * as modules_organizations_mutations from "../modules/organizations/mutations.js";
+import type * as modules_organizations_queries from "../modules/organizations/queries.js";
+import type * as modules_userSettings_helpers from "../modules/userSettings/helpers.js";
+import type * as modules_userSettings_mutations from "../modules/userSettings/mutations.js";
+import type * as modules_users_mutations from "../modules/users/mutations.js";
+import type * as modules_users_queries from "../modules/users/queries.js";
 
 import type {
   ApiFromModules,
@@ -22,12 +31,21 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  billing: typeof billing;
-  errors: typeof errors;
   http: typeof http;
-  organization: typeof organization;
-  stripe: typeof stripe;
-  user: typeof user;
+  "lib/errors": typeof lib_errors;
+  "lib/validators": typeof lib_validators;
+  "modules/billing/actions": typeof modules_billing_actions;
+  "modules/billing/queries": typeof modules_billing_queries;
+  "modules/condo/helpers": typeof modules_condo_helpers;
+  "modules/condo/mutations": typeof modules_condo_mutations;
+  "modules/condo/queires": typeof modules_condo_queires;
+  "modules/organizations/helpers": typeof modules_organizations_helpers;
+  "modules/organizations/mutations": typeof modules_organizations_mutations;
+  "modules/organizations/queries": typeof modules_organizations_queries;
+  "modules/userSettings/helpers": typeof modules_userSettings_helpers;
+  "modules/userSettings/mutations": typeof modules_userSettings_mutations;
+  "modules/users/mutations": typeof modules_users_mutations;
+  "modules/users/queries": typeof modules_users_queries;
 }>;
 
 /**
