@@ -123,3 +123,99 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* UI Elements */
+@utility font-ui-1 {
+  font-size: 3rem;
+  line-height: 3.25rem;
+}
+@utility font-ui-2 {
+  font-size: 2rem;
+  line-height: 2.25rem;
+}
+@utility font-ui-3 {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+}
+@utility font-ui-4 {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+}
+@utility font-ui-5 {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+}
+@utility font-ui-6 {
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+}
+@utility font-ui-7 {
+  font-size: 1rem;
+  line-height: 1.25rem;
+}
+@utility font-ui-8 {
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+}
+@utility font-ui-9 {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+@utility font-ui-10 {
+  font-size: 0.625rem;
+  line-height: 1rem;
+}
+
+/* Paragraphs */
+@utility font-p-1 {
+  font-size: 1.125rem;
+  line-height: 1.625rem;
+}
+@utility font-p-2 {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+@utility font-p-3 {
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+}
+@utility font-p-4 {
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+}
+
+/* Desktop headings */
+@utility font-desktop-h1 {
+  font-size: 3rem;
+  line-height: 3.5rem;
+}
+@utility font-desktop-h2 {
+  font-size: 2rem;
+  line-height: 2.5rem;
+}
+@utility font-desktop-h3 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+@utility font-desktop-h4 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+/* Mobile headings */
+@utility font-mobile-d1 {
+  font-size: 2rem;
+  line-height: 2.5rem;
+}
+@utility font-mobile-d2 {
+  font-size: 2rem;
+  line-height: 2.5rem;
+}
+@utility font-mobile-h1 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+@utility font-mobile-h2 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
