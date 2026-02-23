@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Loader } from "./loader";
 
 const buttonVariants = cva(
-  "inline-flex items-center px-3 py-2.5 justify-center gap-2 whitespace-nowrap rounded-md font-ui-7 font-bold transition-all disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-6 shrink-0 [&_svg]:shrink-0 outline-none",
+  "inline-flex min-w-36 items-center px-3 py-2.5 justify-center gap-2 whitespace-nowrap rounded-md font-ui-7 font-bold transition-all disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-6 shrink-0 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -16,7 +16,7 @@ const buttonVariants = cva(
         ].join(" "),
         secondary: [
           "text-neutral-950 border border-neutral-950 focus-visible:text-neutral-800 focus-visible:border-neutral-800 hover:text-neutral-800 hover:border-neutral-800 disabled:text-neutral-600 disabled:border-neutral-600",
-          "data-destructive:border-red data-destructive:text-red data-destructive:focus-visible:border-red data-destructive:focus-visible:text-red data-destructive:hover:border-red data-destructive:hover:text-red",
+          "data-destructive:border-red data-destructive:text-red data-destructive:focus-visible:border-red-600 data-destructive:focus-visible:text-red-600 data-destructive:hover:border-red-600 data-destructive:hover:text-red-600",
         ].join(" "),
         link: [
           "underline text-neutral-950 focus-visible:text-neutral-800 hover:text-neutral-800 disabled:text-neutral-600",
