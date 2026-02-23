@@ -56,7 +56,14 @@ function Button({
       disabled={loading || props.disabled}
       {...props}
     >
-      {loading ? <Loader size={24} /> : children}
+      {loading ? (
+        <>
+          <Loader size={24} aria-hidden="true" />
+          <span className="sr-only">{children}</span>
+        </>
+      ) : (
+        children
+      )}
     </Comp>
   );
 }
