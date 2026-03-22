@@ -10,7 +10,11 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "secondary", "link"],
+      options: ["primary", "secondary", "link", "ghost"],
+    },
+    size: {
+      control: "select",
+      options: ["standard", "sm"],
     },
     disabled: { control: "boolean" },
     loading: { control: "boolean" },
@@ -19,6 +23,7 @@ const meta = {
   },
   args: {
     variant: "primary",
+    size: "standard",
     disabled: false,
     loading: false,
     destructive: false,
@@ -39,6 +44,22 @@ export const Link: Story = {
   args: { variant: "link" },
 };
 
+export const Ghost: Story = {
+  args: { variant: "ghost" },
+};
+
+export const Small: Story = {
+  args: { size: "sm" },
+};
+
+export const SmallSecondary: Story = {
+  args: { size: "sm", variant: "secondary" },
+};
+
+export const SmallGhost: Story = {
+  args: { size: "sm", variant: "ghost" },
+};
+
 export const Destructive: Story = {
   args: { destructive: true },
 };
@@ -49,6 +70,10 @@ export const DestructiveSecondary: Story = {
 
 export const DestructiveLink: Story = {
   args: { variant: "link", destructive: true },
+};
+
+export const DestructiveGhost: Story = {
+  args: { variant: "ghost", destructive: true },
 };
 
 export const WithIcon: Story = {
@@ -80,14 +105,14 @@ export const AllLoadingStates: Story = {
   render: (args) => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        {(["primary", "secondary", "link"] as const).map((variant) => (
+        {(["primary", "secondary", "link", "ghost"] as const).map((variant) => (
           <Button key={variant} {...args} variant={variant} loading>
             {variant.charAt(0).toUpperCase() + variant.slice(1)}
           </Button>
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        {(["primary", "secondary", "link"] as const).map((variant) => (
+        {(["primary", "secondary", "link", "ghost"] as const).map((variant) => (
           <Button key={variant} {...args} variant={variant} loading destructive>
             {variant.charAt(0).toUpperCase() + variant.slice(1)} Destructive
           </Button>
@@ -105,19 +130,37 @@ export const AllVariants: Story = {
   render: (args) => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        {(["primary", "secondary", "link"] as const).map((variant) => (
+        {(["primary", "secondary", "link", "ghost"] as const).map((variant) => (
           <Button key={variant} {...args} variant={variant}>
             {variant.charAt(0).toUpperCase() + variant.slice(1)}
           </Button>
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        {(["primary", "secondary", "link"] as const).map((variant) => (
+        {(["primary", "secondary", "link", "ghost"] as const).map((variant) => (
           <Button key={variant} {...args} variant={variant} destructive>
             {variant.charAt(0).toUpperCase() + variant.slice(1)} Destructive
           </Button>
         ))}
       </div>
+    </div>
+  ),
+};
+
+export const AllSizes: Story = {
+  render: (args) => (
+    <div className="flex flex-col gap-4">
+      {(["standard", "sm"] as const).map((size) => (
+        <div key={size} className="flex flex-wrap items-center gap-3">
+          {(["primary", "secondary", "link", "ghost"] as const).map(
+            (variant) => (
+              <Button key={variant} {...args} size={size} variant={variant}>
+                {variant.charAt(0).toUpperCase() + variant.slice(1)}
+              </Button>
+            ),
+          )}
+        </div>
+      ))}
     </div>
   ),
 };

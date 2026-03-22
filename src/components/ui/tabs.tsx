@@ -11,7 +11,7 @@ import {
 } from "react";
 
 const TabItemVairant = cva(
-  "isolate relative inline-flex gap-2 items-center font-ui-6 text-neutral-1000 focus-visible:outline-primary focus-visible:outline-2 [&>svg]:size-5",
+  "isolate relative inline-flex gap-2 items-center font-ui-6 text-neutral-1000 focus-visible:outline-primary focus-visible:outline-2 [&_svg:not([class*='size-'])]:size-5",
   {
     variants: {
       variant: {

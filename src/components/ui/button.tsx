@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Loader } from "./loader";
 
 const buttonVariants = cva(
-  "inline-flex min-w-36 items-center px-3 py-2.5 justify-center gap-2 whitespace-nowrap rounded-md font-ui-7 font-bold transition-all disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-6 shrink-0 [&_svg]:shrink-0",
+  "inline-flex min-w-36 items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold transition-all disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-6 shrink-0 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -22,10 +22,19 @@ const buttonVariants = cva(
           "underline text-neutral-950 focus-visible:text-neutral-800 hover:text-neutral-800 disabled:text-neutral-600",
           "data-destructive:text-red data-destructive:focus-visible:text-red-600 data-destructive:hover:text-red-600",
         ].join(" "),
+        ghost: [
+          "text-primary focus-visible:text-primary-900 hover:text-primary-900 disabled:text-neutral-600",
+          "data-destructive:text-red data-destructive:focus-visible:text-red-600 data-destructive:hover:text-red-600",
+        ].join(" "),
+      },
+      size: {
+        standard: "font-ui-6 px-3 py-2.5",
+        sm: "font-ui-7 px-3 py-2",
       },
     },
     defaultVariants: {
       variant: "primary",
+      size: "standard",
     },
   },
 );
@@ -33,7 +42,7 @@ const buttonVariants = cva(
 function Button({
   className,
   variant = "primary",
-  color,
+  size = "standard",
   asChild = false,
   loading,
   destructive = false,
@@ -52,7 +61,7 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-destructive={destructive || undefined}
-      className={cn(buttonVariants({ variant, className }))}
+      className={cn(buttonVariants({ variant, size, className }))}
       disabled={loading || props.disabled}
       {...props}
     >
