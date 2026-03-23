@@ -7,6 +7,7 @@ function ColorsShowcase() {
 const meta = {
   title: "Design Tokens/Colors",
   component: ColorsShowcase,
+  tags: ["autodocs"],
   parameters: {
     controls: { disable: true },
   },

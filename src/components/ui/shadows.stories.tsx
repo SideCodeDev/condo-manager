@@ -7,6 +7,7 @@ function ShadowsShowcase() {
 const meta = {
   title: "Design Tokens/Shadows",
   component: ShadowsShowcase,
+  tags: ["autodocs"],
   parameters: {
     controls: { disable: true },
   },
