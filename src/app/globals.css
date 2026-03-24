@@ -46,6 +46,12 @@
   --shadow-1: 1px 2px 6px -1px #0000000d;
   --shadow-2: 1px 6px 16px -4px #0000001a, 0px 12px 24px -6px #00000014;
   --shadow-floating: 1px 20px 40px -10px #0000000f;
+  --shadow-glass:
+    1px 1px 2px 0px #ffffff4d inset, -2px -2px 2px 0px #ffffff26 inset,
+    0px 0px 10px 0px #ffffff40 inset;
+  --shadow-glass-focus:
+    1px 1px 2px 0px #2b2b304d inset, -2px -2px 2px 0px #2b2b3026 inset,
+    0px 0px 10px 0px #2b2b3040 inset;
 }
 
 @layer base {
