@@ -47,7 +47,7 @@ export function FileUpload({
       ref={labelRef}
       htmlFor={inputId}
       className={cn(
-        "border border-dashed p-6 flex flex-col rounded-lg gap-2 justify-center items-center [&>*]:shrink-0 transition-colors",
+        "border border-dashed p-6 flex flex-col rounded-lg gap-2 justify-center items-center *:shrink-0 transition-colors",
         isDragging ? "border-primary bg-primary-50" : "border-neutral-400",
         className,
       )}
