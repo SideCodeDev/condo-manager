@@ -1,0 +1,60 @@
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { Trash } from "lucide-react";
+
+import { IconButton } from "./icon-button";
+
+const meta = {
+  title: "UI/IconButton",
+  component: IconButton,
+  tags: ["autodocs"],
+  argTypes: {
+    variant: {
+      control: "select",
+      options: ["round", "square"],
+    },
+    size: {
+      control: "select",
+      options: ["large", "small"],
+    },
+    disabled: { control: "boolean" },
+    loading: { control: "boolean" },
+    asChild: { table: { disable: true } },
+  },
+  args: {
+    variant: "round",
+    size: "large",
+    disabled: false,
+    loading: false,
+  },
+  render: (args) => (
+    <IconButton {...args}>
+      <Trash aria-hidden="true" />
+      <span className="sr-only">Delete</span>
+    </IconButton>
+  ),
+} satisfies Meta<typeof IconButton>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Round: Story = {};
+
+export const Square: Story = {
+  args: { variant: "square" },
+};
+
+export const Small: Story = {
+  args: { size: "small" },
+};
+
+export const SmallSquare: Story = {
+  args: { size: "small", variant: "square" },
+};
+
+export const Loading: Story = {
+  args: { loading: true },
+};
+
+export const Disabled: Story = {
+  args: { disabled: true },
+};
