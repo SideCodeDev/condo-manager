@@ -17,7 +17,7 @@ const TabItemVairant = cva(
     variants: {
       variant: {
         chip: "px-3 py-2 rounded-4xl",
-        line: "px-1 pb-1.5 data-[active=true]:text-primary transition-colors",
+        line: "px-1 pb-1.5 data-[active=true]:text-primary transition-colors delay-200",
       },
     },
     defaultVariants: {
