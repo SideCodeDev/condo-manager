@@ -168,25 +168,27 @@ export const LineSpacedIconOnly: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
-      {(["chip", "line", "line-spaced", "line-spaced"] as const).map((variant) => (
-        <div key={variant} className="flex flex-col gap-2">
-          <span className="text-sm font-medium capitalize">{variant}</span>
-          <Tabs variant={variant} initialValue="tab1">
-            <TabItem value="tab1">
-              <Home />
-              Home
-            </TabItem>
-            <TabItem value="tab2">
-              <User />
-              Profile
-            </TabItem>
-            <TabItem value="tab3">
-              <Settings />
-              Settings
-            </TabItem>
-          </Tabs>
-        </div>
-      ))}
+      {(["chip", "line", "line-spaced", "line-spaced"] as const).map(
+        (variant) => (
+          <div key={variant} className="flex flex-col gap-2">
+            <span className="text-sm font-medium capitalize">{variant}</span>
+            <Tabs variant={variant} initialValue="tab1">
+              <TabItem value="tab1">
+                <Home />
+                Home
+              </TabItem>
+              <TabItem value="tab2">
+                <User />
+                Profile
+              </TabItem>
+              <TabItem value="tab3">
+                <Settings />
+                Settings
+              </TabItem>
+            </Tabs>
+          </div>
+        ),
+      )}
     </div>
   ),
 };
