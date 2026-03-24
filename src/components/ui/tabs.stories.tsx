@@ -10,7 +10,7 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["chip", "line"],
+      options: ["chip", "line", "line-spaced"],
     },
     initialValue: { control: "text" },
   },
@@ -117,10 +117,58 @@ export const LineIconOnly: Story = {
   ),
 };
 
+export const LineSpaced: Story = {
+  args: { variant: "line-spaced" },
+  render: (args) => (
+    <Tabs {...args}>
+      <TabItem value="tab1">Tab 1</TabItem>
+      <TabItem value="tab2">Tab 2</TabItem>
+      <TabItem value="tab3">Tab 3</TabItem>
+    </Tabs>
+  ),
+};
+
+export const LineSpacedWithIcons: Story = {
+  args: { variant: "line-spaced" },
+  render: (args) => (
+    <Tabs {...args}>
+      <TabItem value="tab1">
+        <Home />
+        Home
+      </TabItem>
+      <TabItem value="tab2">
+        <User />
+        Profile
+      </TabItem>
+      <TabItem value="tab3">
+        <Settings />
+        Settings
+      </TabItem>
+    </Tabs>
+  ),
+};
+
+export const LineSpacedIconOnly: Story = {
+  args: { variant: "line-spaced" },
+  render: (args) => (
+    <Tabs {...args}>
+      <TabItem value="tab1" aria-label="Home">
+        <Home />
+      </TabItem>
+      <TabItem value="tab2" aria-label="Profile">
+        <User />
+      </TabItem>
+      <TabItem value="tab3" aria-label="Settings">
+        <Settings />
+      </TabItem>
+    </Tabs>
+  ),
+};
+
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
-      {(["chip", "line"] as const).map((variant) => (
+      {(["chip", "line", "line-spaced", "line-spaced"] as const).map((variant) => (
         <div key={variant} className="flex flex-col gap-2">
           <span className="text-sm font-medium capitalize">{variant}</span>
           <Tabs variant={variant} initialValue="tab1">

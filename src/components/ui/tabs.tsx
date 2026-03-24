@@ -17,7 +17,7 @@ const TabItemVairant = cva(
     variants: {
       variant: {
         chip: "px-3 py-2 rounded-4xl",
-        line: "px-1 pb-1.5 data-[active=true]:text-primary transition-colors delay-200",
+        line: "px-1 pb-1.5 data-[spaced=true]:pb-3.5 data-[active=true]:text-primary transition-colors delay-200",
       },
     },
     defaultVariants: {
@@ -61,13 +61,19 @@ export function TabItem({
         onClick?.(ev);
       }}
       data-active={isActive}
-      className={TabItemVairant({ variant, className })}
+      data-spaced={variant === "line-spaced"}
+      className={TabItemVairant({
+        variant: variant === "line-spaced" ? "line" : variant,
+        className,
+      })}
       {...props}
     >
       {isActive && (
         <motion.div
           layoutId={layoutId}
-          className={TabItemIndicator({ variant })}
+          className={TabItemIndicator({
+            variant: variant === "line-spaced" ? "line" : variant,
+          })}
           transition={{
             type: "tween",
             duration: 0.2,
@@ -87,6 +93,7 @@ const TabsVairant = cva(
       variant: {
         chip: "border border-neutral-200 bg-neutral-100 rounded-3xl p-1",
         line: "",
+        "line-spaced": "",
       },
     },
     defaultVariants: {
@@ -103,7 +110,7 @@ export function Tabs({
 }: {
   initialValue: string;
   children: ReactNode;
-  variant?: "chip" | "line";
+  variant?: "chip" | "line" | "line-spaced";
   className?: string;
 }) {
   const [value, setValue] = useState(initialValue);
@@ -123,7 +130,7 @@ export function Tabs({
 const TabsContext = createContext<{
   activeTab: string;
   setActiveTab: (value: string) => void;
-  variant: "chip" | "line";
+  variant: "chip" | "line" | "line-spaced";
   layoutId: string;
 }>({ activeTab: "", setActiveTab: () => {}, variant: "line", layoutId: "" });
 
