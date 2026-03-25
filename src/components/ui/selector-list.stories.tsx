@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SelectorList } from "./selector-list";
 
 const meta = {
-  title: "UI/SelectorList",
+  title: "UI/Selectors/SelectorList",
   component: SelectorList,
   tags: ["autodocs"],
   argTypes: {

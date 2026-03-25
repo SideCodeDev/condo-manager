@@ -4,7 +4,7 @@ import { Trash } from "lucide-react";
 import { Button } from "./button";
 
 const meta = {
-  title: "UI/Button",
+  title: "UI/Buttons/Button",
   component: Button,
   tags: ["autodocs"],
   argTypes: {

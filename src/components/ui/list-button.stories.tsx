@@ -4,7 +4,7 @@ import { Home, Settings } from "lucide-react";
 import { ListButton } from "./list-button";
 
 const meta = {
-  title: "UI/ListButton",
+  title: "UI/Buttons/ListButton",
   component: ListButton,
   tags: ["autodocs"],
   argTypes: {

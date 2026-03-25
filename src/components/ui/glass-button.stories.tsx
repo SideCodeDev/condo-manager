@@ -4,7 +4,7 @@ import { Plus, Trash } from "lucide-react";
 import { GlassButton } from "./glass-button";
 
 const meta = {
-  title: "UI/GlassButton",
+  title: "UI/Buttons/GlassButton",
   component: GlassButton,
   tags: ["autodocs"],
   argTypes: {

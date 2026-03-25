@@ -4,7 +4,7 @@ import { Home } from "lucide-react";
 import { Tag } from "./tag";
 
 const meta = {
-  title: "UI/Tag",
+  title: "UI/Selectors/Tag",
   component: Tag,
   tags: ["autodocs"],
   argTypes: {

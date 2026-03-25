@@ -4,7 +4,7 @@ import { Trash } from "lucide-react";
 import { IconButton } from "./icon-button";
 
 const meta = {
-  title: "UI/IconButton",
+  title: "UI/Buttons/IconButton",
   component: IconButton,
   tags: ["autodocs"],
   argTypes: {

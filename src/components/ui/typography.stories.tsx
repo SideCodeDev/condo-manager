@@ -5,7 +5,7 @@ function TypographyShowcase() {
 }
 
 const meta = {
-  title: "UI/Typography",
+  title: "Design Tokens/Typography",
   component: TypographyShowcase,
   tags: ["autodocs"],
   parameters: {

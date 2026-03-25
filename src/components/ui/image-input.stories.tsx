@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ImageInput } from "./image-input";
 
 const meta = {
-  title: "UI/ImageInput",
+  title: "UI/Inputs/ImageInput",
   component: ImageInput,
   tags: ["autodocs"],
   args: {

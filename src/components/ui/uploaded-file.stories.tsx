@@ -20,7 +20,7 @@ const longNameFile = new File(
 Object.defineProperty(longNameFile, "size", { value: 1.1 * 1024 * 1024 });
 
 const meta = {
-  title: "UI/UploadedFile",
+  title: "UI/Uploaded Files/UploadedFile",
   component: UploadedFile,
   tags: ["autodocs"],
   args: {

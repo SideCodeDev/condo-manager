@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { FileUpload } from "./file-upload";
 
 const meta = {
-  title: "UI/FileUpload",
+  title: "UI/Uploaded Files/FileUpload",
   component: FileUpload,
   tags: ["autodocs"],
   argTypes: {

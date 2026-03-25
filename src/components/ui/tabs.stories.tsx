@@ -4,7 +4,7 @@ import { Home, Settings, User } from "lucide-react";
 import { Tabs, TabItem } from "./tabs";
 
 const meta = {
-  title: "UI/Tabs",
+  title: "UI/Tabs/Tabs",
   component: Tabs,
   tags: ["autodocs"],
   argTypes: {

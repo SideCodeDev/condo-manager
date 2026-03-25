@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { FloatingButton } from "./floating-button";
 
 const meta = {
-  title: "UI/FloatingButton",
+  title: "UI/Buttons/FloatingButton",
   component: FloatingButton,
   tags: ["autodocs"],
   argTypes: {

@@ -4,7 +4,7 @@ import { Home, Settings, Users } from "lucide-react";
 import { MainCardButton } from "./main-card-button";
 
 const meta = {
-  title: "UI/MainCardButton",
+  title: "UI/Buttons/MainCardButton",
   component: MainCardButton,
   tags: ["autodocs"],
   argTypes: {

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Switch } from "./switch";
 
 const meta = {
-  title: "UI/Switch",
+  title: "UI/Selectors/Switch",
   component: Switch,
   tags: ["autodocs"],
   argTypes: {

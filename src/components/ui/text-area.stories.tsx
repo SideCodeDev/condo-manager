@@ -4,7 +4,7 @@ import { Mail, Search } from "lucide-react";
 import { TextArea } from "./text-area";
 
 const meta = {
-  title: "UI/TextArea",
+  title: "UI/Inputs/TextArea",
   component: TextArea,
   tags: ["autodocs"],
   argTypes: {
