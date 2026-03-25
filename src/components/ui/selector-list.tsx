@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
-import { Checkbox } from "./checkbox";
-import { Radio } from "./radio";
-import { If } from "../if";
 import { CheckIcon } from "lucide-react";
+import { ButtonHTMLAttributes } from "react";
+import { If } from "../if";
+import { Slot } from "radix-ui";
 
 export function SelectorList({
   checked,
@@ -11,27 +11,34 @@ export function SelectorList({
   variant,
   className,
   subLabel,
+  onClick,
+  type = "button",
+  asChild,
+  ...props
 }: {
   variant: "checkbox" | "radio";
   checked: boolean;
   label: string;
   subLabel?: string;
-  className?: string;
+  asChild?: boolean;
   onChange: (checked: boolean) => void;
-}) {
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange" | "disabled">) {
+  const Comp = asChild ? Slot.Root : "button";
   return (
-    <button
-      onClick={() => {
+    <Comp
+      onClick={(ev) => {
         onChange(!checked);
+        onClick?.(ev);
       }}
       data-checked={checked}
-      type="button"
+      type={type}
       className={cn(
         "border border-neutral-400 p-3 rounded-lg gap-2 outline-none flex *:shrink-0 transition-colors",
         "hover:bg-neutral-100 focus-visible:bg-neutral-100",
         "data-[checked=true]:border-primary data-[checked=true]:bg-primary-200 data-[checked=true]:hover:bg-primary-200/50 data-[checked=true]:focus-visible:bg-primary-200/50",
         className,
       )}
+      {...props}
     >
       <div className="p-0.5 grid place-items-center size-6">
         <div
@@ -70,6 +77,6 @@ export function SelectorList({
           </span>
         </If>
       </div>
-    </button>
+    </Comp>
   );
 }
