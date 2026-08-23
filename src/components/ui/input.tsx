@@ -3,8 +3,10 @@ import { cn } from "@/lib/utils";
 import { InputHTMLAttributes } from "react";
 import { If } from "../if";
 import { CircleX } from "lucide-react";
+import { Slot } from "radix-ui";
 
-type InputProps = {
+export type InputProps = {
+  ref?: React.Ref<HTMLInputElement>;
   id: string;
   label: string;
   leadingIcon?: React.ReactNode;
@@ -12,6 +14,8 @@ type InputProps = {
   errors?: string[];
   helper?: string[];
   variant?: "ghost" | "outline";
+  asChild?: boolean;
+  active?: boolean;
 } & InputHTMLAttributes<HTMLInputElement>;
 export function Input({
   label,
@@ -21,9 +25,12 @@ export function Input({
   helper,
   variant = "outline",
   className,
+  asChild,
+  active,
   ...props
 }: InputProps) {
   const hasError = !!errors?.length;
+  const Comp = asChild ? Slot.Root : "input";
   return (
     <div className={cn("grid gap-1 font-p-2 text-neutral-950", className)}>
       {variant === "outline" ? <label htmlFor={props.id}>{label}</label> : null}
@@ -36,17 +43,18 @@ export function Input({
             {leadingIcon}
           </div>
         </If>
-        <input
+        <Comp
           {...props}
+          data-active={active}
           data-leading={!!leadingIcon}
           data-trailing={!!trailingIcon}
           data-error={hasError}
           className={cn(
             "font-medium w-full px-3 py-2 rounded-lg data-[leading=true]:pl-11 data-[trailing=true]:pr-11",
             variant === "outline" &&
-              "outline outline-neutral-600 focus-visible:outline-2 hover:outline-2 data-[error=true]:outline-red disabled:outline-neutral-500 disabled:bg-neutral-100 disabled:outline-1",
+              "outline outline-neutral-600 focus-visible:outline-2 data-[active=true]:outline-2 hover:outline-2 data-[error=true]:outline-red disabled:outline-neutral-500 disabled:bg-neutral-100 disabled:outline-1",
             variant === "ghost" &&
-              "focus-visible:outline-2 focus-visible:outline-primary disabled:outline-none",
+              "focus-visible:outline-2 focus-visible:outline-primary data-[active=true]:outline-2 data-[active=true]:outline-primary disabled:outline-none",
           )}
         />
         <If condition={!!trailingIcon}>

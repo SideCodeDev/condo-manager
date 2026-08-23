@@ -57,7 +57,7 @@ const neutral = [
   { name: "neutral-200", hex: "#cccccc" },
   { name: "neutral-300", hex: "#b3b3b3" },
   { name: "neutral-400", hex: "#999999" },
-  { name: "neutral-500", hex: "#7a7a7a" },
+  { name: "neutral-500", hex: "#767676" },
   { name: "neutral-600", hex: "#5e5e5e" },
   { name: "neutral-700", hex: "#454545" },
   { name: "neutral-800", hex: "#2b2b30" },
