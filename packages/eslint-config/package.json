@@ -1,0 +1,21 @@
+{
+  "name": "@condo-manager/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./eslint.config.mjs",
+    "./prettier": "./prettier.config.mjs"
+  },
+  "dependencies": {
+    "@eslint/js": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "globals": "catalog:",
+    "typescript-eslint": "catalog:"
+  },
+  "peerDependencies": {
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  }
+}
