@@ -1,3 +1,12 @@
 {
-  "tailwindCSS.experimental.configFile": "./packages/ui/src/styles.css"
+  "tailwindCSS.experimental.configFile": "./packages/ui/src/styles.css",
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "search.exclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "files.readonlyInclude": {
+    "**/routeTree.gen.ts": true
+  }
 }

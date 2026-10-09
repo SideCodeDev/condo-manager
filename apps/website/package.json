@@ -1,0 +1,34 @@
+{
+  "name": "@condo-manager/website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --port 3000",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@clerk/tanstack-react-start": "^1.4.21",
+    "@condo-manager/ui": "workspace:*",
+    "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-router": "1.170.41",
+    "@tanstack/react-start": "1.168.60",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tailwindcss": "catalog:"
+  },
+  "devDependencies": {
+    "@condo-manager/eslint-config": "workspace:*",
+    "@condo-manager/typescript-config": "workspace:*",
+    "@tanstack/eslint-config": "^0.4.0",
+    "@tanstack/router-cli": "^1.132.0",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "@rolldown/plugin-babel": "catalog:"
+  }
+}

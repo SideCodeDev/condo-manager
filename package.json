@@ -8,6 +8,7 @@
   "keywords": [],
   "scripts": {
     "dev:app": "pnpm --filter @condo-manager/app dev",
+    "dev:website": "pnpm --filter @condo-manager/website dev",
     "dev:ui": "pnpm --filter @condo-manager/ui storybook"
   },
   "devDependencies": {
