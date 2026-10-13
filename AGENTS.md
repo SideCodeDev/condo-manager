@@ -19,12 +19,12 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
   organizations, and billing come from Clerk; it calls the shared Convex backend.
 - `apps/mobile`: the Expo / React Native application, which can connect to the
   same Convex backend.
-- `apps/backend`: the Convex project, including schema, functions, and HTTP
-  routes.
-- `apps/website`: reserved for the sales/marketing application.
-- `packages/ui`: universal React Native shared UI, fonts, helpers, styles, and
-  Storybook. It must remain usable by both Vite and Next.js consumers and must not
-  take a dependency on Next.js.
+- `apps/website`: TanStack Start sales/marketing application.
+- `packages/backend`: the Convex project, including schema, functions, and HTTP
+  routes. Its Convex source lives in `packages/backend/convex/`.
+- `packages/ui`: cross-platform React Native UI, fonts, helpers, styles, and
+  Storybook, consumed by the Vite web apps and the Expo app. Keep it independent
+  of app routing, authentication, billing, and backend concerns.
 - `packages/eslint-config`: shared ESLint configuration.
 - `packages/typescript-config`: shared TypeScript configurations.
 - `pnpm-workspace.yaml`: workspace membership and the centralized dependency
@@ -52,7 +52,7 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 
 ## Generated code and external state
 
-- Do not manually edit files in `apps/backend/convex/_generated/`.
+- Do not manually edit files in `packages/backend/convex/_generated/`.
 - Do not run `convex dev`, `convex deploy`, Convex code generation, migrations,
   webhook replays, or database cleanup unless the user explicitly asks for that
   exact action.
@@ -66,10 +66,14 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
   for declaring direct dependencies.
 - Use `workspace:*` for internal `@condo-manager/*` packages.
 - Use `catalog:` for centrally managed third-party versions.
-- Keep reusable UI free of app-specific routing, authentication, billing, and
-  Convex concerns. Export public UI APIs through `packages/ui` entry points.
+- Keep the universal UI package free of app-specific routing, authentication,
+  billing, and Convex concerns. Export public APIs through `packages/ui` entry
+  points and include platform-specific files only where behavior must differ.
 - Add or update Storybook stories when a shared component's visible behavior or
   public variants change.
+- Keep Expo/React Native dependency versions compatible with the Expo SDK in
+  `apps/mobile/package.json`. Use Expo's installer through pnpm for native
+  packages; do not bypass the workspace package manager.
 
 ## Common commands
 
@@ -77,8 +81,10 @@ Run commands from the repository root:
 
 ```sh
 pnpm dev:web
+pnpm dev:website
 pnpm dev:backend
-pnpm dev:mobile
+pnpm dev:ios
+pnpm dev:android
 pnpm dev:ui
 pnpm --filter @condo-manager/web build
 pnpm --filter @condo-manager/ui check-types
@@ -88,6 +94,8 @@ pnpm --filter @condo-manager/ui storybook:build
 
 Prefer the narrowest relevant check while iterating, then run all checks affected
 by the change. A production build is not a substitute for focused tests.
+There is no root `dev:mobile` script; use `dev:ios` or `dev:android` (or run the
+mobile package's `start` script when you only need the Expo dev server).
 
 ## Implementation style
 

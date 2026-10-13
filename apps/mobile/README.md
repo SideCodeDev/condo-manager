@@ -1,56 +1,60 @@
-# Welcome to your Expo app 👋
+# Condo Manager Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Native iOS and Android application built with Expo, Expo Router, Clerk, and
+Convex. Mobile web is not a target. Repository-wide setup and architecture are
+documented in the root [README](../../README.md); mobile-specific agent rules
+are in [AGENTS.md](AGENTS.md).
 
-## Get started
+## Setup
 
-1. Install dependencies
+From the monorepo root, install dependencies and create `apps/mobile/.env` from
+`.env.example` with:
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```dotenv
+EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=
+EXPO_PUBLIC_CONVEX_URL=
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Use a Clerk publishable key for the intended development instance and the URL
+of its configured Convex deployment. These values are public client config;
+never put Clerk secret keys in this file.
 
-### Other setup steps
+## Run
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+From the monorepo root:
 
-## Learn more
+```sh
+pnpm dev:ios
+pnpm dev:android
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+The corresponding simulator/emulator must be installed and available. For
+physical devices, use the Expo CLI's QR flow after starting the dev server. The
+app uses native modules; Expo Go may not include every required module, in which
+case use a development build for the project.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## App structure
 
-## Join the community
+- `src/app/_layout.tsx`: Clerk and Convex providers, shared font loading, root
+  navigation layout, and NativeWind stylesheet import.
+- `src/app/index.tsx`: current home screen and sign-in/sign-up entry points.
+- `src/components/`: app-specific organization gate, tabs, and billing view.
+- `src/global.css` and `metro.config.js`: NativeWind and shared UI styling.
 
-Join our community of developers creating universal apps.
+Clerk auth is passed to Convex through `ConvexProviderWithClerk`. Keep queries
+and mutations behind authenticated state as appropriate, and enforce access
+control in Convex functions regardless of client-side gates.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Shared UI
+
+Use `@condo-manager/ui` for shared components. Native styles are imported in
+`src/global.css`; the root layout loads DM Sans from the shared package. If a
+shared component's visuals or API change, update its Storybook stories under
+`packages/ui/src/components/`.
+
+## Checks
+
+```sh
+pnpm --filter @condo-manager/mobile lint
+pnpm --filter @condo-manager/mobile exec tsc --noEmit
+```

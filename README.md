@@ -1,148 +1,105 @@
 # Condo Manager
 
-Monorepo for the Condo Manager product. It contains the authenticated web
-application, a reusable UI library, and shared TypeScript, ESLint, and Prettier
-configuration.
-
-`_old/` is an archived implementation and is not part of the current workspace
-or a source of truth.
-
-## Stack
-
-- pnpm workspaces with a centralized dependency catalog
-- React 19 and Vite
-- TypeScript
-- Clerk Authentication, Organizations, and Billing
-- Convex
-- Tailwind CSS 4
-- Storybook, Vitest, and Playwright for the UI package
+Condo Manager is a pnpm monorepo containing web and native applications, a
+shared cross-platform UI library, and a Convex backend. `_old/` is an archive
+and is not part of the current workspace or a source of truth.
 
 ## Workspace
 
 ```text
 apps/
-  web/                 React + Vite authenticated application
-  mobile/              Expo / React Native application
-  backend/             Convex schema, functions, and HTTP routes
-  website/             Sales and marketing website
+  web/                 React + Vite authenticated web application
+  website/             TanStack Start sales/marketing application
+  mobile/              Expo / React Native app for iOS and Android
 packages/
-  ui/                  Shared, framework-agnostic React UI library
+  backend/             Convex schema, functions, and HTTP routes
+  ui/                  Cross-platform components, tokens, fonts, and Storybook
   eslint-config/       Shared ESLint and Prettier configuration
   typescript-config/   Shared TypeScript configurations
-_old/                  Archived application; excluded from current work
 ```
 
-Shared third-party versions are declared in `pnpm-workspace.yaml`. Internal
-packages use the `@condo-manager/*` scope and the `workspace:*` protocol.
+Internal packages use the `@condo-manager/*` scope and `workspace:*`. Shared
+third-party versions belong in `pnpm-workspace.yaml`'s catalog; keep
+single-project or SDK-specific versions in the package that uses them.
 
-## Architecture
+## Stack and architecture
 
-Clerk is the source of truth for users, organizations, memberships, and billing.
-Convex stores application data and local projections synchronized from Clerk.
+- pnpm `11.18.0` workspaces, React 19, and TypeScript
+- React Native + Expo for iOS and Android (mobile web is not a target)
+- Vite for the authenticated web app; TanStack Start for the marketing website
+- Clerk for authentication, organizations, memberships, and billing
+- Convex for application data and Clerk-synchronized projections
+- Tailwind CSS 4 / NativeWind 5 for shared styling
+- Storybook, Vitest, and Playwright for the shared UI package
 
-When a user is created:
+Clerk is the source of truth for identities, organizations, memberships, and
+billing subscriptions. Convex stores application data and local projections.
+Enforce organization membership and authorization in Convex functions; never
+trust a client-provided organization ID by itself. The frontend organization
+gate reconciles the selected organization preference in
+`userSettings.selectedClerkOrganizationId` with the active Clerk session.
 
-1. Clerk sends a `user.created` webhook to Convex.
-2. Convex stores the user and schedules organization provisioning.
-3. A personal organization is created through the Clerk Backend API.
-4. Organization and membership webhooks synchronize the resulting records.
-5. Convex saves the selected organization in
-   `userSettings.selectedClerkOrganizationId`.
-6. The frontend `OrganizationGate` activates that organization in the Clerk
-   session before rendering the application.
+The Convex source is in `packages/backend/convex/`. Clerk webhooks synchronize
+users, organizations, memberships, and billing data. Handlers should remain
+idempotent because webhook delivery can be repeated or arrive out of order.
 
-Billing subscriptions and items are projected into Convex. The application can
-query each organization's billing state, current or upcoming plan, and plan
-feature slugs without querying Clerk directly during normal rendering.
-
-## Requirements
+## Requirements and setup
 
 - Node.js compatible with pnpm 11
-- pnpm `11.18.0` (pinned in `package.json`)
-- Clerk development instance with Organizations and Billing configured
-- Convex project configured from `apps/backend`
+- pnpm `11.18.0` (pinned in the root `package.json`)
+- Clerk development instance; configure Organizations and Billing as needed
+- Convex project/deployment configured for `packages/backend`
 
-Install dependencies from the repository root:
+Install from the repository root:
 
 ```sh
 pnpm install
 ```
 
-## Environment variables
+Copy the relevant `.env.example` to `.env` in each app and set its values:
 
-The web application requires these client-side variables in `apps/web/.env`:
+- `apps/web`: `VITE_CLERK_PUBLISHABLE_KEY`, `VITE_CONVEX_URL`
+- `apps/website`: `VITE_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
+- `apps/mobile`: `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`, `EXPO_PUBLIC_CONVEX_URL`
+- Convex deployment: `CLERK_JWT_ISSUER_DOMAIN`, `CLERK_SECRET_KEY`, and
+  `CLERK_WEBHOOK_SIGNING_SECRET`
 
-```dotenv
-VITE_CONVEX_URL=
-VITE_CLERK_PUBLISHABLE_KEY=
-```
+Only publishable keys and public Convex URLs belong in client app environment
+files. Never expose or commit `CLERK_SECRET_KEY` or
+`CLERK_WEBHOOK_SIGNING_SECRET`. The Clerk JWT template used by Convex must have
+the application ID `convex`, as configured in
+`packages/backend/convex/auth.config.ts`.
 
-The Convex deployment requires these server-side variables:
+The Convex HTTP webhook endpoint is `POST /clerk/webhook`. Configure Clerk to
+send the user, organization, membership, subscription, and subscription-item
+lifecycle events handled in `packages/backend/convex/http.ts`.
 
-```dotenv
-CLERK_JWT_ISSUER_DOMAIN=
-CLERK_SECRET_KEY=
-CLERK_WEBHOOK_SIGNING_SECRET=
-```
+## Development commands
 
-Configure server-side secrets in the appropriate Convex deployment. Never expose
-`CLERK_SECRET_KEY` or `CLERK_WEBHOOK_SIGNING_SECRET` through a `VITE_*` variable
-or commit their values.
-
-The Clerk JWT template used by Convex must have the application ID `convex`, as
-configured in `apps/backend/convex/auth.config.ts`.
-
-## Clerk webhook
-
-The Convex HTTP endpoint is:
-
-```text
-POST /clerk/webhook
-```
-
-The Clerk webhook should subscribe to the lifecycle events used by the app:
-
-- users: created, updated, and deleted
-- organizations: created, updated, and deleted
-- organization memberships: created, updated, and deleted
-- subscriptions: created, updated, active, and past due
-- subscription items: created, updated, active, canceled, upcoming, ended,
-  abandoned, incomplete, past due, and free-trial ending
-
-Webhook signatures are verified with `CLERK_WEBHOOK_SIGNING_SECRET`. Handlers are
-designed to synchronize by Clerk identifiers so repeated deliveries update the
-existing projection instead of creating duplicates.
-
-## Development
-
-Start the web application:
+Run commands from the repository root:
 
 ```sh
-pnpm dev:web
+pnpm dev:web       # authenticated Vite app
+pnpm dev:website   # TanStack Start website
+pnpm dev:backend   # Convex development process
+pnpm dev:ui        # Storybook for @condo-manager/ui
+pnpm dev:ios       # Expo dev server targeting iOS
+pnpm dev:android   # Expo dev server targeting Android
 ```
 
-Start the Convex backend in a separate terminal:
-
-```sh
-pnpm dev:backend
-```
-
-Start the Expo mobile application:
-
-```sh
-pnpm dev:mobile
-```
-
-Start Storybook for the shared UI package:
-
-```sh
-pnpm dev:ui
-```
+For mobile native modules, use an iOS simulator or Android emulator/device with
+the matching native development environment. The Expo Go app may not include
+all native modules used by this project.
 
 ## Validation
 
+Run the narrowest relevant checks while iterating. Common checks are:
+
 ```sh
 pnpm --filter @condo-manager/web build
+pnpm --filter @condo-manager/website build
+pnpm --filter @condo-manager/mobile lint
+pnpm --filter @condo-manager/mobile exec tsc --noEmit
 pnpm --filter @condo-manager/backend check-types
 pnpm --filter @condo-manager/ui check-types
 pnpm --filter @condo-manager/ui lint
@@ -150,53 +107,25 @@ pnpm --filter @condo-manager/ui test-storybook
 pnpm --filter @condo-manager/ui storybook:build
 ```
 
-Generated files under `apps/backend/convex/_generated/` must not be edited
-manually. The web imports the backend's generated API types through the
-`@condo-manager/backend/api` workspace export. Both clients can use the same
-Convex deployment. The mobile workspace is currently an Expo starter and still
-needs Clerk and Convex client integration. Each app has an independent build,
-and Convex is deployed separately with `pnpm deploy:backend`.
+Do not manually edit generated files under
+`packages/backend/convex/_generated/`. See [AGENTS.md](AGENTS.md) for repository
+rules and agent-specific safety constraints.
 
 ## Shared UI
 
-`@condo-manager/ui` contains reusable components, fonts, hooks, helpers, and
-styles. It intentionally has no dependency on Next.js, allowing it to be shared
-by the Vite application and the sales website where platform compatibility
-permits.
+`@condo-manager/ui` provides cross-platform React Native components, design
+tokens, DM Sans fonts, hooks, and helpers for the web apps and the native app.
+Its public API is exported from `packages/ui/src/index.ts`; add/update stories
+when changing visible behavior or public variants.
 
-Import components and global styles through the package's public exports:
+Web apps import the web stylesheet once at their entry point:
 
 ```tsx
 import { Button } from "@condo-manager/ui";
 import "@condo-manager/ui/styles.css";
 ```
 
-Visible changes to shared components should include corresponding Storybook
-stories.
-
-## Current status
-
-Implemented:
-
-- shared TypeScript, ESLint, and Prettier packages
-- framework-agnostic UI package and Storybook
-- Clerk authentication
-- automatic personal organization provisioning
-- organization and membership synchronization
-- active organization reconciliation
-- organization billing state, plans, and feature slugs
-
-Still to be implemented:
-
-- Next.js sales website
-- condominium schema and CRUD functions
-- active condominium selection
-- organization-scoped condominium authorization
-- plan entitlement enforcement, including condominium limits
-- application routing, dashboard, and production screens
-- unit and integration test suites for the app and Convex functions
-
-## Agent guidance
-
-Repository-specific rules for coding agents are documented in `AGENTS.md`.
-`CLAUDE.md` imports those instructions so both use the same source of truth.
+The Expo app configures NativeWind through `apps/mobile/metro.config.js`, imports
+`styles.native.css` from `apps/mobile/src/global.css`, and loads the shared DM
+Sans font in its root layout. Follow those existing integration points when
+adding another consumer.

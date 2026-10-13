@@ -12,8 +12,7 @@
     "dev:ui": "pnpm --filter @condo-manager/ui storybook",
     "dev:android": "pnpm --filter @condo-manager/mobile android",
     "dev:ios": "pnpm --filter @condo-manager/mobile ios",
-    "dev:backend": "pnpm --filter @condo-manager/backend dev",
-    "lint": "expo lint"
+    "dev:backend": "pnpm --filter @condo-manager/backend dev"
   },
   "devDependencies": {
     "@condo-manager/eslint-config": "workspace:*",

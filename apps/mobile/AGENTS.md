@@ -1,41 +1,70 @@
-This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
+# Mobile app agent guide
 
-## Expo has changed — do not trust your training data
+This package is a native-only Expo / React Native application for iOS and
+Android. Mobile web is not a supported target. Repository-wide rules in the
+root `AGENTS.md` still apply; in particular, use pnpm exclusively and preserve
+unrelated changes.
 
-Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
+## Expo and React Native changes
 
-1. Read the major version of the `expo` package in `package.json`.
-2. Fetch the matching versioned docs: `https://docs.expo.dev/versions/v<major>.0.0/`
-3. For anything else, fetch https://docs.expo.dev/llms.txt — an index of all Expo docs with corrections to common LLM misconceptions. Follow its links to the specific page you need; never answer from memory.
+Expo APIs and SDK-compatible package versions change between SDK releases.
+Before changing Expo, EAS, or React Native APIs:
+
+1. Check the Expo SDK version in this package's `package.json`.
+2. Consult the matching versioned Expo docs at
+   `https://docs.expo.dev/versions/v<major>.0.0/` and the relevant API page.
+3. For APIs outside Expo, consult their current official documentation too.
+
+Use Expo's installer through pnpm when adding or changing SDK/native
+dependencies, from the repository root:
+
+```sh
+pnpm --filter @condo-manager/mobile exec expo install <package>
+```
+
+Check the resulting manifest and lockfile; keep shared dependency versions in
+the workspace catalog when appropriate, while respecting Expo SDK compatibility.
+Do not use npm, npx, yarn, or bun in this pnpm workspace.
 
 ## Commands
 
-Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
-
-```bash
-npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
-npx expo start              # start the dev server
-npx expo lint               # lint
-npx tsc --noEmit            # typecheck
-npx expo-doctor             # diagnose dependency and config issues
-npx expo install --fix      # fix incompatible package versions
+```sh
+pnpm dev:ios
+pnpm dev:android
+pnpm --filter @condo-manager/mobile lint
+pnpm --filter @condo-manager/mobile exec tsc --noEmit
 ```
 
-Run lint and typecheck before declaring any task done.
+Run lint and typecheck before declaring a mobile change done. Use the root
+`dev:ios` / `dev:android` commands to start Expo for a target; the native
+simulator/emulator and development build must support any native modules in use.
 
-## Navigation & Routing
+## Routing and app structure
 
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
-- Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
+- Use Expo Router. Route files live under `src/app/`; `_layout.tsx` defines the
+  root layout and providers.
+- Keep reusable components, hooks, and utilities outside `src/app/` so they are
+  not interpreted as routes.
+- Clerk and Convex providers are wired in `src/app/_layout.tsx`. Keep the
+  Convex client connected through Clerk auth (`ConvexProviderWithClerk`).
+- `OrganizationGate` handles organization readiness and selection. Keep server
+  authorization in Convex; the client gate is not a security boundary.
 
-## Building with EAS
+## Shared UI and styling
 
-Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
-Docs: https://docs.expo.dev/eas/index.md
+Prefer `@condo-manager/ui` for shared controls. Its native stylesheet is loaded
+by `src/global.css`, which is imported from the root layout; Metro's NativeWind
+integration is in `metro.config.js`. DM Sans is loaded in the root layout.
+Preserve these integration points when changing styling or fonts. Add or update
+Storybook stories in `packages/ui` for visible shared-component changes.
 
-## Rules
+## Native project files
 
-- If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
-- Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+- `ios/` and `android/` are generated through Expo prebuild when absent. Do not
+  create or hand-edit generated native directories; configure native behavior
+  through `app.json` or config plugins.
+- Expo Go may not contain all native modules used by this app. When a native
+  dependency requires a development build, document and use the project's
+  development-build workflow rather than silently removing the dependency.
+- Do not run EAS builds/submissions, change signing credentials, or publish
+  updates unless the user explicitly requests that external action.
