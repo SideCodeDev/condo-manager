@@ -11,7 +11,6 @@ export default tseslint.config(
       "**/dist/**",
       "**/node_modules/**",
       "**/storybook-static/**",
-      "_old/**",
     ],
   },
   eslint.configs.recommended,

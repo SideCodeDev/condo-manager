@@ -5,9 +5,6 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 
 ## Scope
 
-- Work only in the current monorepo. Ignore `_old/` completely: it is an archive,
-  not a source of truth, and must not be searched, edited, imported, or copied
-  unless the user explicitly requests it.
 - Preserve unrelated user changes. Do not rewrite or remove existing work merely
   to make a task easier.
 - Use `pnpm` exclusively. The pinned package manager is declared in the root
@@ -111,8 +108,6 @@ mobile package's `start` script when you only need the Expo dev server).
 
 ## Definition of done
 
-- The requested behavior is implemented without touching `_old/` or unrelated
-  changes.
 - Relevant type, lint, build, Storybook, and test checks pass, or any check that
   could not be run is reported clearly.
 - Public package exports and dependency declarations are complete.

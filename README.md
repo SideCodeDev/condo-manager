@@ -1,8 +1,7 @@
 # Condo Manager
 
 Condo Manager is a pnpm monorepo containing web and native applications, a
-shared cross-platform UI library, and a Convex backend. `_old/` is an archive
-and is not part of the current workspace or a source of truth.
+shared cross-platform UI library, and a Convex backend.
 
 ## Workspace
 
