@@ -1,5 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Plus, Trash } from "lucide-react";
+import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
+import { Plus, Trash } from "lucide-react-native";
+import { View } from "react-native-css/components";
+import { StyleSheet } from "react-native";
 
 import { GlassButton } from "./glass-button";
 
@@ -18,14 +20,9 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div
-        className="p-6 rounded-xl inline-flex"
-        style={{
-          background: "linear-gradient(90deg, #103CE7 3.99%, #64E9FF 95.74%)",
-        }}
-      >
+      <View className="w-fit grow-0 self-start rounded-xl bg-[linear-gradient(90deg,_#103CE7_3.99%,_#64E9FF_95.74%)]" style={styles.decorator}>
         <Story />
-      </div>
+      </View>
     ),
   ],
 } satisfies Meta<typeof GlassButton>;
@@ -35,9 +32,8 @@ type Story = StoryObj<typeof meta>;
 
 export const IconOnly: Story = {
   render: (args) => (
-    <GlassButton {...args}>
-      <Trash aria-hidden="true" />
-      <span className="sr-only">Delete</span>
+    <GlassButton {...args} accessibilityLabel="Delete">
+      <Trash />
     </GlassButton>
   ),
 };
@@ -49,7 +45,7 @@ export const TextOnly: Story = {
 export const IconAndText: Story = {
   render: (args) => (
     <GlassButton {...args}>
-      <Plus aria-hidden="true" />
+      <Plus />
       Add item
     </GlassButton>
   ),
@@ -63,9 +59,14 @@ export const Loading: Story = {
 export const Disabled: Story = {
   args: { disabled: true },
   render: (args) => (
-    <GlassButton {...args}>
-      <Trash aria-hidden="true" />
-      <span className="sr-only">Delete</span>
+    <GlassButton {...args} accessibilityLabel="Delete">
+      <Trash />
     </GlassButton>
   ),
 };
+
+const styles = StyleSheet.create({
+  decorator: {
+    padding: 24,
+  },
+});

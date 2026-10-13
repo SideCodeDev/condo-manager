@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { FileMimeType } from "./consts";
+
+import type { FileMimeType } from "./consts";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,9 +16,7 @@ export function formatFileSize(sizeInMb: number): string {
   const stripTrailingZeros = (value: string) =>
     value.replace(/\.0+$|(\.\d*[1-9])0+$/, "$1");
 
-  if (sizeInMb < MB) {
-    return `${Math.round(sizeInMb * 1024)}KB`;
-  }
+  if (sizeInMb < MB) return `${Math.round(sizeInMb * 1024)}KB`;
   if (sizeInMb < GB) {
     return `${stripTrailingZeros(sizeInMb.toFixed(2))}MB`;
   }
@@ -46,6 +45,5 @@ export function getValidFiles(
     const maxFileSizeBytes = maxSizeInMb * 1024 * 1024;
     filesArray = filesArray.filter((file) => file.size <= maxFileSizeBytes);
   }
-  if (!filesArray.length) return [];
   return filesArray;
 }

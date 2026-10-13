@@ -1,12 +1,65 @@
-"use client";
-import { cn } from "../lib/utils";
-import { InputHTMLAttributes } from "react";
-import { If } from "./if";
-import { CircleX } from "lucide-react";
-import { Slot } from "radix-ui";
+import * as React from "react";
+import type { TextInputProps } from "react-native";
+import { TextInput, Text, View } from "react-native-css/components";
+import { CircleX } from "lucide-react-native";
+import { cva } from "class-variance-authority";
 
-export type InputProps = {
-  ref?: React.Ref<HTMLInputElement>;
+import { cn } from "../lib/utils";
+import { colors } from "../theme";
+import { Slot } from "./slot";
+
+const inputVariants = cva(
+  "w-full rounded-lg px-3 py-2 font-p-2 font-medium",
+  {
+    variants: {
+      variant: {
+        outline:
+          "outline outline-neutral-600 focus-visible:outline-2 hover:outline-2",
+        ghost: "focus-visible:outline-2 focus-visible:outline-primary",
+      },
+      active: {
+        true: "outline-2",
+        false: "",
+      },
+      error: {
+        true: "outline-red",
+        false: "",
+      },
+      disabled: {
+        true: "bg-neutral-100 outline-neutral-500 outline-1 text-neutral-400 placeholder:text-neutral-300",
+        false: "text-neutral-950 placeholder:text-neutral-300",
+      },
+      leading: {
+        true: "pl-11",
+        false: "",
+      },
+      trailing: {
+        true: "pr-11",
+        false: "",
+      },
+    },
+    compoundVariants: [
+      { variant: "ghost", active: true, class: "outline-primary" },
+      { variant: "ghost", disabled: true, class: "outline-none" },
+    ],
+    defaultVariants: {
+      variant: "outline",
+      active: false,
+      error: false,
+      disabled: false,
+      leading: false,
+      trailing: false,
+    },
+  },
+);
+
+type InputIconProps = {
+  className?: string;
+  color?: string;
+  size?: number;
+};
+
+export type InputProps = Omit<TextInputProps, "children"> & {
   id: string;
   label: string;
   leadingIcon?: React.ReactNode;
@@ -16,77 +69,115 @@ export type InputProps = {
   variant?: "ghost" | "outline";
   asChild?: boolean;
   active?: boolean;
-} & InputHTMLAttributes<HTMLInputElement>;
-export function Input({
-  label,
-  leadingIcon,
-  trailingIcon,
+  children?: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+};
+
+function renderIcon(
+  icon: React.ReactNode,
+  disabled: boolean,
+  className?: string,
+): React.ReactNode {
+  if (!React.isValidElement<InputIconProps>(icon)) return icon;
+
+  return React.cloneElement(icon, {
+    className: cn(className, icon.props.className),
+    color: disabled
+      ? colors.neutral[400]
+      : (icon.props.color ?? colors.neutral[600]),
+    size: icon.props.size ?? 20,
+  });
+}
+
+function Input({
+  active = false,
+  asChild = false,
+  children,
+  className,
+  disabled = false,
   errors,
   helper,
+  id,
+  label,
+  leadingIcon,
+  placeholderTextColor,
+  trailingIcon,
   variant = "outline",
-  className,
-  asChild,
-  active,
   ...props
 }: InputProps) {
-  const hasError = !!errors?.length;
-  const Comp = asChild ? Slot.Root : "input";
+  const hasError = Boolean(errors?.length);
+  const isDisabled = disabled || props.editable === false;
+  const iconClassName = isDisabled ? "text-neutral-400" : "text-neutral-600";
+  const inputClassName = inputVariants({
+    active,
+    disabled: isDisabled,
+    error: hasError,
+    leading: Boolean(leadingIcon),
+    trailing: Boolean(trailingIcon),
+    variant,
+  });
+  const inputProps = {
+    ...props,
+    accessibilityLabel: props.accessibilityLabel ?? label,
+    accessibilityState: {
+      ...props.accessibilityState,
+      disabled: isDisabled,
+    },
+    editable: isDisabled ? false : props.editable,
+    nativeID: id,
+    placeholderTextColor: placeholderTextColor ?? colors.neutral[300],
+  };
+
+  const input = asChild ? (
+    <Slot {...inputProps} className={inputClassName}>
+      {children}
+    </Slot>
+  ) : (
+    <TextInput {...inputProps} className={inputClassName} />
+  );
+
   return (
-    <div className={cn("grid gap-1 font-p-2 text-neutral-950", className)}>
-      {variant === "outline" ? <label htmlFor={props.id}>{label}</label> : null}
-      <div
-        data-disabled={props.disabled}
-        className="[&_svg:not([class*='size-'])]:size-5 relative data-[disabled=true]:text-neutral-400"
-      >
-        <If condition={!!leadingIcon}>
-          <div className="absolute left-3 top-1/2 -translate-y-1/2">
-            {leadingIcon}
-          </div>
-        </If>
-        <Comp
-          {...props}
-          data-active={active}
-          data-leading={!!leadingIcon}
-          data-trailing={!!trailingIcon}
-          data-error={hasError}
-          className={cn(
-            "font-medium w-full px-3 py-2 rounded-lg data-[leading=true]:pl-11 data-[trailing=true]:pr-11",
-            variant === "outline" &&
-              "outline outline-neutral-600 focus-visible:outline-2 data-[active=true]:outline-2 hover:outline-2 data-[error=true]:outline-red disabled:outline-neutral-500 disabled:bg-neutral-100 disabled:outline-1",
-            variant === "ghost" &&
-              "focus-visible:outline-2 focus-visible:outline-primary data-[active=true]:outline-2 data-[active=true]:outline-primary disabled:outline-none",
-          )}
-        />
-        <If condition={!!trailingIcon}>
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            {trailingIcon}
-          </div>
-        </If>
-      </div>
-      <If condition={hasError}>
-        <ul className="grid gap-1">
-          {errors?.map((err) => (
-            <li
-              key={err}
-              className="text-red font-p-3 inline-flex gap-1 items-center"
-            >
-              <CircleX className="size-4" /> {err}
-            </li>
+    <View className={cn("gap-1 font-p-2 text-neutral-950", className)}>
+      {variant === "outline" ? (
+        <Text className="font-p-2" nativeID={`${id}-label`}>
+          {label}
+        </Text>
+      ) : null}
+      <View className="relative">
+        {leadingIcon ? (
+          <View className="absolute left-3 top-1/2 z-10 -translate-y-1/2">
+            {renderIcon(leadingIcon, isDisabled, iconClassName)}
+          </View>
+        ) : null}
+        {input}
+        {trailingIcon ? (
+          <View className="absolute right-3 top-1/2 z-10 -translate-y-1/2">
+            {renderIcon(trailingIcon, isDisabled, iconClassName)}
+          </View>
+        ) : null}
+      </View>
+      {hasError ? (
+        <View className="gap-1">
+          {errors?.map((error) => (
+            <View className="flex-row items-center gap-1" key={error}>
+              <CircleX color={colors.red.DEFAULT} size={16} />
+              <Text className="font-p-3 text-red">{error}</Text>
+            </View>
           ))}
-        </ul>
-      </If>
-      <If condition={!!helper?.length}>
-        <ul className="grid gap-1">
-          {helper?.map((help) => (
-            <li
-              key={help}
-              className="text-neutral-600 font-p-3 inline-flex gap-1 items-center"
-            >
+        </View>
+      ) : null}
+      {helper?.length ? (
+        <View className="gap-1">
+          {helper.map((help) => (
+            <Text className="font-p-3 text-neutral-600" key={help}>
               {help}
-            </li>
+            </Text>
           ))}
-        </ul>
-      </If>
-    </div>
+        </View>
+      ) : null}
+    </View>
   );
 }
+
+export { Input, inputVariants };

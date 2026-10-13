@@ -1,4 +1,6 @@
-import type { StorybookConfig } from "@storybook/react-vite";
+import path from "node:path";
+
+import type { StorybookConfig } from "@storybook/react-native-web-vite";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -9,7 +11,19 @@ const config: StorybookConfig = {
     "@storybook/addon-docs",
     "@storybook/addon-onboarding",
   ],
-  framework: "@storybook/react-vite",
+  framework: "@storybook/react-native-web-vite",
+  viteFinal: async (config) => ({
+    ...config,
+    resolve: {
+      ...config.resolve,
+      alias: {
+        "expo-document-picker": path.resolve(
+          import.meta.dirname,
+          "../src/lib/expo-document-picker.web.ts",
+        ),
+      },
+    },
+  }),
 };
 
 export default config;

@@ -1,41 +1,56 @@
-"use client";
+import type { ViewProps } from "react-native";
+import { Pressable, Text, View } from "react-native-css/components";
+import { FileText, X } from "lucide-react-native";
 
 import { cn, formatFileSize } from "../lib/utils";
-import { X, FileText } from "lucide-react";
+import { colors } from "../theme";
 
-export function UploadedFile({
-  onRemove,
-  file,
-  className,
-}: {
-  file: File;
+export type UploadedFileData = {
+  name: string;
+  size: number;
+};
+
+export type UploadedFileProps = Omit<ViewProps, "children"> & {
+  file: UploadedFileData;
   className?: string;
   onRemove: () => void;
-}) {
-  const name = file.name;
-  const sizeInBytes = file.size;
-  const formattedSize = formatFileSize(sizeInBytes / (1024 * 1024));
+};
+
+function UploadedFile({
+  className,
+  file,
+  onRemove,
+  ...props
+}: UploadedFileProps) {
+  const formattedSize = formatFileSize(file.size / (1024 * 1024));
+
   return (
-    <div
+    <View
+      {...props}
       className={cn(
-        "p-3 items-center flex gap-2 bg-neutral-50 border border-neutral-300 rounded-xl hover:bg-neutral-100 focus-within:bg-neutral-100 transition-colors",
+        "flex-row items-center gap-2 rounded-xl border border-neutral-300 bg-neutral-50 p-3 transition-colors hover:bg-neutral-100 focus-within:bg-neutral-100",
         className,
       )}
     >
-      <div className="text-primary bg-neutral-100 border border-neutral-200 grid place-items-center rounded size-10">
-        <FileText size={24} />
-      </div>
-      <div className="grid w-full">
-        <span className="font-p-3 text-neutral-1000">{name}</span>
-        <span className="font-p-4 text-neutral-700">{formattedSize}</span>
-      </div>
-      <button
-        type="button"
-        className="text-neutral-1000"
-        onClick={() => onRemove()}
+      <View className="h-10 w-10 shrink-0 items-center justify-center rounded border border-neutral-200 bg-neutral-100">
+        <FileText color={colors.primary.DEFAULT} size={24} />
+      </View>
+      <View className="min-w-0 flex-1 gap-0">
+        <Text className="font-p-3 text-neutral-1000">
+          {file.name}
+        </Text>
+        <Text className="font-p-4 text-neutral-700">{formattedSize}</Text>
+      </View>
+      <Pressable
+        accessibilityLabel={`Remove ${file.name}`}
+        accessibilityRole="button"
+        className="shrink-0 text-neutral-1000"
+        onPress={onRemove}
       >
-        <X size={20} />
-      </button>
-    </div>
+        <X color={colors.neutral[1000]} size={20} />
+      </Pressable>
+    </View>
   );
 }
+
+export { UploadedFile };

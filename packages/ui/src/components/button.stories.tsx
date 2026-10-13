@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Trash } from "lucide-react";
+import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
+import { Trash } from "lucide-react-native";
+import { StyleSheet, View } from "react-native";
 
 import { Button } from "./button";
 
@@ -103,22 +104,32 @@ export const LoadingDestructive: Story = {
 
 export const AllLoadingStates: Story = {
   render: (args) => (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3">
-        {(["primary", "secondary", "link", "ghost"] as const).map((variant) => (
-          <Button key={variant} {...args} variant={variant} loading>
-            {variant.charAt(0).toUpperCase() + variant.slice(1)}
-          </Button>
-        ))}
-      </div>
-      <div className="flex flex-wrap items-center gap-3">
-        {(["primary", "secondary", "link", "ghost"] as const).map((variant) => (
-          <Button key={variant} {...args} variant={variant} loading destructive>
-            {variant.charAt(0).toUpperCase() + variant.slice(1)} Destructive
-          </Button>
-        ))}
-      </div>
-    </div>
+    <View style={styles.column}>
+      <View style={styles.row}>
+        {(["primary", "secondary", "link", "ghost"] as const).map(
+          (variant) => (
+            <Button key={variant} {...args} variant={variant} loading>
+              {variant.charAt(0).toUpperCase() + variant.slice(1)}
+            </Button>
+          ),
+        )}
+      </View>
+      <View style={styles.row}>
+        {(["primary", "secondary", "link", "ghost"] as const).map(
+          (variant) => (
+            <Button
+              key={variant}
+              {...args}
+              variant={variant}
+              loading
+              destructive
+            >
+              {variant.charAt(0).toUpperCase() + variant.slice(1)} Destructive
+            </Button>
+          ),
+        )}
+      </View>
+    </View>
   ),
 };
 
@@ -128,30 +139,34 @@ export const Disabled: Story = {
 
 export const AllVariants: Story = {
   render: (args) => (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3">
-        {(["primary", "secondary", "link", "ghost"] as const).map((variant) => (
-          <Button key={variant} {...args} variant={variant}>
-            {variant.charAt(0).toUpperCase() + variant.slice(1)}
-          </Button>
-        ))}
-      </div>
-      <div className="flex flex-wrap items-center gap-3">
-        {(["primary", "secondary", "link", "ghost"] as const).map((variant) => (
-          <Button key={variant} {...args} variant={variant} destructive>
-            {variant.charAt(0).toUpperCase() + variant.slice(1)} Destructive
-          </Button>
-        ))}
-      </div>
-    </div>
+    <View style={styles.column}>
+      <View style={styles.row}>
+        {(["primary", "secondary", "link", "ghost"] as const).map(
+          (variant) => (
+            <Button key={variant} {...args} variant={variant}>
+              {variant.charAt(0).toUpperCase() + variant.slice(1)}
+            </Button>
+          ),
+        )}
+      </View>
+      <View style={styles.row}>
+        {(["primary", "secondary", "link", "ghost"] as const).map(
+          (variant) => (
+            <Button key={variant} {...args} variant={variant} destructive>
+              {variant.charAt(0).toUpperCase() + variant.slice(1)} Destructive
+            </Button>
+          ),
+        )}
+      </View>
+    </View>
   ),
 };
 
 export const AllSizes: Story = {
   render: (args) => (
-    <div className="flex flex-col gap-4">
+    <View style={styles.column}>
       {(["standard", "sm"] as const).map((size) => (
-        <div key={size} className="flex flex-wrap items-center gap-3">
+        <View key={size} style={styles.row}>
           {(["primary", "secondary", "link", "ghost"] as const).map(
             (variant) => (
               <Button key={variant} {...args} size={size} variant={variant}>
@@ -159,8 +174,20 @@ export const AllSizes: Story = {
               </Button>
             ),
           )}
-        </div>
+        </View>
       ))}
-    </div>
+    </View>
   ),
 };
+
+const styles = StyleSheet.create({
+  column: {
+    gap: 16,
+  },
+  row: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+});

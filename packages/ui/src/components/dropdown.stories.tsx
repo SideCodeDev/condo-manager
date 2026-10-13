@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
 import { useState, type ComponentProps } from "react";
 
 import { Dropdown } from "./dropdown";

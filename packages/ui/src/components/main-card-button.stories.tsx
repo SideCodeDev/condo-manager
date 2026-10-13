@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Home, Settings, Users } from "lucide-react";
+import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
+import { Home, Settings, Users } from "lucide-react-native";
+import { StyleSheet, View } from "react-native";
 
 import { MainCardButton } from "./main-card-button";
 
@@ -21,8 +22,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => (
-    <MainCardButton {...args}>
-      <Home aria-hidden="true" />
+    <MainCardButton {...args} accessibilityLabel="Home">
+      <Home />
       Home
     </MainCardButton>
   ),
@@ -31,8 +32,8 @@ export const Default: Story = {
 export const Disabled: Story = {
   args: { disabled: true },
   render: (args) => (
-    <MainCardButton {...args}>
-      <Home aria-hidden="true" />
+    <MainCardButton {...args} accessibilityLabel="Home">
+      <Home />
       Home
     </MainCardButton>
   ),
@@ -40,19 +41,33 @@ export const Disabled: Story = {
 
 export const Grid: Story = {
   render: (args) => (
-    <div className="grid grid-cols-3 gap-3 w-96">
-      <MainCardButton {...args}>
-        <Home aria-hidden="true" />
+    <View style={styles.grid}>
+      <MainCardButton {...args} accessibilityLabel="Home">
+        <Home />
         Home
       </MainCardButton>
-      <MainCardButton {...args}>
-        <Users aria-hidden="true" />
+      <MainCardButton
+        {...args}
+        accessibilityLabel="Residents"
+      >
+        <Users />
         Residents
       </MainCardButton>
-      <MainCardButton {...args}>
-        <Settings aria-hidden="true" />
+      <MainCardButton
+        {...args}
+        accessibilityLabel="Settings"
+      >
+        <Settings />
         Settings
       </MainCardButton>
-    </div>
+    </View>
   ),
 };
+
+const styles = StyleSheet.create({
+  grid: {
+    flexDirection: "row",
+    gap: 12,
+    width: 384,
+  },
+});

@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Trash } from "lucide-react";
+import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
+import { Trash } from "lucide-react-native";
 
 import { IconButton } from "./icon-button";
 
@@ -27,9 +27,8 @@ const meta = {
     loading: false,
   },
   render: (args) => (
-    <IconButton {...args}>
-      <Trash aria-hidden="true" />
-      <span className="sr-only">Delete</span>
+    <IconButton {...args} accessibilityLabel="Delete">
+      <Trash />
     </IconButton>
   ),
 } satisfies Meta<typeof IconButton>;

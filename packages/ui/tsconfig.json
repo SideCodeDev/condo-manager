@@ -1,7 +1,7 @@
 {
   "extends": "@condo-manager/typescript-config/react-library.json",
   "compilerOptions": {
-    "types": ["react", "react-dom"]
+    "types": ["react", "react-dom", "react-native"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

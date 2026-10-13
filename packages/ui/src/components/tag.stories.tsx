@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Home } from "lucide-react";
+import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
+import { Home } from "lucide-react-native";
 
 import { Tag } from "./tag";
 

@@ -1,156 +1,237 @@
-"use client";
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  type ColorValue,
+  Easing,
+  Platform,
+  StyleSheet,
+  View,
+} from "react-native";
 
-export function Loader({ size = 36 }: { size?: number }) {
+const ANIMATION_DURATION = 4_000;
+const ANIMATION_STEPS = 11;
+const BASE_SIZE = 36;
+const BOX_SIZE = 10;
+const BOX_RADIUS = 1;
+
+const inputRange = Array.from(
+  { length: ANIMATION_STEPS + 1 },
+  (_, index) => index / ANIMATION_STEPS,
+);
+
+const positions = [
+  [13, 1],
+  [13, 1],
+  [25, 25],
+  [13, 13],
+  [13, 13],
+  [25, 13],
+  [1, 25],
+  [13, 25],
+  [25, 25],
+] as const;
+
+const paths = [
+  [
+    [0, 0],
+    [-12, 0],
+    [0, 0],
+    [0, 0],
+    [12, 0],
+    [12, 12],
+    [12, 12],
+    [12, 12],
+    [12, 0],
+    [0, 0],
+    [-12, 0],
+    [0, 0],
+  ],
+  [
+    [0, 0],
+    [0, 0],
+    [12, 0],
+    [0, 0],
+    [12, 0],
+    [12, 12],
+    [12, 12],
+    [12, 12],
+    [12, 12],
+    [0, 12],
+    [0, 12],
+    [0, 0],
+  ],
+  [
+    [0, 0],
+    [-12, 0],
+    [-12, 0],
+    [0, 0],
+    [-12, 0],
+    [-12, 0],
+    [-12, 0],
+    [-12, 0],
+    [-12, 0],
+    [-12, -12],
+    [0, -12],
+    [0, 0],
+  ],
+  [
+    [0, 0],
+    [-12, 0],
+    [-12, 0],
+    [-12, -12],
+    [0, -12],
+    [0, 0],
+    [0, -12],
+    [0, -12],
+    [0, -12],
+    [-12, -12],
+    [-12, 0],
+    [0, 0],
+  ],
+  [
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [12, 0],
+    [12, 0],
+    [12, 0],
+    [12, 0],
+    [12, 0],
+    [12, -12],
+    [0, -12],
+    [0, 0],
+  ],
+  [
+    [0, 0],
+    [0, 0],
+    [-12, 0],
+    [-12, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 12],
+    [-12, 12],
+    [-12, 0],
+    [0, 0],
+  ],
+  [
+    [0, 0],
+    [12, 0],
+    [12, 0],
+    [12, 0],
+    [0, 0],
+    [0, -12],
+    [12, -12],
+    [0, -12],
+    [0, -12],
+    [0, 0],
+    [12, 0],
+    [0, 0],
+  ],
+  [
+    [0, 0],
+    [0, 0],
+    [-12, 0],
+    [-12, -12],
+    [0, -12],
+    [0, -12],
+    [0, -12],
+    [0, -12],
+    [0, -12],
+    [12, -12],
+    [12, 0],
+    [0, 0],
+  ],
+  [
+    [0, 0],
+    [-12, 0],
+    [-12, 0],
+    [0, 0],
+    [-12, 0],
+    [0, 0],
+    [0, 0],
+    [-12, 0],
+    [-12, 0],
+    [-24, 0],
+    [-12, 0],
+    [0, 0],
+  ],
+] as const;
+
+const cssEase = Easing.bezier(0.25, 0.1, 0.25, 1);
+const boxColor = Platform.select({ default: "#000000", web: "currentColor" });
+
+export function Loader({
+  color,
+  size = BASE_SIZE,
+}: {
+  color?: ColorValue;
+  size?: number;
+}) {
+  const progress = useRef(new Animated.Value(0)).current;
+  const scale = size / BASE_SIZE;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence(
+        inputRange.slice(1).map((toValue) =>
+          Animated.timing(progress, {
+            duration: ANIMATION_DURATION / ANIMATION_STEPS,
+            easing: cssEase,
+            toValue,
+            useNativeDriver: true,
+          }),
+        ),
+      ),
+    );
+
+    animation.start();
+
+    return () => {
+      animation.stop();
+      progress.setValue(0);
+    };
+  }, [progress]);
+
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 36 36"
-      width={size}
-      height={size}
-    >
-      <style>{`
-        .box5532 {
-          fill: currentColor;
-          transform-origin: 50% 50%;
-        }
-        @keyframes box5532-1 {
-          9.0909090909% { transform: translate(-12px, 0); }
-          18.1818181818% { transform: translate(0px, 0); }
-          27.2727272727% { transform: translate(0px, 0); }
-          36.3636363636% { transform: translate(12px, 0); }
-          45.4545454545% { transform: translate(12px, 12px); }
-          54.5454545455% { transform: translate(12px, 12px); }
-          63.6363636364% { transform: translate(12px, 12px); }
-          72.7272727273% { transform: translate(12px, 0px); }
-          81.8181818182% { transform: translate(0px, 0px); }
-          90.9090909091% { transform: translate(-12px, 0px); }
-          100% { transform: translate(0px, 0px); }
-        }
-        .box5532:nth-child(1) { animation: box5532-1 4s infinite; }
-        @keyframes box5532-2 {
-          9.0909090909% { transform: translate(0, 0); }
-          18.1818181818% { transform: translate(12px, 0); }
-          27.2727272727% { transform: translate(0px, 0); }
-          36.3636363636% { transform: translate(12px, 0); }
-          45.4545454545% { transform: translate(12px, 12px); }
-          54.5454545455% { transform: translate(12px, 12px); }
-          63.6363636364% { transform: translate(12px, 12px); }
-          72.7272727273% { transform: translate(12px, 12px); }
-          81.8181818182% { transform: translate(0px, 12px); }
-          90.9090909091% { transform: translate(0px, 12px); }
-          100% { transform: translate(0px, 0px); }
-        }
-        .box5532:nth-child(2) { animation: box5532-2 4s infinite; }
-        @keyframes box5532-3 {
-          9.0909090909% { transform: translate(-12px, 0); }
-          18.1818181818% { transform: translate(-12px, 0); }
-          27.2727272727% { transform: translate(0px, 0); }
-          36.3636363636% { transform: translate(-12px, 0); }
-          45.4545454545% { transform: translate(-12px, 0); }
-          54.5454545455% { transform: translate(-12px, 0); }
-          63.6363636364% { transform: translate(-12px, 0); }
-          72.7272727273% { transform: translate(-12px, 0); }
-          81.8181818182% { transform: translate(-12px, -12px); }
-          90.9090909091% { transform: translate(0px, -12px); }
-          100% { transform: translate(0px, 0px); }
-        }
-        .box5532:nth-child(3) { animation: box5532-3 4s infinite; }
-        @keyframes box5532-4 {
-          9.0909090909% { transform: translate(-12px, 0); }
-          18.1818181818% { transform: translate(-12px, 0); }
-          27.2727272727% { transform: translate(-12px, -12px); }
-          36.3636363636% { transform: translate(0px, -12px); }
-          45.4545454545% { transform: translate(0px, 0px); }
-          54.5454545455% { transform: translate(0px, -12px); }
-          63.6363636364% { transform: translate(0px, -12px); }
-          72.7272727273% { transform: translate(0px, -12px); }
-          81.8181818182% { transform: translate(-12px, -12px); }
-          90.9090909091% { transform: translate(-12px, 0px); }
-          100% { transform: translate(0px, 0px); }
-        }
-        .box5532:nth-child(4) { animation: box5532-4 4s infinite; }
-        @keyframes box5532-5 {
-          9.0909090909% { transform: translate(0, 0); }
-          18.1818181818% { transform: translate(0, 0); }
-          27.2727272727% { transform: translate(0, 0); }
-          36.3636363636% { transform: translate(12px, 0); }
-          45.4545454545% { transform: translate(12px, 0); }
-          54.5454545455% { transform: translate(12px, 0); }
-          63.6363636364% { transform: translate(12px, 0); }
-          72.7272727273% { transform: translate(12px, 0); }
-          81.8181818182% { transform: translate(12px, -12px); }
-          90.9090909091% { transform: translate(0px, -12px); }
-          100% { transform: translate(0px, 0px); }
-        }
-        .box5532:nth-child(5) { animation: box5532-5 4s infinite; }
-        @keyframes box5532-6 {
-          9.0909090909% { transform: translate(0, 0); }
-          18.1818181818% { transform: translate(-12px, 0); }
-          27.2727272727% { transform: translate(-12px, 0); }
-          36.3636363636% { transform: translate(0px, 0); }
-          45.4545454545% { transform: translate(0px, 0); }
-          54.5454545455% { transform: translate(0px, 0); }
-          63.6363636364% { transform: translate(0px, 0); }
-          72.7272727273% { transform: translate(0px, 12px); }
-          81.8181818182% { transform: translate(-12px, 12px); }
-          90.9090909091% { transform: translate(-12px, 0px); }
-          100% { transform: translate(0px, 0px); }
-        }
-        .box5532:nth-child(6) { animation: box5532-6 4s infinite; }
-        @keyframes box5532-7 {
-          9.0909090909% { transform: translate(12px, 0); }
-          18.1818181818% { transform: translate(12px, 0); }
-          27.2727272727% { transform: translate(12px, 0); }
-          36.3636363636% { transform: translate(0px, 0); }
-          45.4545454545% { transform: translate(0px, -12px); }
-          54.5454545455% { transform: translate(12px, -12px); }
-          63.6363636364% { transform: translate(0px, -12px); }
-          72.7272727273% { transform: translate(0px, -12px); }
-          81.8181818182% { transform: translate(0px, 0px); }
-          90.9090909091% { transform: translate(12px, 0px); }
-          100% { transform: translate(0px, 0px); }
-        }
-        .box5532:nth-child(7) { animation: box5532-7 4s infinite; }
-        @keyframes box5532-8 {
-          9.0909090909% { transform: translate(0, 0); }
-          18.1818181818% { transform: translate(-12px, 0); }
-          27.2727272727% { transform: translate(-12px, -12px); }
-          36.3636363636% { transform: translate(0px, -12px); }
-          45.4545454545% { transform: translate(0px, -12px); }
-          54.5454545455% { transform: translate(0px, -12px); }
-          63.6363636364% { transform: translate(0px, -12px); }
-          72.7272727273% { transform: translate(0px, -12px); }
-          81.8181818182% { transform: translate(12px, -12px); }
-          90.9090909091% { transform: translate(12px, 0px); }
-          100% { transform: translate(0px, 0px); }
-        }
-        .box5532:nth-child(8) { animation: box5532-8 4s infinite; }
-        @keyframes box5532-9 {
-          9.0909090909% { transform: translate(-12px, 0); }
-          18.1818181818% { transform: translate(-12px, 0); }
-          27.2727272727% { transform: translate(0px, 0); }
-          36.3636363636% { transform: translate(-12px, 0); }
-          45.4545454545% { transform: translate(0px, 0); }
-          54.5454545455% { transform: translate(0px, 0); }
-          63.6363636364% { transform: translate(-12px, 0); }
-          72.7272727273% { transform: translate(-12px, 0); }
-          81.8181818182% { transform: translate(-24px, 0); }
-          90.9090909091% { transform: translate(-12px, 0); }
-          100% { transform: translate(0px, 0); }
-        }
-        .box5532:nth-child(9) { animation: box5532-9 4s infinite; }
-      `}</style>
-      <g>
-        <rect className="box5532" x="13" y="1" rx="1" width="10" height="10" />
-        <rect className="box5532" x="13" y="1" rx="1" width="10" height="10" />
-        <rect className="box5532" x="25" y="25" rx="1" width="10" height="10" />
-        <rect className="box5532" x="13" y="13" rx="1" width="10" height="10" />
-        <rect className="box5532" x="13" y="13" rx="1" width="10" height="10" />
-        <rect className="box5532" x="25" y="13" rx="1" width="10" height="10" />
-        <rect className="box5532" x="1" y="25" rx="1" width="10" height="10" />
-        <rect className="box5532" x="13" y="25" rx="1" width="10" height="10" />
-        <rect className="box5532" x="25" y="25" rx="1" width="10" height="10" />
-      </g>
-    </svg>
+    <View style={{ height: size, width: size }}>
+      {positions.map(([left, top], index) => {
+        const path = paths[index];
+        const translateX = progress.interpolate({
+          inputRange,
+          outputRange: path.map(([x]) => x * scale),
+        });
+        const translateY = progress.interpolate({
+          inputRange,
+          outputRange: path.map(([, y]) => y * scale),
+        });
+
+        return (
+          <Animated.View
+            key={index}
+            style={[
+              styles.box,
+              {
+                backgroundColor: color ?? boxColor,
+                borderRadius: BOX_RADIUS * scale,
+                height: BOX_SIZE * scale,
+                left: left * scale,
+                top: top * scale,
+                transform: [{ translateX }, { translateY }],
+                width: BOX_SIZE * scale,
+              },
+            ]}
+          />
+        );
+      })}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  box: {
+    position: "absolute",
+  },
+});

@@ -15,11 +15,14 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 
 ## Repository map
 
-- `apps/app`: the main React 19 + Vite application. Authentication,
-  organizations, and billing come from Clerk; application data and synchronized
-  projections live in Convex.
+- `apps/web`: the main React 19 + Vite application. Authentication,
+  organizations, and billing come from Clerk; it calls the shared Convex backend.
+- `apps/mobile`: the Expo / React Native application, which can connect to the
+  same Convex backend.
+- `apps/backend`: the Convex project, including schema, functions, and HTTP
+  routes.
 - `apps/website`: reserved for the sales/marketing application.
-- `packages/ui`: framework-agnostic shared React UI, fonts, helpers, styles, and
+- `packages/ui`: universal React Native shared UI, fonts, helpers, styles, and
   Storybook. It must remain usable by both Vite and Next.js consumers and must not
   take a dependency on Next.js.
 - `packages/eslint-config`: shared ESLint configuration.
@@ -49,7 +52,7 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 
 ## Generated code and external state
 
-- Do not manually edit files in `apps/app/convex/_generated/`.
+- Do not manually edit files in `apps/backend/convex/_generated/`.
 - Do not run `convex dev`, `convex deploy`, Convex code generation, migrations,
   webhook replays, or database cleanup unless the user explicitly asks for that
   exact action.
@@ -73,9 +76,11 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 Run commands from the repository root:
 
 ```sh
-pnpm dev:app
+pnpm dev:web
+pnpm dev:backend
+pnpm dev:mobile
 pnpm dev:ui
-pnpm --filter @condo-manager/app build
+pnpm --filter @condo-manager/web build
 pnpm --filter @condo-manager/ui check-types
 pnpm --filter @condo-manager/ui lint
 pnpm --filter @condo-manager/ui storybook:build

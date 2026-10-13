@@ -1,0 +1,48 @@
+{
+  "name": "@condo-manager/mobile",
+  "private": true,
+  "main": "expo-router/entry",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "lint": "expo lint"
+  },
+  "dependencies": {
+    "@clerk/expo": "^4.10.1",
+    "@condo-manager/backend": "workspace:*",
+    "@condo-manager/ui": "workspace:*",
+    "@expo/ui": "~57.0.22",
+    "convex": "catalog:",
+    "expo": "~57.0.27",
+    "expo-auth-session": "~57.0.14",
+    "expo-constants": "~57.0.21",
+    "expo-crypto": "~57.0.3",
+    "expo-document-picker": "catalog:",
+    "expo-font": "~57.0.4",
+    "expo-router": "~57.0.25",
+    "expo-secure-store": "~57.0.4",
+    "expo-splash-screen": "~57.0.9",
+    "expo-system-ui": "~57.0.4",
+    "expo-web-browser": "~57.0.3",
+    "lucide-react-native": "catalog:",
+    "nativewind": "catalog:",
+    "react": "catalog:",
+    "react-native": "catalog:",
+    "react-native-css": "catalog:",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "catalog:",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "react-native-svg": "catalog:",
+    "react-native-worklets": "0.10.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "catalog:",
+    "@types/react": "catalog:",
+    "postcss": "8.5.26",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:"
+  }
+}

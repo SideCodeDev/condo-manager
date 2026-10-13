@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Mail, Search } from "lucide-react";
+import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
+import { Mail, Search } from "lucide-react-native";
 
 import { Input } from "./input";
 
@@ -107,9 +107,9 @@ export const AllVariants: Story = {
         <Input
           key={variant}
           {...args}
-          variant={variant}
           id={variant}
           label={variant.charAt(0).toUpperCase() + variant.slice(1)}
+          variant={variant}
         />
       ))}
     </div>

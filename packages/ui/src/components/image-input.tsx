@@ -1,117 +1,153 @@
-"use client";
+import * as React from "react";
+import * as DocumentPicker from "expo-document-picker";
+import { Platform } from "react-native";
+import { Image, View } from "react-native-css/components";
 
-import { useImageFallback } from "../hooks/image-fallback";
 import { cn, getValidFiles } from "../lib/utils";
-import { If } from "./if";
-import { FileMimeType } from "../lib/consts";
-import { FileUpload } from "./file-upload";
+import { useImageFallback } from "../hooks/image-fallback";
 import { Button } from "./button";
-import { useRef } from "react";
+import { FileUpload, type FileUploadFile } from "./file-upload";
 
-const mimesForImageInput: FileMimeType[] = [
-  "image/png",
-  "image/jpeg",
-  "image/gif",
-];
+const imageMimeTypes = ["image/png", "image/jpeg", "image/gif"] as const;
 
-type ImageInputProps = {
+type ImageInputLabels = {
+  add?: string;
+  dragAndDrop?: string;
+  remove?: string;
+  replace?: string;
+  size?: (formattedSize: string) => string;
+};
+
+export type ImageInputProps = {
   id: string;
-  value: string | File | null | undefined;
-  onChange: (v: File | null) => void;
+  value: string | FileUploadFile | null | undefined;
+  onChange: (value: FileUploadFile | null) => void;
   className?: string;
   alt: string;
   maxFileSizeMB?: number;
-  labels?: {
-    add?: string;
-    dragAndDrop?: string;
-    remove?: string;
-    replace?: string;
-    size?: (formattedSize: string) => string;
-  };
+  labels?: ImageInputLabels;
 };
-export function ImageInput({
-  className,
-  value,
+
+function getImageUri(value: ImageInputProps["value"]): string | undefined {
+  if (!value) return undefined;
+  if (typeof value === "string") return value;
+  if ("uri" in value) return value.uri;
+  if (typeof File !== "undefined" && value instanceof File) {
+    return URL.createObjectURL(value);
+  }
+  return undefined;
+}
+
+function ImageInput({
   alt,
+  className,
   id,
+  labels,
   maxFileSizeMB = 10,
   onChange,
-  labels,
+  value,
 }: ImageInputProps) {
-  const valueAsSrc = !value
-    ? undefined
-    : typeof value === "string"
-      ? value
-      : URL.createObjectURL(value);
-  const { hasError, imgSrc, onError } = useImageFallback(valueAsSrc, undefined);
-  const fileUploadRef = useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [imageUri, setImageUri] = React.useState<string>();
+  const { hasError, imgSrc, onError } = useImageFallback(imageUri, undefined);
+
+  React.useEffect(() => {
+    const uri = getImageUri(value);
+    setImageUri(uri);
+
+    if (
+      typeof value !== "string" &&
+      value &&
+      !("uri" in value) &&
+      typeof File !== "undefined" &&
+      value instanceof File &&
+      uri
+    ) {
+      return () => URL.revokeObjectURL(uri);
+    }
+  }, [value]);
+
+  const handleWebFiles = (files: FileList | null) => {
+    const [file] = getValidFiles(
+      files,
+      [...imageMimeTypes],
+      maxFileSizeMB,
+    );
+    if (file) onChange(file);
+  };
+
+  const pickImage = async () => {
+    if (Platform.OS === "web") {
+      inputRef.current?.click();
+      return;
+    }
+
+    const result = await DocumentPicker.getDocumentAsync({
+      copyToCacheDirectory: false,
+      multiple: false,
+      type: [...imageMimeTypes],
+    });
+    if (result.canceled) return;
+
+    const [asset] = result.assets.filter(
+      (item) =>
+        imageMimeTypes.includes(item.mimeType as (typeof imageMimeTypes)[number]) &&
+        (!maxFileSizeMB ||
+          item.size === undefined ||
+          item.size <= maxFileSizeMB * 1024 * 1024),
+    );
+    if (asset) onChange({ ...asset, size: asset.size ?? 0 });
+  };
+
   return (
-    <div className={cn("size-89.75", className)}>
-      <If condition={!value}>
+    <View className={cn("size-89.75", className)}>
+      {!value ? (
         <FileUpload
           className="size-full"
-          type="single"
           id={id}
-          maxFileSizeMB={maxFileSizeMB}
-          validTypes={mimesForImageInput}
           labels={labels}
+          maxFileSizeMB={maxFileSizeMB}
           onFileSelect={onChange}
+          type="single"
+          validTypes={[...imageMimeTypes]}
         />
-      </If>
-      <If condition={!!value}>
-        <div
-          className={cn(
-            "relative isolate group size-full rounded border border-neutral-200 overflow-clip",
-            className,
-          )}
-        >
-          <input
-            ref={fileUploadRef}
-            aria-hidden
-            className="sr-only w-full z-20 inset-0 absolute"
-            type="file"
-            accept={mimesForImageInput.join(",")}
-            onChange={(ev) => {
-              const files = ev.target.files;
-              const [newFile] = getValidFiles(
-                files,
-                mimesForImageInput,
-                maxFileSizeMB,
-              );
-              if (!newFile) return;
-              onChange(newFile);
-            }}
-          />
-          <If condition={!hasError && !!imgSrc}>
-            <img
-              data-error={hasError}
-              src={imgSrc}
-              alt={alt}
-              className="size-full object-fill"
-              onError={onError}
+      ) : (
+        <View className="group relative isolate size-full overflow-clip rounded border border-neutral-200">
+          {Platform.OS === "web" ? (
+            <input
+              ref={inputRef}
+              accept={imageMimeTypes.join(",")}
+              aria-hidden
+              className="sr-only"
+              onChange={(event) => handleWebFiles(event.target.files)}
+              type="file"
             />
-          </If>
-          <div className="absolute  -inset-2 bg-neutral-1000/80 z-10 opacity-0 focus:opacity-100 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-5 *:shrink-0 *:min-w-55">
+          ) : null}
+          {!hasError && imgSrc ? (
+            <Image
+              accessibilityLabel={alt}
+              className="size-full"
+              onError={onError}
+              source={{ uri: imgSrc }}
+              resizeMode="cover"
+            />
+          ) : null}
+          <View className="absolute inset-0 z-10 flex-col items-center justify-center gap-5 bg-neutral-1000/80 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
             <Button
+              className="min-w-55 bg-neutral-0"
+              onPress={pickImage}
               variant="secondary"
-              className="bg-neutral-0"
-              type="button"
-              onClick={() => fileUploadRef.current?.click()}
             >
               {labels?.replace ?? "Change image"}
             </Button>
-            <Button
-              destructive
-              type="button"
-              onClick={() => {
-                onChange(null);
-              }}
-            >
+            <Button destructive className="min-w-55" onPress={() => onChange(null)}>
               {labels?.remove ?? "Remove"}
             </Button>
-          </div>
-        </div>
-      </If>
-    </div>
+          </View>
+        </View>
+      )}
+    </View>
   );
 }
+
+export { ImageInput };

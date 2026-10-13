@@ -4,8 +4,8 @@ Monorepo for the Condo Manager product. It contains the authenticated web
 application, a reusable UI library, and shared TypeScript, ESLint, and Prettier
 configuration.
 
-The project is under active migration. `_old/` is an archived implementation
-and is not part of the current workspace or a source of truth.
+`_old/` is an archived implementation and is not part of the current workspace
+or a source of truth.
 
 ## Stack
 
@@ -21,8 +21,10 @@ and is not part of the current workspace or a source of truth.
 
 ```text
 apps/
-  app/                 React + Vite authenticated application
-  website/             Reserved for the Next.js sales website
+  web/                 React + Vite authenticated application
+  mobile/              Expo / React Native application
+  backend/             Convex schema, functions, and HTTP routes
+  website/             Sales and marketing website
 packages/
   ui/                  Shared, framework-agnostic React UI library
   eslint-config/       Shared ESLint and Prettier configuration
@@ -58,7 +60,7 @@ feature slugs without querying Clerk directly during normal rendering.
 - Node.js compatible with pnpm 11
 - pnpm `11.18.0` (pinned in `package.json`)
 - Clerk development instance with Organizations and Billing configured
-- Convex project connected to `apps/app`
+- Convex project configured from `apps/backend`
 
 Install dependencies from the repository root:
 
@@ -68,7 +70,7 @@ pnpm install
 
 ## Environment variables
 
-The Vite application requires these client-side variables:
+The web application requires these client-side variables in `apps/web/.env`:
 
 ```dotenv
 VITE_CONVEX_URL=
@@ -88,7 +90,7 @@ Configure server-side secrets in the appropriate Convex deployment. Never expose
 or commit their values.
 
 The Clerk JWT template used by Convex must have the application ID `convex`, as
-configured in `apps/app/convex/auth.config.ts`.
+configured in `apps/backend/convex/auth.config.ts`.
 
 ## Clerk webhook
 
@@ -113,16 +115,22 @@ existing projection instead of creating duplicates.
 
 ## Development
 
-Start the Vite application and Convex development process together:
+Start the web application:
 
 ```sh
-pnpm dev:app
+pnpm dev:web
 ```
 
-Start only the Vite frontend:
+Start the Convex backend in a separate terminal:
 
 ```sh
-pnpm --filter @condo-manager/app dev:app
+pnpm dev:backend
+```
+
+Start the Expo mobile application:
+
+```sh
+pnpm dev:mobile
 ```
 
 Start Storybook for the shared UI package:
@@ -134,20 +142,27 @@ pnpm dev:ui
 ## Validation
 
 ```sh
-pnpm --filter @condo-manager/app build
+pnpm --filter @condo-manager/web build
+pnpm --filter @condo-manager/backend check-types
 pnpm --filter @condo-manager/ui check-types
 pnpm --filter @condo-manager/ui lint
 pnpm --filter @condo-manager/ui test-storybook
 pnpm --filter @condo-manager/ui storybook:build
 ```
 
-Generated files under `apps/app/convex/_generated/` must not be edited manually.
+Generated files under `apps/backend/convex/_generated/` must not be edited
+manually. The web imports the backend's generated API types through the
+`@condo-manager/backend/api` workspace export. Both clients can use the same
+Convex deployment. The mobile workspace is currently an Expo starter and still
+needs Clerk and Convex client integration. Each app has an independent build,
+and Convex is deployed separately with `pnpm deploy:backend`.
 
 ## Shared UI
 
 `@condo-manager/ui` contains reusable components, fonts, hooks, helpers, and
 styles. It intentionally has no dependency on Next.js, allowing it to be shared
-by the Vite application and the future Next.js sales website.
+by the Vite application and the sales website where platform compatibility
+permits.
 
 Import components and global styles through the package's public exports:
 

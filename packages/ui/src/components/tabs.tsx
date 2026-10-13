@@ -1,151 +1,378 @@
-"use client";
-import { cn } from "../lib/utils";
+import * as React from "react";
 import { cva } from "class-variance-authority";
-import { motion } from "motion/react";
-import { Slot } from "radix-ui";
 import {
-  ComponentPropsWithoutRef,
-  createContext,
-  ReactNode,
-  useContext,
-  useState,
-} from "react";
+  Platform,
+  type LayoutChangeEvent,
+  type PressableProps,
+} from "react-native";
+import { Pressable, Text, View } from "react-native-css/components";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
-const TabItemVairant = cva(
-  "isolate relative inline-flex gap-2 items-center font-ui-6 text-neutral-1000 focus-visible:outline-primary focus-visible:outline-2 [&_svg:not([class*='size-'])]:size-5",
+import { cn } from "../lib/utils";
+import { colors } from "../theme";
+import { getSlotChild, Slot } from "./slot";
+
+type TabsVariant = "chip" | "line" | "line-spaced";
+
+const tabItemVariants = cva(
+  "isolate relative flex-row shrink-0 items-center gap-2 font-ui-6 text-neutral-1000 focus-visible:outline-primary focus-visible:outline-2",
   {
     variants: {
       variant: {
-        chip: "px-3 py-2 rounded-4xl",
-        line: "px-1 pb-1.5 data-[spaced=true]:pb-3.5 data-[active=true]:text-primary transition-colors delay-200",
+        chip: "rounded-4xl px-3 py-2",
+        line: "px-1 pb-1.5 transition-colors delay-200",
       },
+      active: { true: "", false: "" },
+      spaced: { true: "pb-3.5", false: "" },
     },
-    defaultVariants: {
-      variant: "chip",
-    },
+    compoundVariants: [
+      { variant: "line", active: true, class: "text-primary" },
+    ],
+    defaultVariants: { variant: "chip", active: false, spaced: false },
   },
 );
 
-const TabItemIndicator = cva("absolute -z-1", {
-  variants: {
-    variant: {
-      chip: "bg-neutral-0 rounded-4xl shadow-card inset-0",
-      line: "bottom-0 left-0 w-full h-0.5 bg-primary rounded-3xl",
+const tabIndicatorVariants = cva(
+  "absolute transition-[left,top,width,height] duration-200 ease-in-out",
+  {
+    variants: {
+      variant: {
+        chip: "z-0 rounded-4xl bg-neutral-0 shadow-card",
+        line: "z-0 rounded-3xl bg-primary",
+      },
     },
+    defaultVariants: { variant: "chip" },
   },
-  defaultVariants: { variant: "chip" },
-});
+);
 
-export function TabItem({
-  value,
-  asChild,
-  className,
-  onClick,
-  children,
-  ...props
-}: {
+const tabsVariants = cva(
+  "relative flex-row items-center justify-center gap-2 self-start w-fit",
+  {
+    variants: {
+      variant: {
+        chip: "rounded-3xl border border-neutral-200 bg-neutral-100 p-1",
+        line: "",
+      },
+    },
+    defaultVariants: { variant: "chip" },
+  },
+);
+
+type TabChildProps = {
+  children?: React.ReactNode;
+  className?: string;
+  color?: string;
+  size?: number;
+};
+
+function renderTabChildren(
+  children: React.ReactNode,
+  textClassName: string,
+  iconColor: string,
+  iconClassName?: string,
+): React.ReactNode {
+  return React.Children.map(children, (child) => {
+    if (typeof child === "string" || typeof child === "number") {
+      return <Text className={textClassName}>{child}</Text>;
+    }
+    if (!React.isValidElement<TabChildProps>(child)) return child;
+    if (child.type === React.Fragment) {
+      return renderTabChildren(
+        child.props.children,
+        textClassName,
+        iconColor,
+        iconClassName,
+      );
+    }
+    if (child.type === Text) {
+      return React.cloneElement(child, {
+        className: cn(textClassName, child.props.className),
+      });
+    }
+    return React.cloneElement(child, {
+      color: child.props.color ?? iconColor,
+      className: cn(iconClassName, child.props.className),
+      size: child.props.size ?? 20,
+    });
+  });
+}
+
+type TabLayout = { height: number; width: number; x: number; y: number };
+
+type TabsContextValue = {
+  activeTab: string;
+  registerLayout: (value: string, layout: TabLayout) => void;
+  setActiveTab: (value: string) => void;
+  variant: TabsVariant;
+};
+
+const TabsContext = React.createContext<TabsContextValue | null>(null);
+
+export type TabItemProps = Omit<PressableProps, "children" | "onPress"> & {
   value: string;
   asChild?: boolean;
-} & ComponentPropsWithoutRef<"button">) {
-  const context = useContext(TabsContext);
-  if (!context) {
-    throw new Error("TabItem must be used within a Tabs component");
+  children?: React.ReactNode;
+  className?: string;
+  onPress?: PressableProps["onPress"];
+};
+
+function TabItem({
+  asChild = false,
+  children,
+  className,
+  onLayout,
+  onPress,
+  value,
+  ...props
+}: TabItemProps) {
+  const context = React.useContext(TabsContext);
+  if (!context) throw new Error("TabItem must be used within a Tabs component");
+
+  const isActive = context.activeTab === value;
+  const variant = context.variant === "line-spaced" ? "line" : context.variant;
+  const textClassName = cn(
+    "font-ui-6",
+    context.variant !== "chip" && "transition-colors delay-200",
+    context.variant === "line" || context.variant === "line-spaced"
+      ? isActive
+        ? "text-primary"
+        : "text-neutral-1000"
+      : "text-neutral-1000",
+  );
+  const iconColor =
+    context.variant !== "chip" && isActive
+      ? colors.primary.DEFAULT
+      : colors.neutral[1000];
+  const handleLayout = (event: LayoutChangeEvent) => {
+    if (Platform.OS !== "web") {
+      context.registerLayout(value, event.nativeEvent.layout);
+    }
+    onLayout?.(event);
+  };
+  const itemClassName = tabItemVariants({
+    active: isActive,
+    className,
+    spaced: context.variant === "line-spaced",
+    variant,
+  });
+  const content = renderTabChildren(
+    children,
+    textClassName,
+    iconColor,
+    context.variant !== "chip" ? "transition-colors delay-200" : undefined,
+  );
+
+  if (asChild) {
+    const child = getSlotChild(children) as React.ReactElement<TabChildProps>;
+    return (
+      <Slot
+        {...props}
+        className={itemClassName}
+        nativeID={`tabs-${value}`}
+        onLayout={handleLayout}
+        onPress={(event: unknown) => {
+          context.setActiveTab(value);
+          onPress?.(event as never);
+        }}
+      >
+        {React.cloneElement(child, { children: content })}
+      </Slot>
+    );
   }
-  const { setActiveTab, activeTab, variant, layoutId } = context;
-  const Comp = asChild ? Slot.Root : "button";
-  const isActive = activeTab === value;
+
   return (
-    <Comp
-      onClick={(ev) => {
-        setActiveTab(value);
-        onClick?.(ev);
-      }}
-      data-active={isActive}
-      data-spaced={variant === "line-spaced"}
-      className={TabItemVairant({
-        variant: variant === "line-spaced" ? "line" : variant,
-        className,
-      })}
+    <Pressable
       {...props}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: isActive }}
+      className={itemClassName}
+      nativeID={`tabs-${value}`}
+      onLayout={handleLayout}
+      onPress={(event) => {
+        context.setActiveTab(value);
+        onPress?.(event);
+      }}
     >
-      {isActive && (
-        <motion.div
-          layoutId={layoutId}
-          className={TabItemIndicator({
-            variant: variant === "line-spaced" ? "line" : variant,
-          })}
-          transition={{
-            type: "tween",
-            duration: 0.2,
-            ease: "easeInOut",
-          }}
-        />
-      )}
-      {children}
-    </Comp>
+      {content}
+    </Pressable>
   );
 }
 
-const TabsVairant = cva(
-  "flex [&>&]:shrink-0 items-center gap-2 justify-center w-fit",
-  {
-    variants: {
-      variant: {
-        chip: "border border-neutral-200 bg-neutral-100 rounded-3xl p-1",
-        line: "",
-        "line-spaced": "",
-      },
-    },
-    defaultVariants: {
-      variant: "chip",
-    },
-  },
-);
-
-export function Tabs({
-  initialValue,
-  children,
-  variant = "chip",
-  className,
-}: {
+export type TabsProps = {
   initialValue: string;
-  children: ReactNode;
-  variant?: "chip" | "line" | "line-spaced";
+  children: React.ReactNode;
+  variant?: TabsVariant;
   className?: string;
-}) {
-  const [value, setValue] = useState(initialValue);
-  const [layoutId] = useState(
-    () => `tabs-${Math.random().toString(36).substr(2, 9)}`,
+};
+
+function Tabs({
+  children,
+  className,
+  initialValue,
+  variant = "chip",
+}: TabsProps) {
+  const [activeTab, setActiveTab] = React.useState(initialValue);
+  const [layouts, setLayouts] = React.useState<Record<string, TabLayout>>({});
+  const childArray = React.Children.toArray(children);
+  const tabChildren = childArray.filter(
+    (child) => !(React.isValidElement(child) && child.type === TabContent),
   );
+  const contentChildren = childArray.filter(
+    (child) => React.isValidElement(child) && child.type === TabContent,
+  );
+  const tabsRootId = `tabs-root-${React.useId().replace(/:/g, "")}`;
+  const registerLayout = React.useCallback(
+    (value: string, layout: TabLayout) => {
+      setLayouts((current) => ({ ...current, [value]: layout }));
+    },
+    [],
+  );
+  const activeLayout = layouts[activeTab];
+  const indicatorX = useSharedValue(0);
+  const indicatorY = useSharedValue(0);
+  const indicatorWidth = useSharedValue(0);
+  const indicatorHeight = useSharedValue(0);
+
+  React.useEffect(() => {
+    if (Platform.OS !== "web") return;
+
+    const measure = () => {
+      const root =
+        document.getElementById(tabsRootId) ??
+        (window.parent !== window
+          ? window.parent.document.getElementById(tabsRootId)
+          : null);
+      if (!root) return;
+
+      const rootRect = root.getBoundingClientRect();
+      root.querySelectorAll('[id^="tabs-"]').forEach((node) => {
+        const rect = node.getBoundingClientRect();
+        const value = node.id.slice("tabs-".length);
+        registerLayout(value, {
+          height: rect.height,
+          width: rect.width,
+          x: rect.left - rootRect.left - root.clientLeft,
+          y: rect.top - rootRect.top - root.clientTop,
+        });
+      });
+    };
+
+    const frame = window.requestAnimationFrame(measure);
+    window.addEventListener("resize", measure);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", measure);
+    };
+  }, [children, registerLayout, tabsRootId, variant]);
+
+  React.useEffect(() => {
+    if (!activeLayout) return;
+    const isLine = variant !== "chip";
+    const targetY = isLine
+      ? activeLayout.y + activeLayout.height - 2
+      : activeLayout.y;
+    const targetHeight = isLine ? 2 : activeLayout.height;
+    const config = { duration: 200, easing: Easing.bezier(0.42, 0, 0.58, 1) };
+    indicatorX.value = withTiming(activeLayout.x, config);
+    indicatorY.value = withTiming(targetY, config);
+    indicatorWidth.value = withTiming(activeLayout.width, config);
+    indicatorHeight.value = withTiming(targetHeight, config);
+  }, [
+    activeLayout,
+    indicatorHeight,
+    indicatorWidth,
+    indicatorX,
+    indicatorY,
+    variant,
+  ]);
+
+  const indicatorStyle = useAnimatedStyle(
+    () => ({
+      height: indicatorHeight.value,
+      left: indicatorX.value,
+      top: indicatorY.value,
+      width: indicatorWidth.value,
+    }),
+    [],
+  );
+  const webIndicatorStyle = activeLayout
+    ? {
+        height: variant === "chip" ? activeLayout.height : 2,
+        left: activeLayout.x,
+        top:
+          variant === "chip"
+            ? activeLayout.y
+            : activeLayout.y + activeLayout.height - 2,
+        width: activeLayout.width,
+      }
+    : undefined;
+  const indicatorBaseStyle = {
+    backgroundColor:
+      variant === "chip" ? colors.neutral[0] : colors.primary.DEFAULT,
+    borderRadius: variant === "chip" ? 32 : 24,
+    position: "absolute" as const,
+    zIndex: 0,
+    ...(variant === "chip" && Platform.OS === "web"
+      ? { boxShadow: "1px 1px 3px 0px #0000000f, 0px 4px 12px -2px #00000014" }
+      : {}),
+    ...(Platform.OS === "web"
+      ? {
+          transitionDuration: "200ms",
+          transitionProperty: "left, top, width, height",
+          transitionTimingFunction: "cubic-bezier(0.42, 0, 0.58, 1)",
+        }
+      : {}),
+  };
 
   return (
     <TabsContext.Provider
-      value={{ activeTab: value, setActiveTab: setValue, variant, layoutId }}
+      value={{ activeTab, registerLayout, setActiveTab, variant }}
     >
-      <div className={cn(TabsVairant({ variant }), className)}>{children}</div>
+      <View
+        className={cn(
+          tabsVariants({
+            variant: variant === "line-spaced" ? "line" : variant,
+          }),
+          className,
+        )}
+        nativeID={tabsRootId}
+      >
+        <Animated.View
+          className={tabIndicatorVariants({
+            variant: variant === "line-spaced" ? "line" : variant,
+          })}
+          pointerEvents="none"
+          style={[
+            indicatorBaseStyle,
+            Platform.OS === "web" ? webIndicatorStyle : indicatorStyle,
+          ]}
+        />
+        {tabChildren}
+      </View>
+      {contentChildren}
     </TabsContext.Provider>
   );
 }
 
-const TabsContext = createContext<{
-  activeTab: string;
-  setActiveTab: (value: string) => void;
-  variant: "chip" | "line" | "line-spaced";
-  layoutId: string;
-}>({ activeTab: "", setActiveTab: () => {}, variant: "line", layoutId: "" });
+export type TabContentProps = { value: string; children: React.ReactNode };
 
-export function TabContent({
-  value,
-  children,
-}: {
-  value: string;
-  children: ReactNode;
-}) {
-  const context = useContext(TabsContext);
-  if (!context) {
+function TabContent({ children, value }: TabContentProps) {
+  const context = React.useContext(TabsContext);
+  if (!context)
     throw new Error("TabContent must be used within a Tabs component");
-  }
-  const { activeTab } = context;
-  if (activeTab !== value) return null;
-  return <>{children}</>;
+  return context.activeTab === value ? <>{children}</> : null;
 }
+
+export {
+  TabContent,
+  TabItem,
+  Tabs,
+  tabIndicatorVariants,
+  tabItemVariants,
+  tabsVariants,
+};

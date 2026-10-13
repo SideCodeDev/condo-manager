@@ -7,9 +7,13 @@
   "license": "ISC",
   "keywords": [],
   "scripts": {
-    "dev:app": "pnpm --filter @condo-manager/app dev",
+    "dev:web": "pnpm --filter @condo-manager/web dev",
     "dev:website": "pnpm --filter @condo-manager/website dev",
-    "dev:ui": "pnpm --filter @condo-manager/ui storybook"
+    "dev:ui": "pnpm --filter @condo-manager/ui storybook",
+    "dev:android": "pnpm --filter @condo-manager/mobile android",
+    "dev:ios": "pnpm --filter @condo-manager/mobile ios",
+    "dev:backend": "pnpm --filter @condo-manager/backend dev",
+    "lint": "expo lint"
   },
   "devDependencies": {
     "@condo-manager/eslint-config": "workspace:*",

@@ -1,17 +1,19 @@
-"use client";
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import type { PressableProps } from "react-native";
+import { Pressable } from "react-native-css/components";
 
-import { cn } from "../lib/utils";
-import { cva, VariantProps } from "class-variance-authority";
-import { Slot } from "radix-ui";
+import { colors } from "../theme";
 import { Loader } from "./loader";
+import { getSlotChild, Slot } from "./slot";
 
-const buttonVariants = cva(
-  "border border-neutral-200 grid place-items-center bg-neutral-0 text-neutral-1000 hover:bg-neutral-100 focus-visible:bg-neutral-100",
+const iconButtonVariants = cva(
+  "flex-row items-center justify-center border border-neutral-200 bg-neutral-0 text-neutral-1000 hover:bg-neutral-100 focus-visible:bg-neutral-100",
   {
     variants: {
       size: {
-        large: "size-10 [&_svg:not([class*='size-'])]:size-6",
-        small: "size-8 [&_svg:not([class*='size-'])]:size-5",
+        large: "h-10 w-10",
+        small: "h-8 w-8",
       },
       variant: {
         round: "rounded-full",
@@ -25,35 +27,80 @@ const buttonVariants = cva(
   },
 );
 
-export function IconButton({
+type IconButtonVariantProps = VariantProps<typeof iconButtonVariants>;
+
+export type IconButtonProps = Omit<PressableProps, "children"> &
+  IconButtonVariantProps & {
+    asChild?: boolean;
+    children?: React.ReactNode;
+    className?: string;
+    loading?: boolean;
+  };
+
+type IconChildProps = {
+  children?: React.ReactNode;
+  color?: string;
+  size?: number;
+};
+
+function renderIcon(
+  children: React.ReactNode,
+  iconSize: number,
+): React.ReactNode {
+  return React.Children.map(children, (child) => {
+    if (!React.isValidElement<IconChildProps>(child)) return child;
+
+    if (child.type === React.Fragment) {
+      return renderIcon(child.props.children, iconSize);
+    }
+
+    return React.cloneElement(child, {
+      color: child.props.color ?? colors.neutral[1000],
+      size: child.props.size ?? iconSize,
+    });
+  });
+}
+
+function IconButton({
   className,
   variant = "round",
   size = "large",
   asChild = false,
-  loading,
+  loading = false,
   children,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-    loading?: boolean;
-  }) {
-  const Comp = asChild && !loading ? Slot.Root : "button";
+}: IconButtonProps) {
+  const iconSize = size === "small" ? 20 : 24;
+  const buttonClassName = iconButtonVariants({ className, size, variant });
+  const disabled = loading || Boolean(props.disabled);
+  const content = loading ? (
+    <Loader color={colors.neutral[1000]} size={iconSize} />
+  ) : (
+    renderIcon(children, iconSize)
+  );
+
+  if (asChild && !loading) {
+    const child = getSlotChild(children) as React.ReactElement<IconChildProps>;
+
+    return (
+      <Slot {...props} className={buttonClassName} disabled={disabled}>
+        {React.cloneElement(child, {
+          children: renderIcon(child.props.children, iconSize),
+        })}
+      </Slot>
+    );
+  }
+
   return (
-    <Comp
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      disabled={loading || props.disabled}
+    <Pressable
+      accessibilityRole="button"
+      className={buttonClassName}
+      disabled={disabled}
       {...props}
     >
-      {loading ? (
-        <>
-          <Loader aria-hidden="true" />
-          <span className="sr-only">{children}</span>
-        </>
-      ) : (
-        children
-      )}
-    </Comp>
+      {content}
+    </Pressable>
   );
 }
+
+export { IconButton, iconButtonVariants };

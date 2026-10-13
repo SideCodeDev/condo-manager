@@ -1,40 +1,90 @@
-export { Button, buttonVariants } from "./components/button";
-export { Checkbox } from "./components/checkbox";
-export { Combobox, type Option } from "./components/combobox";
+export { Button, type ButtonProps, buttonVariants } from "./components/button";
+export { Checkbox, type CheckboxProps, checkboxVariants } from "./components/checkbox";
 export {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "./components/command";
-export { Dropdown } from "./components/dropdown";
-export { FileUpload } from "./components/file-upload";
-export { FloatingButton } from "./components/floating-button";
-export { GlassButton } from "./components/glass-button";
-export { IconButton } from "./components/icon-button";
-export { If } from "./components/if";
-export { ImageInput } from "./components/image-input";
-export { Indicator } from "./components/indicator";
-export { Input, type InputProps } from "./components/input";
-export { ListButton } from "./components/list-button";
+  FloatingButton,
+  type FloatingButtonProps,
+  floatingButtonVariants,
+} from "./components/floating-button";
+export {
+  GlassButton,
+  type GlassButtonProps,
+  glassButtonVariants,
+} from "./components/glass-button";
+export {
+  IconButton,
+  type IconButtonProps,
+  iconButtonVariants,
+} from "./components/icon-button";
+export { Indicator, type IndicatorProps, indicatorVariants } from "./components/indicator";
+export { Input, type InputProps, inputVariants } from "./components/input";
+export { ImageInput, type ImageInputProps } from "./components/image-input";
+export {
+  Else,
+  If,
+  Then,
+  type IfBranchProps,
+  type IfProps,
+} from "./components/if";
+export {
+  Dropdown,
+  type DropdownOption,
+  type DropdownProps,
+} from "./components/dropdown";
+export {
+  TextArea,
+  type TextAreaProps,
+  textAreaVariants,
+} from "./components/text-area";
+export {
+  ListButton,
+  type ListButtonProps,
+  listButtonVariants,
+} from "./components/list-button";
+export {
+  MainCardButton,
+  type MainCardButtonProps,
+  mainCardButtonVariants,
+} from "./components/main-card-button";
 export { Loader } from "./components/loader";
-export { MainCardButton } from "./components/main-card-button";
+export { Radio, type RadioProps, radioVariants } from "./components/radio";
+export { Slot, type SlotProps } from "./components/slot";
 export {
-  Popover,
-  PopoverAnchor,
-  PopoverContent,
-  PopoverTrigger,
-} from "./components/popover";
-export { Radio } from "./components/radio";
-export { SelectorList } from "./components/selector-list";
-export { Switch } from "./components/switch";
-export { TabContent, TabItem, Tabs } from "./components/tabs";
-export { Tag } from "./components/tag";
-export { TextArea } from "./components/text-area";
-export { UploadedFile } from "./components/uploaded-file";
-export { useImageFallback } from "./hooks/image-fallback";
-export { useResponsiveElementSize } from "./hooks/responsive-element-size";
-export { MimeTypeDescriptions, type FileMimeType } from "./lib/consts";
+  Switch,
+  type SwitchProps,
+  switchThumbVariants,
+  switchVariants,
+} from "./components/switch";
+export {
+  UploadedFile,
+  type UploadedFileData,
+  type UploadedFileProps,
+} from "./components/uploaded-file";
+export {
+  FileUpload,
+  type FileUploadFile,
+  type FileUploadProps,
+} from "./components/file-upload";
+export { Tag, type TagProps, tagVariants } from "./components/tag";
+export {
+  TabContent,
+  TabItem,
+  Tabs,
+  type TabContentProps,
+  type TabItemProps,
+  type TabsProps,
+  tabIndicatorVariants,
+  tabItemVariants,
+  tabsVariants,
+} from "./components/tabs";
+export {
+  SelectorList,
+  type SelectorListProps,
+  selectorListVariants,
+} from "./components/selector-list";
 export { cn, formatFileSize, getValidFiles } from "./lib/utils";
+export {
+  MimeTypeDescriptions,
+  type FileMimeType,
+} from "./lib/consts";
+export * from "./theme";
+export { useImageFallback, useResponsiveElementSize } from "./hooks";

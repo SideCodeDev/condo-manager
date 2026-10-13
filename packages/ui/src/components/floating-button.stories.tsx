@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Plus } from "lucide-react";
+import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
+import { Plus } from "lucide-react-native";
 
 import { FloatingButton } from "./floating-button";
 
@@ -23,9 +23,8 @@ type Story = StoryObj<typeof meta>;
 
 export const IconOnly: Story = {
   render: (args) => (
-    <FloatingButton {...args}>
-      <Plus aria-hidden="true" />
-      <span className="sr-only">Add</span>
+    <FloatingButton {...args} accessibilityLabel="Add">
+      <Plus />
     </FloatingButton>
   ),
 };
@@ -41,7 +40,7 @@ export const TextOnly: Story = {
 export const IconAndText: Story = {
   render: (args) => (
     <FloatingButton {...args} className="px-6">
-      <Plus aria-hidden="true" />
+      <Plus />
       Add item
     </FloatingButton>
   ),

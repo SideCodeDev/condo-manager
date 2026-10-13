@@ -35,14 +35,11 @@ export const MimeTypeDescriptions: Record<FileMimeType, string> = {
   "image/webp": "WEBP",
   "image/svg+xml": "SVG",
   "application/msword": "Word Document",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-    "Word Document (DOCX)",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Word Document (DOCX)",
   "application/vnd.ms-excel": "Excel Spreadsheet",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-    "Excel Spreadsheet (XLSX)",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Excel Spreadsheet (XLSX)",
   "application/vnd.ms-powerpoint": "PowerPoint Presentation",
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-    "PowerPoint Presentation (PPTX)",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": "PowerPoint Presentation (PPTX)",
   "text/plain": "Text File",
   "text/csv": "CSV File",
   "application/zip": "ZIP Archive",

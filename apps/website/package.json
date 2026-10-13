@@ -9,11 +9,19 @@
   "dependencies": {
     "@clerk/tanstack-react-start": "^1.4.21",
     "@condo-manager/ui": "workspace:*",
-    "@tailwindcss/vite": "^4.1.18",
+    "@tailwindcss/vite": "catalog:",
     "@tanstack/react-router": "1.170.41",
     "@tanstack/react-start": "1.168.60",
+    "lucide-react": "catalog:",
+    "lucide-react-native": "catalog:",
+    "nativewind": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-native": "catalog:",
+    "react-native-css": "catalog:",
+    "react-native-reanimated": "catalog:",
+    "react-native-svg": "catalog:",
+    "react-native-web": "catalog:",
     "tailwindcss": "catalog:"
   },
   "devDependencies": {

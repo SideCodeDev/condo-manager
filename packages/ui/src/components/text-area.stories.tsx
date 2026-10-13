@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Mail, Search } from "lucide-react";
+import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
+import { Mail, Search } from "lucide-react-native";
 
 import { TextArea } from "./text-area";
 

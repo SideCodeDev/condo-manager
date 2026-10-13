@@ -1,30 +1,100 @@
-"use client";
-
 import * as React from "react";
-import { Switch as SwitchPrimitive } from "radix-ui";
+import type { GestureResponderEvent, PressableProps } from "react-native";
+import { Pressable, View } from "react-native-css/components";
+import { cva } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
 
+const switchVariants = cva(
+  "relative h-6 w-11 shrink-0 flex-row items-center rounded-full border border-transparent outline-none transition-colors focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary",
+  {
+    variants: {
+      checked: {
+        true: "bg-primary",
+        false: "bg-neutral-300",
+      },
+      disabled: {
+        true: "cursor-not-allowed bg-neutral-600",
+        false: "",
+      },
+    },
+    defaultVariants: {
+      checked: false,
+      disabled: false,
+    },
+  },
+);
+
+const switchThumbVariants = cva(
+  "pointer-events-none h-5 w-5 rounded-full bg-neutral-0 transition-transform",
+  {
+    variants: {
+      checked: {
+        true: "translate-x-5",
+        false: "translate-x-0",
+      },
+      disabled: {
+        true: "bg-neutral-400",
+        false: "",
+      },
+    },
+    defaultVariants: {
+      checked: false,
+      disabled: false,
+    },
+  },
+);
+
+export type SwitchProps = Omit<
+  PressableProps,
+  "children" | "disabled" | "onPress"
+> & {
+  checked?: boolean;
+  className?: string;
+  defaultChecked?: boolean;
+  disabled?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  onPress?: PressableProps["onPress"];
+};
+
 function Switch({
+  checked,
   className,
+  defaultChecked = false,
+  disabled = false,
+  onCheckedChange,
+  onPress,
   ...props
-}: React.ComponentProps<typeof SwitchPrimitive.Root>) {
+}: SwitchProps) {
+  const [uncontrolledChecked, setUncontrolledChecked] =
+    React.useState(defaultChecked);
+  const currentChecked = checked ?? uncontrolledChecked;
+
+  const toggle = (event: GestureResponderEvent) => {
+    if (disabled) return;
+
+    const nextChecked = !currentChecked;
+    if (checked === undefined) {
+      setUncontrolledChecked(nextChecked);
+    }
+    onCheckedChange?.(nextChecked);
+    onPress?.(event);
+  };
+
   return (
-    <SwitchPrimitive.Root
-      data-slot="switch"
-      className={cn(
-        "data-[state=checked]:bg-primary data-[state=unchecked]:bg-neutral-300 focus-visible:border-primary focus-visible:ring-primary aria-invalid:ring-red aria-invalid:border-red shrink-0 rounded-full border border-transparent focus-visible:ring-3 aria-invalid:ring-3 h-6 w-11 peer group/switch relative inline-flex items-center transition-all outline-none after:absolute after:-inset-x-3 after:-inset-y-2 data-[state=unchecked]:disabled:cursor-not-allowed data-[state=checked]:disabled:cursor-not-allowed data-[state=unchecked]:disabled:bg-neutral-600 data-[state=checked]:disabled:bg-neutral-600",
-        className,
-      )}
+    <Pressable
       {...props}
+      accessibilityRole="switch"
+      accessibilityState={{ checked: currentChecked, disabled }}
+      className={cn(switchVariants({ checked: currentChecked, disabled }), className)}
+      disabled={disabled}
+      onPress={toggle}
     >
-      <SwitchPrimitive.Thumb
-        data-slot="switch-thumb"
-        data-disabled={props.disabled}
-        className="bg-neutral-0 rounded-full size-5 data-[state=checked]:translate-x-full data-[state=unchecked]:translate-x-0 pointer-events-none block ring-0 transition-transform data-[disabled=true]:bg-neutral-400"
+      <View
+        className={switchThumbVariants({ checked: currentChecked, disabled })}
       />
-    </SwitchPrimitive.Root>
+    </Pressable>
   );
 }
 
-export { Switch };
+export { Switch, switchThumbVariants, switchVariants };

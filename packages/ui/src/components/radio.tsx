@@ -1,51 +1,119 @@
-"use client";
-
-import { Checkbox as CheckboxPrimitive } from "radix-ui";
 import * as React from "react";
+import type { GestureResponderEvent, PressableProps } from "react-native";
+import { Pressable, Text, View } from "react-native-css/components";
+import { cva } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
-import { If } from "./if";
+
+const radioVariants = cva(
+  "h-5 w-5 shrink-0 flex-row items-center justify-center rounded-full border transition-colors",
+  {
+    variants: {
+      state: {
+        unchecked: "border-neutral-600",
+        checked: "border-primary",
+        "disabled-checked": "border-neutral-600",
+      },
+      disabled: {
+        true: "cursor-not-allowed border-neutral-400",
+        false: "",
+      },
+    },
+    defaultVariants: {
+      state: "unchecked",
+      disabled: false,
+    },
+  },
+);
+
+export type RadioProps = Omit<
+  PressableProps,
+  "children" | "onPress" | "disabled"
+> & {
+  checked?: boolean;
+  className?: string;
+  defaultChecked?: boolean;
+  disabled?: boolean;
+  id?: string;
+  label?: string;
+  onCheckedChange?: (checked: boolean) => void;
+  onPress?: PressableProps["onPress"];
+};
 
 function Radio({
-  label,
+  checked,
   className,
+  defaultChecked = false,
+  disabled = false,
+  label,
+  onCheckedChange,
+  onPress,
+  accessibilityLabel,
   ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root> & { label?: string }) {
+}: RadioProps) {
+  const [uncontrolledChecked, setUncontrolledChecked] =
+    React.useState(defaultChecked);
+  const isChecked = checked ?? uncontrolledChecked;
+  const state = disabled
+    ? isChecked
+      ? "disabled-checked"
+      : "unchecked"
+    : isChecked
+      ? "checked"
+      : "unchecked";
+
+  const toggle = (event?: GestureResponderEvent) => {
+    if (disabled) return;
+
+    const nextChecked = !isChecked;
+    if (checked === undefined) {
+      setUncontrolledChecked(nextChecked);
+    }
+    onCheckedChange?.(nextChecked);
+    if (event) onPress?.(event);
+  };
+
   return (
-    <div className={cn("flex items-center gap-2.5", className)}>
-      <CheckboxPrimitive.Root
-        data-slot="checkbox"
-        className={cn(
-          "border-neutral-600 data-[state=checked]:text-primary data-[state=checked]:border-primary flex size-5 items-center justify-center rounded-full border transition-colors shrink-0 disabled:cursor-not-allowed disabled:border-neutral-400 data-[state=checked]:disabled:border-neutral-600 data-[state=checked]:disabled:text-neutral-600",
-        )}
+    <View
+      className={cn(
+        "flex-row items-center gap-2.5",
+        disabled && "cursor-not-allowed",
+        className,
+      )}
+    >
+      <Pressable
         {...props}
+        accessibilityLabel={accessibilityLabel ?? label}
+        accessibilityRole="radio"
+        accessibilityState={{ checked: isChecked, disabled }}
+        className={radioVariants({ disabled, state })}
+        disabled={disabled}
+        onPress={toggle}
       >
-        <CheckboxPrimitive.Indicator
-          data-slot="checkbox-indicator"
-          className="grid place-content-center text-current transition-none"
-        >
-          <svg
-            width="10"
-            height="10"
-            viewBox="0 0 10 10"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect width="10" height="10" rx="5" fill="currentColor" />
-          </svg>
-        </CheckboxPrimitive.Indicator>
-      </CheckboxPrimitive.Root>
-      <If condition={!!label}>
-        <label
-          htmlFor={props.id}
-          className="font-ui-6 text-neutral-1000 cursor-pointer data-[disabled=true]:cursor-not-allowed data-[disabled=true]:text-neutral-600"
-          data-disabled={props.disabled}
+        {isChecked ? (
+          <View
+            className={cn(
+              "h-2.5 w-2.5 rounded-full",
+              disabled ? "bg-neutral-600" : "bg-primary",
+            )}
+          />
+        ) : null}
+      </Pressable>
+      {label ? (
+        <Text
+          className={cn(
+            "font-ui-6",
+            disabled
+              ? "cursor-not-allowed text-neutral-600"
+              : "cursor-pointer text-neutral-1000",
+          )}
+          onPress={toggle}
         >
           {label}
-        </label>
-      </If>
-    </div>
+        </Text>
+      ) : null}
+    </View>
   );
 }
 
-export { Radio };
+export { Radio, radioVariants };

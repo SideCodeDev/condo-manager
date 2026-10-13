@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Home, Settings } from "lucide-react";
+import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
+import { Home, Settings } from "lucide-react-native";
+import { StyleSheet, View } from "react-native";
 
 import { ListButton } from "./list-button";
 
@@ -27,8 +28,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Standalone: Story = {
   render: (args) => (
-    <ListButton {...args}>
-      <Home aria-hidden="true" />
+    <ListButton {...args} accessibilityLabel="Home">
+      <Home />
       Home
     </ListButton>
   ),
@@ -36,9 +37,8 @@ export const Standalone: Story = {
 
 export const StandaloneIconOnly: Story = {
   render: (args) => (
-    <ListButton {...args}>
-      <Home aria-hidden="true" />
-      <span className="sr-only">Home</span>
+    <ListButton {...args} accessibilityLabel="Home">
+      <Home />
     </ListButton>
   ),
 };
@@ -50,8 +50,8 @@ export const StandaloneTextOnly: Story = {
 export const Dropdown: Story = {
   args: { variant: "dropdown" },
   render: (args) => (
-    <ListButton {...args}>
-      <Settings aria-hidden="true" />
+    <ListButton {...args} accessibilityLabel="Settings">
+      <Settings />
       Settings
     </ListButton>
   ),
@@ -60,8 +60,8 @@ export const Dropdown: Story = {
 export const DropdownSelected: Story = {
   args: { variant: "dropdown", selected: true },
   render: (args) => (
-    <ListButton {...args}>
-      <Settings aria-hidden="true" />
+    <ListButton {...args} accessibilityLabel="Settings">
+      <Settings />
       Settings
     </ListButton>
   ),
@@ -70,19 +70,26 @@ export const DropdownSelected: Story = {
 export const DropdownList: Story = {
   args: { variant: "dropdown" },
   render: (args) => (
-    <div className="flex flex-col w-48">
-      <ListButton {...args} selected>
-        <Home aria-hidden="true" />
+    <View style={styles.list}>
+      <ListButton {...args} selected accessibilityLabel="Home">
+        <Home />
         Home
       </ListButton>
-      <ListButton {...args}>
-        <Settings aria-hidden="true" />
+      <ListButton {...args} accessibilityLabel="Settings">
+        <Settings />
         Settings
       </ListButton>
-      <ListButton {...args} disabled>
-        <Settings aria-hidden="true" />
+      <ListButton {...args} disabled accessibilityLabel="Disabled">
+        <Settings />
         Disabled
       </ListButton>
-    </div>
+    </View>
   ),
 };
+
+const styles = StyleSheet.create({
+  list: {
+    width: 192,
+    gap: 0,
+  },
+});

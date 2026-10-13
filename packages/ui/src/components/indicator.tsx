@@ -1,45 +1,73 @@
-"use client";
+import { Check } from "lucide-react-native";
+import { cva } from "class-variance-authority";
+import { View } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
-import { CheckIcon } from "lucide-react";
-import { If } from "./if";
+import { colors } from "../theme";
 
-export function Indicator({
-  checked,
-  variant,
-  className,
-}: {
+const indicatorVariants = cva("h-6 w-6 p-0.5 flex-row items-center justify-center", {
+  variants: {
+    variant: {
+      checkbox: "",
+      radio: "",
+    },
+  },
+  defaultVariants: {
+    variant: "checkbox",
+  },
+});
+
+const indicatorControlVariants = cva(
+  "h-5 w-5 flex-row items-center justify-center border border-neutral-400",
+  {
+    variants: {
+      variant: {
+        checkbox: "rounded-sm",
+        radio: "rounded-full",
+      },
+      checked: {
+        true: "border-primary",
+        false: "",
+      },
+    },
+    compoundVariants: [
+      {
+        variant: "checkbox",
+        checked: true,
+        class: "bg-primary text-neutral-0",
+      },
+      {
+        variant: "radio",
+        checked: true,
+        class: "text-primary",
+      },
+    ],
+    defaultVariants: {
+      variant: "checkbox",
+      checked: false,
+    },
+  },
+);
+
+export type IndicatorProps = {
+  checked: boolean;
   className?: string;
   variant: "radio" | "checkbox";
-  checked: boolean;
-}) {
+};
+
+function Indicator({ checked, variant, className }: IndicatorProps) {
   return (
-    <div className={cn("p-0.5 grid place-items-center size-6", className)}>
-      <div
-        className={cn(
-          "border border-neutral-400 data-[checked=true]:border-primary size-5 grid place-items-center",
-          variant === "checkbox" &&
-            "rounded-sm data-[checked=true]:bg-primary data-[checked=true]:text-neutral-0",
-          variant === "radio" &&
-            "rounded-full data-[checked=true]:text-primary",
-        )}
-        data-checked={checked}
-      >
-        <If condition={variant === "checkbox" && checked}>
-          <CheckIcon size={16} />
-        </If>
-        <If condition={variant === "radio" && checked}>
-          <svg
-            width="10"
-            height="10"
-            viewBox="0 0 10 10"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect width="10" height="10" rx="5" fill="currentColor" />
-          </svg>
-        </If>
-      </div>
-    </div>
+    <View className={cn(indicatorVariants({ variant }), className)}>
+      <View className={indicatorControlVariants({ checked, variant })}>
+        {variant === "checkbox" && checked ? (
+          <Check color={colors.neutral[0]} size={16} strokeWidth={2} />
+        ) : null}
+        {variant === "radio" && checked ? (
+          <View className="h-2.5 w-2.5 rounded-full bg-primary" />
+        ) : null}
+      </View>
+    </View>
   );
 }
+
+export { Indicator, indicatorVariants };
