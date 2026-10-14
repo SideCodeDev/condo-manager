@@ -16,91 +16,61 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 type Swatch = { name: string; className: string };
-
 const neutral: Swatch[] = [
-  { name: "white", className: "bg-white" },
-  { name: "neutral-50", className: "bg-neutral-50" },
-  { name: "neutral-100", className: "bg-neutral-100" },
-  { name: "neutral-200", className: "bg-neutral-200" },
-  { name: "neutral-300", className: "bg-neutral-300" },
-  { name: "neutral-400", className: "bg-neutral-400" },
-  { name: "neutral-500", className: "bg-neutral-500" },
-  { name: "neutral-600", className: "bg-neutral-600" },
-  { name: "neutral-700", className: "bg-neutral-700" },
-  { name: "neutral-800", className: "bg-neutral-800" },
-  { name: "neutral-900", className: "bg-neutral-900" },
-  { name: "neutral-950", className: "bg-neutral-950" },
   { name: "black", className: "bg-black" },
+  { name: "neutral-950", className: "bg-neutral-950" },
+  { name: "neutral-900", className: "bg-neutral-900" },
+  { name: "neutral-800", className: "bg-neutral-800" },
+  { name: "neutral-700", className: "bg-neutral-700" },
+  { name: "neutral-600", className: "bg-neutral-600" },
+  { name: "neutral-500", className: "bg-neutral-500" },
+  { name: "neutral-400", className: "bg-neutral-400" },
+  { name: "neutral-300", className: "bg-neutral-300" },
+  { name: "neutral-200", className: "bg-neutral-200" },
+  { name: "neutral-100", className: "bg-neutral-100" },
+  { name: "neutral-50", className: "bg-neutral-50" },
+  { name: "white", className: "bg-white" },
 ];
 
-const brand: Swatch[] = [
-  { name: "primary", className: "bg-primary" },
-  { name: "primary-500", className: "bg-primary" },
-  { name: "primary-100", className: "bg-primary-100" },
-  { name: "primary-200", className: "bg-primary-200" },
-  { name: "primary-300", className: "bg-primary-300" },
-  { name: "primary-400", className: "bg-primary-400" },
-  { name: "primary-600", className: "bg-primary-600" },
-  { name: "primary-700", className: "bg-primary-700" },
-  { name: "primary-800", className: "bg-primary-800" },
-  { name: "primary-900", className: "bg-primary-900" },
-  { name: "primary-1000", className: "bg-primary-1000" },
-  { name: "secondary", className: "bg-secondary" },
-  { name: "secondary-500", className: "bg-secondary" },
-  { name: "secondary-100", className: "bg-secondary-100" },
-  { name: "secondary-200", className: "bg-secondary-200" },
-  { name: "secondary-300", className: "bg-secondary-300" },
-  { name: "secondary-400", className: "bg-secondary-400" },
-  { name: "secondary-600", className: "bg-secondary-600" },
-  { name: "secondary-700", className: "bg-secondary-700" },
-  { name: "secondary-800", className: "bg-secondary-800" },
-  { name: "secondary-900", className: "bg-secondary-900" },
-  { name: "secondary-1000", className: "bg-secondary-1000" },
+const palettes = [
+  { name: "Primary", swatches: [
+    { name: "Primary-1000", className: "bg-primary-1000" }, { name: "Primary-900", className: "bg-primary-900" },
+    { name: "Primary-800", className: "bg-primary-800" }, { name: "Primary-700", className: "bg-primary-700" },
+    { name: "Primary-600", className: "bg-primary-600" }, { name: "Primary-500", className: "bg-primary" },
+    { name: "Primary-400", className: "bg-primary-400" }, { name: "Primary-300", className: "bg-primary-300" },
+    { name: "Primary-200", className: "bg-primary-200" }, { name: "Primary-100", className: "bg-primary-100" },
+  ] },
+  { name: "Secondary", swatches: [
+    { name: "Secondary-1000", className: "bg-secondary-1000" }, { name: "Secondary-900", className: "bg-secondary-900" },
+    { name: "Secondary-800", className: "bg-secondary-800" }, { name: "Secondary-700", className: "bg-secondary-700" },
+    { name: "Secondary-600", className: "bg-secondary-600" }, { name: "Secondary-500", className: "bg-secondary" },
+    { name: "Secondary-400", className: "bg-secondary-400" }, { name: "Secondary-300", className: "bg-secondary-300" },
+    { name: "Secondary-200", className: "bg-secondary-200" }, { name: "Secondary-100", className: "bg-secondary-100" },
+  ] },
 ];
 
-const semantic: Swatch[] = [
-  { name: "red", className: "bg-red" },
-  { name: "red-50", className: "bg-red-50" },
-  { name: "red-100", className: "bg-red-100" },
-  { name: "red-200", className: "bg-red-200" },
-  { name: "red-300", className: "bg-red-300" },
-  { name: "red-400", className: "bg-red-400" },
-  { name: "red-500", className: "bg-red" },
-  { name: "red-600", className: "bg-red-600" },
-  { name: "red-700", className: "bg-red-700" },
-  { name: "red-800", className: "bg-red-800" },
-  { name: "red-900", className: "bg-red-900" },
-  { name: "orange", className: "bg-orange" },
-  { name: "orange-50", className: "bg-orange-50" },
-  { name: "orange-100", className: "bg-orange-100" },
-  { name: "orange-200", className: "bg-orange-200" },
-  { name: "orange-300", className: "bg-orange-300" },
-  { name: "orange-400", className: "bg-orange-400" },
-  { name: "orange-500", className: "bg-orange" },
-  { name: "orange-600", className: "bg-orange-600" },
-  { name: "orange-700", className: "bg-orange-700" },
-  { name: "orange-800", className: "bg-orange-800" },
-  { name: "orange-900", className: "bg-orange-900" },
-  { name: "green", className: "bg-green" },
-  { name: "green-50", className: "bg-green-50" },
-  { name: "green-100", className: "bg-green-100" },
-  { name: "green-200", className: "bg-green-200" },
-  { name: "green-300", className: "bg-green-300" },
-  { name: "green-400", className: "bg-green-400" },
-  { name: "green-500", className: "bg-green" },
-  { name: "green-600", className: "bg-green-600" },
-  { name: "green-700", className: "bg-green-700" },
-  { name: "green-800", className: "bg-green-800" },
-  { name: "green-900", className: "bg-green-900" },
+const otherPalettes = [
+  { name: "Red", swatches: [
+    { name: "Red-900", className: "bg-red-900" }, { name: "Red-800", className: "bg-red-800" }, { name: "Red-700", className: "bg-red-700" },
+    { name: "Red-600", className: "bg-red-600" }, { name: "Red-500", className: "bg-red" }, { name: "Red-400", className: "bg-red-400" },
+    { name: "Red-300", className: "bg-red-300" }, { name: "Red-200", className: "bg-red-200" }, { name: "Red-100", className: "bg-red-100" }, { name: "Red-50", className: "bg-red-50" },
+  ] },
+  { name: "Orange", swatches: [
+    { name: "Orange-900", className: "bg-orange-900" }, { name: "Orange-800", className: "bg-orange-800" }, { name: "Orange-700", className: "bg-orange-700" },
+    { name: "Orange-600", className: "bg-orange-600" }, { name: "Orange-500", className: "bg-orange" }, { name: "Orange-400", className: "bg-orange-400" },
+    { name: "Orange-300", className: "bg-orange-300" }, { name: "Orange-200", className: "bg-orange-200" }, { name: "Orange-100", className: "bg-orange-100" }, { name: "Orange-50", className: "bg-orange-50" },
+  ] },
+  { name: "Green", swatches: [
+    { name: "Green-900", className: "bg-green-900" }, { name: "Green-800", className: "bg-green-800" }, { name: "Green-700", className: "bg-green-700" },
+    { name: "Green-600", className: "bg-green-600" }, { name: "Green-500", className: "bg-green" }, { name: "Green-400", className: "bg-green-400" },
+    { name: "Green-300", className: "bg-green-300" }, { name: "Green-200", className: "bg-green-200" }, { name: "Green-100", className: "bg-green-100" }, { name: "Green-50", className: "bg-green-50" },
+  ] },
 ];
 
 function ColorSwatch({ name, className }: Swatch) {
   return (
     <View className="w-24 gap-1">
-      <View
-        accessibilityLabel={name}
-        className={`h-12 w-full rounded-md border border-neutral-200 ${className}`}
-      />
+      <View accessibilityLabel={name} className={`h-12 w-full rounded-md border border-neutral-200 ${className}`} />
       <Text className="font-p-3 text-neutral-700">{name}</Text>
       <Text className="font-p-3 text-neutral-500">{className}</Text>
     </View>
@@ -109,39 +79,33 @@ function ColorSwatch({ name, className }: Swatch) {
 
 function ColorGroup({ title, swatches }: { title: string; swatches: Swatch[] }) {
   return (
-    <View className="gap-3">
-      <Text className="font-h4 border-b border-neutral-200 pb-1 text-neutral-600">
-        {title}
-      </Text>
+    <View className="gap-3 rounded-lg bg-white p-4">
+      <Text className="font-h5 text-neutral-950">{title}</Text>
       <View className="flex-row flex-wrap gap-4">
-        {swatches.map((swatch) => (
-          <ColorSwatch key={swatch.name} {...swatch} />
-        ))}
+        {swatches.map((swatch) => <ColorSwatch key={swatch.name} {...swatch} />)}
       </View>
     </View>
   );
 }
 
-function AllColorGroups() {
+function PaletteGroup({ title, groups }: { title: string; groups: { name: string; swatches: Swatch[] }[] }) {
   return (
-    <View className="gap-8">
-      <ColorGroup title="Neutral" swatches={neutral} />
-      <ColorGroup title="Brand" swatches={brand} />
-      <ColorGroup title="Semantic" swatches={semantic} />
+    <View className="gap-4">
+      <Text className="font-h4 text-neutral-950">{title}</Text>
+      {groups.map((palette) => <ColorGroup key={palette.name} title={palette.name} swatches={palette.swatches} />)}
     </View>
   );
 }
 
-export const Neutral: Story = {
-  render: () => <ColorGroup title="Neutral" swatches={neutral} />,
+export const Neutral: Story = { render: () => <ColorGroup title="Neutral" swatches={neutral} /> };
+export const Brand: Story = { render: () => <PaletteGroup title="Brand" groups={palettes} /> };
+export const Other: Story = { render: () => <PaletteGroup title="Other" groups={otherPalettes} /> };
+export const AllColors: Story = {
+  render: () => (
+    <View className="gap-8 bg-neutral-50 p-4">
+      <ColorGroup title="Neutral" swatches={neutral} />
+      <PaletteGroup title="Brand" groups={palettes} />
+      <PaletteGroup title="Other" groups={otherPalettes} />
+    </View>
+  ),
 };
-
-export const Brand: Story = {
-  render: () => <ColorGroup title="Brand" swatches={brand} />,
-};
-
-export const Semantic: Story = {
-  render: () => <ColorGroup title="Semantic" swatches={semantic} />,
-};
-
-export const AllColors: Story = { render: () => <AllColorGroups /> };

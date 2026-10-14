@@ -15,106 +15,57 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-type ShadowToken = { name: string; className: string };
+type ShadowGroupDefinition = {
+  title: string;
+  description: string;
+  levels: readonly string[];
+};
 
-const topShadows: ShadowToken[] = [
-  { name: "shadow-top-0", className: "shadow-top-0" },
-  { name: "shadow-top-1", className: "shadow-top-1" },
-  { name: "shadow-top-2", className: "shadow-top-2" },
-  { name: "shadow-top-3", className: "shadow-top-3" },
-  { name: "shadow-top-4", className: "shadow-top-4" },
-];
+const shadowGroups: ShadowGroupDefinition[] = [
+  {
+    title: "Top",
+    description: "When applying this drop shadow to an element like a card, include a border. The shadow alone does not provide sufficient edge definition.",
+    levels: ["shadow-top-0", "shadow-top-1", "shadow-top-2", "shadow-top-3", "shadow-top-4"],
+  },
+  {
+    title: "Center",
+    description: "This drop shadow does not require a border, but in some cases it might be better to include one.",
+    levels: ["shadow-center-0", "shadow-center-1", "shadow-center-2", "shadow-center-3", "shadow-center-4"],
+  },
+  {
+    title: "Bottom",
+    description: "When applying this drop shadow to an element like a card, include a border. The shadow alone does not provide sufficient edge definition.",
+    levels: ["shadow-bottom-0", "shadow-bottom-1", "shadow-bottom-2", "shadow-bottom-3", "shadow-bottom-4"],
+  },
+] as const;
 
-const centerShadows: ShadowToken[] = [
-  { name: "shadow-center-0", className: "shadow-center-0" },
-  { name: "shadow-center-1", className: "shadow-center-1" },
-  { name: "shadow-center-2", className: "shadow-center-2" },
-  { name: "shadow-center-3", className: "shadow-center-3" },
-  { name: "shadow-center-4", className: "shadow-center-4" },
-];
-
-const bottomShadows: ShadowToken[] = [
-  { name: "shadow-bottom-0", className: "shadow-bottom-0" },
-  { name: "shadow-bottom-1", className: "shadow-bottom-1" },
-  { name: "shadow-bottom-2", className: "shadow-bottom-2" },
-  { name: "shadow-bottom-3", className: "shadow-bottom-3" },
-  { name: "shadow-bottom-4", className: "shadow-bottom-4" },
-];
-
-const glassShadows: ShadowToken[] = [
-  { name: "shadow-glass", className: "shadow-glass" },
-  { name: "shadow-glass-focus", className: "shadow-glass-focus" },
-];
-
-function ShadowSwatch({
-  name,
-  className,
-  surfaceClassName = "bg-white",
-}: ShadowToken & { surfaceClassName?: string }) {
+function ShadowGroup({ group }: { group: ShadowGroupDefinition }) {
   return (
-    <View className="w-48 items-start gap-3 p-8">
-      <View className={`h-24 w-48 rounded-xl ${surfaceClassName} ${className}`} />
-      <View>
-        <Text className="font-p-3 font-medium text-neutral-950">{name}</Text>
-        <Text className="font-p-3 text-neutral-500">{className}</Text>
+    <View className="gap-3">
+      <View className="gap-1">
+        <Text className="font-p-1 font-bold text-neutral-950">{group.title}</Text>
+        <Text className="font-p-3 text-neutral-700">{group.description}</Text>
       </View>
-    </View>
-  );
-}
-
-function ShadowGroup({ title, tokens }: { title: string; tokens: ShadowToken[] }) {
-  return (
-    <View className="gap-4">
-      <Text className="font-h4 text-neutral-950">{title}</Text>
-      <View className="flex-row flex-wrap gap-4">
-        {tokens.map((token) => (
-          <ShadowSwatch key={token.name} {...token} />
+      <View className="flex-row flex-wrap gap-3 px-2 py-2">
+        {group.levels.map((className, index) => (
+          <View className={`h-14 min-w-36 w-36 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-white ${className}`} key={className}>
+            <Text className="font-p-2 font-bold text-neutral-800">{index}</Text>
+          </View>
         ))}
       </View>
     </View>
   );
 }
 
-export const AllShadows: Story = {
-  render: () => (
-    <View className="gap-10 rounded-xl bg-neutral-50 p-8">
-      <ShadowGroup title="Top" tokens={topShadows} />
-      <ShadowGroup title="Center" tokens={centerShadows} />
-      <ShadowGroup title="Bottom" tokens={bottomShadows} />
-      <View className="gap-4">
-        <Text className="font-h4 text-neutral-950">Glass</Text>
-        <View className="flex-row flex-wrap gap-4">
-          <ShadowSwatch
-            {...glassShadows[0]}
-            surfaceClassName="bg-neutral-900"
-          />
-          <ShadowSwatch
-            {...glassShadows[1]}
-            surfaceClassName="bg-neutral-100"
-          />
-        </View>
-      </View>
+function ShadowSections({ groups = shadowGroups }: { groups?: ShadowGroupDefinition[] }) {
+  return (
+    <View className="gap-8 rounded-xl bg-white p-6">
+      {groups.map((group) => <ShadowGroup key={group.title} group={group} />)}
     </View>
-  ),
-};
+  );
+}
 
-export const Top: Story = {
-  render: () => <ShadowGroup title="Top" tokens={topShadows} />,
-};
-
-export const Center: Story = {
-  render: () => <ShadowGroup title="Center" tokens={centerShadows} />,
-};
-
-export const Bottom: Story = {
-  render: () => <ShadowGroup title="Bottom" tokens={bottomShadows} />,
-};
-
-export const Glass: Story = {
-  render: () => (
-    <View className="flex-row flex-wrap gap-4">
-      <ShadowSwatch {...glassShadows[0]} surfaceClassName="bg-neutral-900" />
-      <ShadowSwatch {...glassShadows[1]} surfaceClassName="bg-neutral-100" />
-    </View>
-  ),
-};
+export const AllShadows: Story = { render: () => <ShadowSections /> };
+export const Top: Story = { render: () => <ShadowSections groups={[shadowGroups[0]]} /> };
+export const Center: Story = { render: () => <ShadowSections groups={[shadowGroups[1]]} /> };
+export const Bottom: Story = { render: () => <ShadowSections groups={[shadowGroups[2]]} /> };

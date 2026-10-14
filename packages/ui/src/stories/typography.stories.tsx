@@ -16,84 +16,61 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const sampleText = "The quick brown fox jumps over the lazy dog";
+const typographyTokens = [
+  { label: "Display", className: "font-display", size: "64px", lineHeight: "72px" },
+  { label: "H1", className: "font-h1", size: "56px", lineHeight: "64px" },
+  { label: "H2", className: "font-h2", size: "48px", lineHeight: "56px" },
+  { label: "H3", className: "font-h3", size: "40px", lineHeight: "48px" },
+  { label: "H4", className: "font-h4", size: "32px", lineHeight: "40px" },
+  { label: "H5", className: "font-h5", size: "24px", lineHeight: "32px" },
+  { label: "H6", className: "font-h6", size: "20px", lineHeight: "28px" },
+  { label: "P1", className: "font-p-1", size: "16px", lineHeight: "24px" },
+  { label: "P2", className: "font-p-2", size: "14px", lineHeight: "22px" },
+  { label: "P3", className: "font-p-3", size: "12px", lineHeight: "20px" },
+] as const;
 
 const weights = [
   { label: "Bold", className: "font-bold" },
   { label: "Medium", className: "font-medium" },
   { label: "Regular", className: "font-normal" },
   { label: "Light", className: "font-light" },
-];
+] as const;
 
-type FontDefinition = { label: string; className: string };
-
-const paragraphs: FontDefinition[] = [
-  { label: "font-p-1", className: "font-p-1" },
-  { label: "font-p-2", className: "font-p-2" },
-  { label: "font-p-3", className: "font-p-3" },
-];
-
-const semanticHeadings: FontDefinition[] = [
-  { label: "font-display", className: "font-display" },
-  { label: "font-h1", className: "font-h1" },
-  { label: "font-h2", className: "font-h2" },
-  { label: "font-h3", className: "font-h3" },
-  { label: "font-h4", className: "font-h4" },
-  { label: "font-h5", className: "font-h5" },
-  { label: "font-h6", className: "font-h6" },
-];
-
-function FontRow({ label, className }: FontDefinition) {
+function WeightShowcase({ label, className }: (typeof weights)[number]) {
   return (
-    <View className="gap-1">
-      <Text className="font-p-3 text-neutral-600">{label}</Text>
-      {weights.map((weight) => (
-        <View className="flex-row items-baseline gap-3" key={weight.label}>
-          <Text className="w-20 shrink-0 font-p-3 text-neutral-500">
-            {weight.label}
-          </Text>
-          <Text className={`${className} ${weight.className} shrink`}>
-            {sampleText}
-          </Text>
-        </View>
-      ))}
+    <View className="overflow-hidden rounded-lg bg-white">
+      <View className="flex-row items-center justify-between bg-neutral-950 px-4 py-6">
+        <Text className="font-h5 font-bold text-secondary">DM Sans – {label}</Text>
+        <Text className="font-h5 text-secondary">Aa</Text>
+      </View>
+      <View className="px-4">
+        {typographyTokens.map((token) => (
+          <View className="gap-2 border-b border-neutral-200 py-3" key={token.label}>
+            <View className="flex-row items-center justify-between">
+              <Text className="rounded bg-neutral-200 px-2 font-p-3 text-neutral-800">{label} / {token.label}</Text>
+              <View className="flex-row gap-6">
+                <Text className="font-p-3 text-neutral-700">{token.size}</Text>
+                <Text className="font-p-3 text-neutral-700">{token.lineHeight}</Text>
+              </View>
+            </View>
+            <Text className={`${token.className} ${className}`}>{sampleText}</Text>
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
 
-function FontGroup({
-  title,
-  definitions,
-}: {
-  title?: string;
-  definitions: FontDefinition[];
-}) {
+function WeightGroup({ weightsToShow = weights }: { weightsToShow?: typeof weights }) {
   return (
-    <View className="gap-8">
-      {title ? (
-        <Text className="font-h4 border-b border-neutral-200 pb-1 text-neutral-600">
-          {title}
-        </Text>
-      ) : null}
-      {definitions.map((definition) => (
-        <FontRow key={definition.label} {...definition} />
-      ))}
+    <View className="gap-6">
+      {weightsToShow.map((weight) => <WeightShowcase key={weight.label} {...weight} />)}
     </View>
   );
 }
 
-export const Paragraphs: Story = {
-  render: () => <FontGroup definitions={paragraphs} />,
-};
-
-export const SemanticHeadings: Story = {
-  render: () => <FontGroup definitions={semanticHeadings} />,
-};
-
-export const AllFonts: Story = {
-  render: () => (
-    <View className="gap-10">
-      <FontGroup title="Paragraphs" definitions={paragraphs} />
-      <FontGroup title="Semantic Headings" definitions={semanticHeadings} />
-    </View>
-  ),
-};
+export const Bold: Story = { render: () => <WeightShowcase {...weights[0]} /> };
+export const Medium: Story = { render: () => <WeightShowcase {...weights[1]} /> };
+export const Regular: Story = { render: () => <WeightShowcase {...weights[2]} /> };
+export const Light: Story = { render: () => <WeightShowcase {...weights[3]} /> };
+export const AllWeights: Story = { render: () => <WeightGroup /> };
