@@ -66,6 +66,14 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 - Keep the universal UI package free of app-specific routing, authentication,
   billing, and Convex concerns. Export public APIs through `packages/ui` entry
   points and include platform-specific files only where behavior must differ.
+- Use Tailwind CSS v4 tokens as the single source of truth for visual styling
+  across web and native mobile. Apply colors, typography, spacing, borders,
+  shadows, and other visual tokens with Tailwind/NativeWind class names; do not
+  add or use a parallel TypeScript `theme`/design-token folder or read color
+  values into component styles. Define or change shared tokens in the UI
+  package's Tailwind CSS theme, and consume them through classes on both
+  platforms. When a native API requires a style prop, use it only for values
+  that cannot be expressed with Tailwind classes, not as a second token system.
 - Add or update Storybook stories when a shared component's visible behavior or
   public variants change.
 - Keep Expo/React Native dependency versions compatible with the Expo SDK in

@@ -9,7 +9,7 @@ requires different behavior.
 ## What's included
 
 - Shared controls such as buttons, inputs, selectors, tabs, and file upload.
-- Design tokens for colors, shadows, and typography, plus DM Sans assets.
+- Shared Tailwind CSS v4 tokens and DM Sans assets.
 - Hooks and small utilities used by shared components.
 - Storybook stories for components and design tokens.
 
@@ -20,7 +20,18 @@ variants, or public API changes.
 
 ## Styling and fonts
 
-Tailwind CSS v4 / NativeWind v5 provide the shared design tokens and utilities.
+Tailwind CSS v4 / NativeWind v5 are the single source of truth for visual
+tokens and utilities on web and native mobile. Define tokens in the Tailwind
+theme in `src/styles.base.css` and consume them with Tailwind/NativeWind classes
+(for example, `text-neutral-600`, `bg-primary`, or `shadow-card`). Do not add a
+TypeScript `theme` folder, duplicate token values in TypeScript, or pass token
+colors through inline styles or component color props. This applies equally to
+shared components and app-specific UI in `apps/web` and `apps/mobile`.
+
+Prefer class names on icons and native components as well. If a platform API
+only accepts a style prop and cannot be styled with a class, keep that prop
+limited to the platform integration and do not create a parallel token source.
+
 The web stylesheet is:
 
 ```tsx

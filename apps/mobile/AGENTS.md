@@ -58,6 +58,13 @@ integration is in `metro.config.js`. DM Sans is loaded in the root layout.
 Preserve these integration points when changing styling or fonts. Add or update
 Storybook stories in `packages/ui` for visible shared-component changes.
 
+Use Tailwind/NativeWind classes as the only source for visual styling on mobile,
+matching the web app. Consume shared colors, typography, spacing, shadows, and
+other visual tokens through class names defined by the Tailwind theme. Do not
+read colors from `Colors`, a TypeScript theme module, or inline style values;
+do not create a second token system. Use style props only when a native API
+cannot be styled with a class, and keep such props limited to that integration.
+
 ## Native project files
 
 - `ios/` and `android/` are generated through Expo prebuild when absent. Do not

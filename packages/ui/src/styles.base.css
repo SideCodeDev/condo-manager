@@ -16,8 +16,9 @@
   --font-sans: var(--font-app);
   --font-mono: var(--font-app);
 
-  --color-neutral-0: #ffffff;
-  --color-neutral-50: #f0f0f0;
+  /* Neutrals */
+  --color-white: #ffffff;
+  --color-neutral-50: #ebebeb;
   --color-neutral-100: #e2e2e2;
   --color-neutral-200: #cccccc;
   --color-neutral-300: #b3b3b3;
@@ -28,25 +29,67 @@
   --color-neutral-800: #2b2b30;
   --color-neutral-900: #1c1c21;
   --color-neutral-950: #121217;
-  --color-neutral-1000: #000000;
+  --color-black: #000000;
 
-  --color-green: #10b981;
-  --color-green-600: #059669;
-  --color-green-700: #059669;
-  --color-yellow: #f59e0b;
-  --color-yellow-600: #d97706;
-  --color-yellow-900: #c84900;
-  --color-red: #dc2626;
-  --color-red-600: #b91c1c;
-
-  --color-primary: #4f46e5;
-  --color-primary-50: #eef2ff;
+  /* Primary */
   --color-primary-100: #e0e7ff;
-  --color-primary-200: #dcdafa;
-  --color-primary-600: #4338ca;
-  --color-primary-700: #3730a3;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary: #4f46e5; /* 500 */
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
   --color-primary-900: #312e81;
-  --color-secondary: #f59e0b;
+  --color-primary-1000: #1e1b4b;
+
+  /* Secondary */
+  --color-secondary-100: #d1fae5;
+  --color-secondary-200: #a7f3d0;
+  --color-secondary-300: #6ee7b7;
+  --color-secondary-400: #34d399;
+  --color-secondary: #10b981; /* 500 */
+  --color-secondary-600: #059669;
+  --color-secondary-700: #047857;
+  --color-secondary-800: #065f46;
+  --color-secondary-900: #064e3b;
+  --color-secondary-1000: #022c22;
+
+  /* Red */
+  --color-red-50: #fde7e4;
+  --color-red-100: #fbd7d1;
+  --color-red-200: #f6b7ad;
+  --color-red-300: #ef978b;
+  --color-red-400: #de6253;
+  --color-red: #cd2922; /* 500 */
+  --color-red-600: #ad211a;
+  --color-red-700: #8b1913;
+  --color-red-800: #660f0b;
+  --color-red-900: #430605;
+
+  /* Orange */
+  --color-orange-50: #ffedd5;
+  --color-orange-100: #fed7aa;
+  --color-orange-200: #fdba74;
+  --color-orange-300: #fb923c;
+  --color-orange-400: #f97316;
+  --color-orange: #ea580c; /* 500 */
+  --color-orange-600: #c2410c;
+  --color-orange-700: #c2410c;
+  --color-orange-800: #7c2d12;
+  --color-orange-900: #431407;
+
+  /* Green */
+  --color-green-50: #e8f3e3;
+  --color-green-100: #d9ebd1;
+  --color-green-200: #bcdcad;
+  --color-green-300: #a0cb8b;
+  --color-green-400: #73b351;
+  --color-green: #4d9f00; /* 500 */
+  --color-green-600: #408600;
+  --color-green-700: #316b00;
+  --color-green-800: #224d00;
+  --color-green-900: #143200;
 
   --shadow-card: 1px 1px 3px 0px #0000000f, 0px 4px 12px -2px #00000014;
   --shadow-1: 1px 2px 6px -1px #0000000d;
@@ -67,6 +110,53 @@
   }
 }
 
+@utility font-display {
+  font-size: 4rem;
+  line-height: 4.5rem;
+}
+
+@utility font-h1 {
+  font-size: 3.5rem;
+  line-height: 4rem;
+}
+@utility font-h2 {
+  font-size: 3rem;
+  line-height: 3.5rem;
+}
+@utility font-h3 {
+  font-size: 2.5rem;
+  line-height: 3rem;
+}
+
+@utility font-h4 {
+  font-size: 2rem;
+  line-height: 2.5rem;
+}
+
+@utility font-h5 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+@utility font-h6 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+@utility font-p-1 {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+@utility font-p-2 {
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+}
+@utility font-p-3 {
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+}
+
+/* 
 @utility font-ui-1 {
   font-size: 3rem;
   line-height: 3.25rem;
@@ -157,4 +247,4 @@
 @utility font-mobile-h2 {
   font-size: 1.25rem;
   line-height: 1.75rem;
-}
+} */
