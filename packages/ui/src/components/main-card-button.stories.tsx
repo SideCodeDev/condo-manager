@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
 import { Home, Settings, Users } from "lucide-react-native";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native-css/components";
 
 import { MainCardButton } from "./main-card-button";
 
@@ -41,7 +41,7 @@ export const Disabled: Story = {
 
 export const Grid: Story = {
   render: (args) => (
-    <View style={styles.grid}>
+    <View className="w-96 flex-row gap-3">
       <MainCardButton {...args} accessibilityLabel="Home">
         <Home />
         Home
@@ -63,11 +63,3 @@ export const Grid: Story = {
     </View>
   ),
 };
-
-const styles = StyleSheet.create({
-  grid: {
-    flexDirection: "row",
-    gap: 12,
-    width: 384,
-  },
-});

@@ -72,8 +72,14 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
   add or use a parallel TypeScript `theme`/design-token folder or read color
   values into component styles. Define or change shared tokens in the UI
   package's Tailwind CSS theme, and consume them through classes on both
-  platforms. When a native API requires a style prop, use it only for values
-  that cannot be expressed with Tailwind classes, not as a second token system.
+  platforms.
+- Prefer Tailwind/NativeWind `className` for fixed visual styling across every
+  app and package. Use `style` props or `StyleSheet.create` only when a value is
+  genuinely computed at runtime or required by a native API, and keep those
+  styles limited to the dynamic/integration values. Do not duplicate fixed
+  Tailwind utilities or design-token values in style objects. The shared
+  `Loader` keeps its numeric `size` prop for dimensions and its runtime
+  animation styles.
 - Use the web Tailwind class-based styling model for all visual behavior in
   React, React Native Web, and React Native. Do not branch visual styles by
   platform or pass token colors through `color`, `backgroundColor`, or similar

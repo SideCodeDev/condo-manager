@@ -2,9 +2,10 @@ import { useEffect, useRef } from "react";
 import {
   Animated,
   Easing,
-  StyleSheet,
   View,
 } from "react-native";
+
+import { cn } from "../lib/utils";
 
 const ANIMATION_DURATION = 4_000;
 const ANIMATION_STEPS = 11;
@@ -206,28 +207,19 @@ export function Loader({
 
         return (
           <Animated.View
-            className={className}
+            className={cn("absolute", className)}
             key={index}
-            style={[
-              styles.box,
-              {
-                borderRadius: BOX_RADIUS * scale,
-                height: BOX_SIZE * scale,
-                left: left * scale,
-                top: top * scale,
-                transform: [{ translateX }, { translateY }],
-                width: BOX_SIZE * scale,
-              },
-            ]}
+            style={{
+              borderRadius: BOX_RADIUS * scale,
+              height: BOX_SIZE * scale,
+              left: left * scale,
+              top: top * scale,
+              transform: [{ translateX }, { translateY }],
+              width: BOX_SIZE * scale,
+            }}
           />
         );
       })}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  box: {
-    position: "absolute",
-  },
-});

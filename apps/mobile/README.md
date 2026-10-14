@@ -54,6 +54,10 @@ Use `@condo-manager/ui` for shared components. Native styles are imported in
 shared component's visuals or API change, update its Storybook stories under
 `packages/ui/src/components/`.
 
+Prefer Tailwind/NativeWind `className` for fixed visual styling. Use style props
+or `StyleSheet.create` only for genuinely dynamic values or native API
+integration, and keep them limited to those values.
+
 ## Checks
 
 ```sh

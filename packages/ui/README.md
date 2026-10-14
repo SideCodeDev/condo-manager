@@ -35,9 +35,12 @@ mobile root layout loads the font asset. Font family is global: do not add
 font-weight utilities remain valid. Add a local family override only when a
 design intentionally uses a different typeface.
 
-Prefer class names on icons and native components as well. If a platform API
-only accepts a style prop and cannot be styled with a class, keep that prop
-limited to the platform integration and do not create a parallel token source.
+Prefer Tailwind/NativeWind `className` for fixed visual styling on both web and
+native. Use `style` props or `StyleSheet.create` only for values computed at
+runtime or required by a native API, keeping those styles limited to the
+dynamic/integration values. Do not duplicate fixed utilities or design-token
+values in style objects. The shared `Loader` keeps runtime animation styles and
+its numeric `size` prop for dimensions.
 
 Use the same web-style class logic in React Native and React Native Web; do not
 add platform-specific branches for visual colors. For SVG icons (including
