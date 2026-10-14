@@ -74,6 +74,19 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
   package's Tailwind CSS theme, and consume them through classes on both
   platforms. When a native API requires a style prop, use it only for values
   that cannot be expressed with Tailwind classes, not as a second token system.
+- Use the web Tailwind class-based styling model for all visual behavior in
+  React, React Native Web, and React Native. Do not branch visual styles by
+  platform or pass token colors through `color`, `backgroundColor`, or similar
+  props. For SVG icons, apply the matching Tailwind text-color class with
+  `className` so the icon uses the same color as its text; remove or avoid a
+  conflicting `color` prop. Keep hover, focus, active, and disabled colors in
+  Tailwind state classes, including when forwarding classes to child icons.
+- Set the app's default font once in the shared global stylesheet: on `body`
+  for `apps/web` and `apps/website`, and through the native global base rule
+  for React Native text. Font family is global; do not repeat `font-sans` or
+  `fontFamily` on individual components. Tailwind classes may still set font
+  size and weight. Add a local family override only when the design
+  intentionally requires a different typeface.
 - Add or update Storybook stories when a shared component's visible behavior or
   public variants change.
 - Keep Expo/React Native dependency versions compatible with the Expo SDK in

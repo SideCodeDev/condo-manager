@@ -4,12 +4,11 @@ import type { PressableProps } from "react-native";
 import { Pressable, Text } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 import { Loader } from "./loader";
 import { getSlotChild, Slot } from "./slot";
 
 const glassButtonVariants = cva(
-  "self-start flex-row items-center gap-2 rounded-full px-2 py-1 bg-neutral-0/1 text-neutral-0 shadow-glass transition-all hover:shadow-glass-focus focus-visible:shadow-glass-focus focus-visible:outline-none [&_svg:not([class*='size-'])]:size-5",
+  "self-start flex-row items-center gap-2 rounded-full px-2 py-1 bg-white/1 text-white shadow-glass transition-all hover:shadow-glass-focus focus-visible:shadow-glass-focus focus-visible:outline-none [&_svg:not([class*='size-'])]:size-5",
 );
 
 export type GlassButtonProps = Omit<PressableProps, "children"> & {
@@ -29,7 +28,7 @@ type ChildProps = {
 function renderChildren(children: React.ReactNode): React.ReactNode {
   return React.Children.map(children, (child) => {
     if (typeof child === "string" || typeof child === "number") {
-      return <Text className="text-neutral-0">{child}</Text>;
+      return <Text className="text-white">{child}</Text>;
     }
 
     if (!React.isValidElement<ChildProps>(child)) return child;
@@ -40,12 +39,13 @@ function renderChildren(children: React.ReactNode): React.ReactNode {
 
     if (child.type === Text) {
       return React.cloneElement(child, {
-        className: cn("text-neutral-0", child.props.className),
+        className: cn("text-white", child.props.className),
       });
     }
 
     return React.cloneElement(child, {
-      color: child.props.color ?? colors.neutral[0],
+      className: cn("text-white", child.props.className),
+      color: undefined,
       size: child.props.size ?? 20,
     });
   });
@@ -61,7 +61,7 @@ function GlassButton({
   const buttonClassName = glassButtonVariants({ className });
   const disabled = loading || Boolean(props.disabled);
   const content = loading ? (
-    <Loader color={colors.neutral[0]} size={20} />
+    <Loader className="bg-white" size={20} />
   ) : (
     renderChildren(children)
   );

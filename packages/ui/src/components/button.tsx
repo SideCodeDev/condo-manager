@@ -4,17 +4,16 @@ import type { PressableProps } from "react-native";
 import { Pressable, Text } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 import { Loader } from "./loader";
 import { getSlotChild, Slot } from "./slot";
 
 const buttonVariants = cva(
-  "group min-w-36 shrink-0 flex-row items-center justify-center gap-2 rounded-md font-sans font-semibold transition-all disabled:pointer-events-none",
+  "group min-w-36 shrink-0 flex-row items-center justify-center gap-2 rounded-md font-semibold transition-all disabled:pointer-events-none",
   {
     variants: {
       variant: {
         primary:
-          "bg-neutral-950 text-neutral-0 hover:bg-neutral-800 focus-visible:bg-neutral-800 active:bg-neutral-800 disabled:bg-neutral-700 disabled:text-neutral-300",
+          "bg-neutral-950 text-white hover:bg-neutral-800 focus-visible:bg-neutral-800 active:bg-neutral-800 disabled:bg-neutral-700 disabled:text-neutral-300",
         secondary:
           "border border-neutral-950 text-neutral-950 hover:border-neutral-800 hover:text-neutral-800 focus-visible:border-neutral-800 focus-visible:text-neutral-800 active:border-neutral-800 active:text-neutral-800 disabled:border-neutral-600 disabled:text-neutral-600",
         link: "text-neutral-950 hover:text-neutral-800 focus-visible:text-neutral-800 active:text-neutral-800 disabled:text-neutral-600",
@@ -35,7 +34,7 @@ const buttonVariants = cva(
         variant: "primary",
         destructive: true,
         class:
-          "bg-red hover:bg-red-600 focus-visible:bg-red-600 active:bg-red-600 disabled:bg-red disabled:text-neutral-0",
+          "bg-red hover:bg-red-600 focus-visible:bg-red-600 active:bg-red-600 disabled:bg-red disabled:text-white",
       },
       {
         variant: "secondary",
@@ -64,11 +63,11 @@ const buttonVariants = cva(
   },
 );
 
-const buttonTextVariants = cva("font-sans font-semibold", {
+const buttonTextVariants = cva("font-semibold", {
   variants: {
     variant: {
       primary:
-        "text-neutral-0 group-disabled:text-neutral-300 group-hover:text-neutral-0 group-focus-visible:text-neutral-0 group-active:text-neutral-0",
+        "text-white group-disabled:text-neutral-300 group-hover:text-white group-focus-visible:text-white group-active:text-white",
       secondary:
         "text-neutral-950 group-disabled:text-neutral-600 group-hover:text-neutral-800 group-focus-visible:text-neutral-800 group-active:text-neutral-800",
       link: "text-neutral-950 underline group-disabled:text-neutral-600 group-hover:text-neutral-800 group-focus-visible:text-neutral-800 group-active:text-neutral-800",
@@ -76,8 +75,8 @@ const buttonTextVariants = cva("font-sans font-semibold", {
         "text-primary group-disabled:text-neutral-600 group-hover:text-primary-900 group-focus-visible:text-primary-900 group-active:text-primary-900",
     },
     size: {
-      standard: "font-ui-6",
-      sm: "font-ui-7",
+      standard: "font-p-1",
+      sm: "font-p-1",
     },
     destructive: {
       true: "",
@@ -88,7 +87,7 @@ const buttonTextVariants = cva("font-sans font-semibold", {
     {
       variant: "primary",
       destructive: true,
-      class: "text-neutral-0 group-disabled:text-neutral-0",
+      class: "text-white group-disabled:text-white",
     },
     {
       variant: ["secondary", "link", "ghost"],
@@ -102,6 +101,34 @@ const buttonTextVariants = cva("font-sans font-semibold", {
     size: "standard",
     destructive: false,
   },
+});
+
+const buttonLoaderVariants = cva("", {
+  variants: {
+    variant: {
+      primary: "bg-white group-disabled:bg-neutral-300",
+      secondary:
+        "bg-neutral-950 group-disabled:bg-neutral-600 group-hover:bg-neutral-800 group-focus-visible:bg-neutral-800 group-active:bg-neutral-800",
+      link: "bg-neutral-950 group-disabled:bg-neutral-600 group-hover:bg-neutral-800 group-focus-visible:bg-neutral-800 group-active:bg-neutral-800",
+      ghost:
+        "bg-primary group-disabled:bg-neutral-600 group-hover:bg-primary-900 group-focus-visible:bg-primary-900 group-active:bg-primary-900",
+    },
+    destructive: { true: "", false: "" },
+  },
+  compoundVariants: [
+    {
+      variant: "primary",
+      destructive: true,
+      class: "bg-white group-disabled:bg-white",
+    },
+    {
+      variant: ["secondary", "link", "ghost"],
+      destructive: true,
+      class:
+        "bg-red group-disabled:bg-red group-hover:bg-red-600 group-focus-visible:bg-red-600 group-active:bg-red-600",
+    },
+  ],
+  defaultVariants: { variant: "primary", destructive: false },
 });
 
 type ButtonVariantProps = VariantProps<typeof buttonVariants>;
@@ -121,35 +148,11 @@ type ChildProps = {
   color?: string;
   disabled?: boolean | null;
   size?: number;
-  style?: unknown;
 };
-
-function getForegroundColor(
-  variant: NonNullable<ButtonProps["variant"]>,
-  destructive: boolean,
-  disabled: boolean,
-  interactive: boolean,
-) {
-  if (destructive) {
-    if (variant === "primary") return colors.neutral[0];
-    return interactive ? colors.red[600] : colors.red.DEFAULT;
-  }
-
-  if (disabled) {
-    return variant === "primary" ? colors.neutral[300] : colors.neutral[600];
-  }
-
-  if (variant === "primary") return colors.neutral[0];
-  if (variant === "ghost") {
-    return interactive ? colors.primary[900] : colors.primary.DEFAULT;
-  }
-  return interactive ? colors.neutral[800] : colors.neutral[950];
-}
 
 function renderChildren(
   children: React.ReactNode,
   textClassName: string,
-  color: string,
 ): React.ReactNode {
   return React.Children.map(children, (child) => {
     if (typeof child === "string" || typeof child === "number") {
@@ -163,11 +166,7 @@ function renderChildren(
     if (!React.isValidElement<ChildProps>(child)) return child;
 
     if (child.type === React.Fragment) {
-      return renderChildren(
-        child.props.children,
-        textClassName,
-        color,
-      );
+      return renderChildren(child.props.children, textClassName);
     }
 
     if (child.type === Text) {
@@ -177,7 +176,8 @@ function renderChildren(
     }
 
     return React.cloneElement(child, {
-      color: child.props.color ?? color,
+      className: cn(child.props.className, textClassName),
+      color: undefined,
       size: child.props.size ?? 24,
     });
   });
@@ -193,11 +193,12 @@ function Button({
   children,
   ...props
 }: ButtonProps) {
-  const [focused, setFocused] = React.useState(false);
-  const [hovered, setHovered] = React.useState(false);
   const resolvedVariant = variant ?? "primary";
   const resolvedSize = size ?? "standard";
-  const hasDisabledProp = Object.prototype.hasOwnProperty.call(props, "disabled");
+  const hasDisabledProp = Object.prototype.hasOwnProperty.call(
+    props,
+    "disabled",
+  );
   const disabled = hasDisabledProp
     ? Boolean(props.disabled)
     : Boolean(loading || props.disabled);
@@ -214,66 +215,26 @@ function Button({
     size: resolvedSize,
     variant: resolvedVariant,
   });
+  const loaderClassName = buttonLoaderVariants({
+    destructive,
+    variant: resolvedVariant,
+  });
 
-  const renderContent = (pressed = false) => {
-    const foregroundColor = getForegroundColor(
-      resolvedVariant,
-      destructive,
-      disabled,
-      hovered || focused || pressed,
-    );
-
+  const renderContent = () => {
     return loading ? (
-      <Loader color={foregroundColor} size={24} />
+      <Loader className={loaderClassName} size={24} />
     ) : (
-      renderChildren(
-        children,
-        textClassName,
-        foregroundColor,
-      )
+      renderChildren(children, textClassName)
     );
-  };
-
-  const handleBlur: NonNullable<PressableProps["onBlur"]> = (event) => {
-    setFocused(false);
-    props.onBlur?.(event);
-  };
-
-  const handleFocus: NonNullable<PressableProps["onFocus"]> = (event) => {
-    setFocused(true);
-    props.onFocus?.(event);
-  };
-
-  const handleHoverIn: NonNullable<PressableProps["onHoverIn"]> = (event) => {
-    setHovered(true);
-    props.onHoverIn?.(event);
-  };
-
-  const handleHoverOut: NonNullable<PressableProps["onHoverOut"]> = (event) => {
-    setHovered(false);
-    props.onHoverOut?.(event);
   };
 
   if (asChild && !loading) {
     const child = getSlotChild(children) as React.ReactElement<ChildProps>;
 
     return (
-      <Slot
-        {...props}
-        className={buttonClassName}
-        disabled={disabled}
-      >
+      <Slot {...props} className={buttonClassName} disabled={disabled}>
         {React.cloneElement(child, {
-          children: renderChildren(
-            child.props.children,
-            textClassName,
-            getForegroundColor(
-              resolvedVariant,
-              destructive,
-              disabled,
-              hovered || focused,
-            ),
-          ),
+          children: renderChildren(child.props.children, textClassName),
         })}
       </Slot>
     );
@@ -289,12 +250,8 @@ function Button({
       className={buttonClassName}
       disabled={loading || props.disabled}
       {...props}
-      onBlur={handleBlur}
-      onFocus={handleFocus}
-      onHoverIn={handleHoverIn}
-      onHoverOut={handleHoverOut}
     >
-      {({ pressed }) => renderContent(pressed)}
+      {renderContent()}
     </Pressable>
   );
 }

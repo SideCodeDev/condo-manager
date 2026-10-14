@@ -3,7 +3,6 @@ import { Pressable, Text, View } from "react-native-css/components";
 import { FileText, X } from "lucide-react-native";
 
 import { cn, formatFileSize } from "../lib/utils";
-import { colors } from "../theme";
 
 export type UploadedFileData = {
   name: string;
@@ -33,21 +32,21 @@ function UploadedFile({
       )}
     >
       <View className="h-10 w-10 shrink-0 items-center justify-center rounded border border-neutral-200 bg-neutral-100">
-        <FileText color={colors.primary.DEFAULT} size={24} />
+        <FileText className="text-primary" size={24} />
       </View>
       <View className="min-w-0 flex-1 gap-0">
-        <Text className="font-p-3 text-neutral-1000">
+        <Text className="font-p-3 text-black">
           {file.name}
         </Text>
-        <Text className="font-p-4 text-neutral-700">{formattedSize}</Text>
+        <Text className="font-p-3 text-neutral-700">{formattedSize}</Text>
       </View>
       <Pressable
         accessibilityLabel={`Remove ${file.name}`}
         accessibilityRole="button"
-        className="shrink-0 text-neutral-1000"
+        className="shrink-0 text-black"
         onPress={onRemove}
       >
-        <X color={colors.neutral[1000]} size={20} />
+        <X className="text-black" size={20} />
       </Pressable>
     </View>
   );

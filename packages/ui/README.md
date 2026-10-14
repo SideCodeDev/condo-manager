@@ -28,9 +28,26 @@ TypeScript `theme` folder, duplicate token values in TypeScript, or pass token
 colors through inline styles or component color props. This applies equally to
 shared components and app-specific UI in `apps/web` and `apps/mobile`.
 
+The default DM Sans family is applied globally in `src/styles.base.css` on the
+web document body and through the native base rule for React Native text. The
+mobile root layout loads the font asset. Font family is global: do not add
+`font-sans` or `fontFamily` to individual components. Font-size and
+font-weight utilities remain valid. Add a local family override only when a
+design intentionally uses a different typeface.
+
 Prefer class names on icons and native components as well. If a platform API
 only accepts a style prop and cannot be styled with a class, keep that prop
 limited to the platform integration and do not create a parallel token source.
+
+Use the same web-style class logic in React Native and React Native Web; do not
+add platform-specific branches for visual colors. For SVG icons (including
+Lucide icons), pass the component's Tailwind text-color class through
+`className` so it matches the surrounding text and responds to the same
+`hover:`, `focus-visible:`, `active:`, and `disabled:` states. Do not set an
+icon's `color` prop when its color comes from the design; remove a conflicting
+`color` prop when forwarding the class to a child icon. Keep visual state in
+Tailwind classes on the component and its child SVGs, not in JavaScript color
+calculations or inline styles.
 
 The web stylesheet is:
 

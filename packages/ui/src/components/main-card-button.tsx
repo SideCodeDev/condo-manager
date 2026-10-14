@@ -4,11 +4,10 @@ import type { PressableProps } from "react-native";
 import { Pressable, Text } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 import { getSlotChild, Slot } from "./slot";
 
 const mainCardButtonVariants = cva(
-  "flex-col gap-3 rounded-xl border border-neutral-100 bg-neutral-0 pl-4 pr-11 py-5 font-ui-6 font-semibold text-neutral-1000 transition-all hover:bg-neutral-50 focus-visible:bg-neutral-50 hover:shadow-2 focus-visible:shadow-2 outline-none",
+  "flex-col gap-3 rounded-xl border border-neutral-100 bg-white pl-4 pr-11 py-5 font-p-1 font-semibold text-black transition-all hover:bg-neutral-50 focus-visible:bg-neutral-50 hover:shadow-2 focus-visible:shadow-2 outline-none",
 );
 
 export type MainCardButtonProps = Omit<PressableProps, "children"> & {
@@ -29,7 +28,7 @@ function renderChildren(children: React.ReactNode): React.ReactNode {
     if (typeof child === "string" || typeof child === "number") {
       return (
         <Text
-          className="shrink-0 font-ui-6 font-semibold text-neutral-1000"
+          className="shrink-0 font-p-1 font-semibold text-black"
           ellipsizeMode="clip"
           numberOfLines={1}
         >
@@ -47,14 +46,15 @@ function renderChildren(children: React.ReactNode): React.ReactNode {
     if (child.type === Text) {
       return React.cloneElement(child, {
         className: cn(
-          "font-ui-6 font-semibold text-neutral-1000",
+          "font-p-1 font-semibold text-black",
           child.props.className,
         ),
       });
     }
 
     return React.cloneElement(child, {
-      color: child.props.color ?? colors.neutral[1000],
+      className: cn("text-black", child.props.className),
+      color: undefined,
       size: child.props.size ?? 32,
     });
   });

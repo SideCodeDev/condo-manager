@@ -10,8 +10,7 @@
     ".": "./src/index.ts",
     "./fonts/*": "./src/fonts/*",
     "./styles.css": "./src/styles.css",
-    "./styles.native.css": "./src/styles.native.css",
-    "./theme": "./src/theme/index.ts"
+    "./styles.native.css": "./src/styles.native.css"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

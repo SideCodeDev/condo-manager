@@ -1,9 +1,7 @@
 import { useEffect, useRef } from "react";
 import {
   Animated,
-  type ColorValue,
   Easing,
-  Platform,
   StyleSheet,
   View,
 } from "react-native";
@@ -161,13 +159,11 @@ const paths = [
 ] as const;
 
 const cssEase = Easing.bezier(0.25, 0.1, 0.25, 1);
-const boxColor = Platform.select({ default: "#000000", web: "currentColor" });
-
 export function Loader({
-  color,
+  className,
   size = BASE_SIZE,
 }: {
-  color?: ColorValue;
+  className?: string;
   size?: number;
 }) {
   const progress = useRef(new Animated.Value(0)).current;
@@ -210,11 +206,11 @@ export function Loader({
 
         return (
           <Animated.View
+            className={className}
             key={index}
             style={[
               styles.box,
               {
-                backgroundColor: color ?? boxColor,
                 borderRadius: BOX_RADIUS * scale,
                 height: BOX_SIZE * scale,
                 left: left * scale,

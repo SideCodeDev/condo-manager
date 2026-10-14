@@ -35,8 +35,10 @@ case use a development build for the project.
 
 ## App structure
 
-- `src/app/_layout.tsx`: Clerk and Convex providers, shared font loading, root
-  navigation layout, and NativeWind stylesheet import.
+- `src/app/_layout.tsx`: Clerk and Convex providers, shared DM Sans loading,
+  root navigation layout, and NativeWind stylesheet import. The shared
+  stylesheet applies DM Sans globally to native text; do not add font-family
+  classes or styles to individual components.
 - `src/app/index.tsx`: current home screen and sign-in/sign-up entry points.
 - `src/components/`: app-specific organization gate, tabs, and billing view.
 - `src/global.css` and `metro.config.js`: NativeWind and shared UI styling.

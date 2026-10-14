@@ -3,12 +3,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { PressableProps } from "react-native";
 import { Pressable } from "react-native-css/components";
 
-import { colors } from "../theme";
+import { cn } from "../lib/utils";
 import { Loader } from "./loader";
 import { getSlotChild, Slot } from "./slot";
 
 const iconButtonVariants = cva(
-  "flex-row items-center justify-center border border-neutral-200 bg-neutral-0 text-neutral-1000 hover:bg-neutral-100 focus-visible:bg-neutral-100",
+  "flex-row items-center justify-center border border-neutral-200 bg-white text-black hover:bg-neutral-100 focus-visible:bg-neutral-100",
   {
     variants: {
       size: {
@@ -38,6 +38,7 @@ export type IconButtonProps = Omit<PressableProps, "children"> &
   };
 
 type IconChildProps = {
+  className?: string;
   children?: React.ReactNode;
   color?: string;
   size?: number;
@@ -46,16 +47,18 @@ type IconChildProps = {
 function renderIcon(
   children: React.ReactNode,
   iconSize: number,
+  className: string,
 ): React.ReactNode {
   return React.Children.map(children, (child) => {
     if (!React.isValidElement<IconChildProps>(child)) return child;
 
     if (child.type === React.Fragment) {
-      return renderIcon(child.props.children, iconSize);
+      return renderIcon(child.props.children, iconSize, className);
     }
 
     return React.cloneElement(child, {
-      color: child.props.color ?? colors.neutral[1000],
+      className: cn(className, child.props.className),
+      color: undefined,
       size: child.props.size ?? iconSize,
     });
   });
@@ -74,9 +77,9 @@ function IconButton({
   const buttonClassName = iconButtonVariants({ className, size, variant });
   const disabled = loading || Boolean(props.disabled);
   const content = loading ? (
-    <Loader color={colors.neutral[1000]} size={iconSize} />
+    <Loader className="bg-black" size={iconSize} />
   ) : (
-    renderIcon(children, iconSize)
+    renderIcon(children, iconSize, "text-black")
   );
 
   if (asChild && !loading) {
@@ -85,7 +88,7 @@ function IconButton({
     return (
       <Slot {...props} className={buttonClassName} disabled={disabled}>
         {React.cloneElement(child, {
-          children: renderIcon(child.props.children, iconSize),
+          children: renderIcon(child.props.children, iconSize, "text-black"),
         })}
       </Slot>
     );

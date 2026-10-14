@@ -3,7 +3,6 @@ import { cva } from "class-variance-authority";
 import { View } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 
 const indicatorVariants = cva("h-6 w-6 p-0.5 flex-row items-center justify-center", {
   variants: {
@@ -34,7 +33,7 @@ const indicatorControlVariants = cva(
       {
         variant: "checkbox",
         checked: true,
-        class: "bg-primary text-neutral-0",
+        class: "bg-primary text-white",
       },
       {
         variant: "radio",
@@ -60,7 +59,7 @@ function Indicator({ checked, variant, className }: IndicatorProps) {
     <View className={cn(indicatorVariants({ variant }), className)}>
       <View className={indicatorControlVariants({ checked, variant })}>
         {variant === "checkbox" && checked ? (
-          <Check color={colors.neutral[0]} size={16} strokeWidth={2} />
+          <Check className="text-white" size={16} strokeWidth={2} />
         ) : null}
         {variant === "radio" && checked ? (
           <View className="h-2.5 w-2.5 rounded-full bg-primary" />

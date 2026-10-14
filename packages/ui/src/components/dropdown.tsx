@@ -4,7 +4,6 @@ import { findNodeHandle, Platform, UIManager } from "react-native";
 import { Pressable, Text, TextInput, View } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 import { Input, type InputProps } from "./input";
 import { DropdownPortal } from "./dropdown-portal";
 
@@ -258,7 +257,10 @@ function Dropdown<T>({
               isDisabled ? "text-neutral-300" : "text-neutral-900",
             )}
           >
-            <ChevronDown color={isDisabled ? colors.neutral[300] : colors.neutral[900]} size={24} />
+            <ChevronDown
+              className={isDisabled ? "text-neutral-300" : "text-neutral-900"}
+              size={24}
+            />
           </View>
         }
       >
@@ -296,7 +298,7 @@ function Dropdown<T>({
             accessibilityLabel={popupLabel}
             accessibilityRole="menu"
             className={cn(
-              "z-50 duration-150 rounded-lg border border-neutral-100 bg-neutral-0 px-1 py-2 shadow-2",
+              "z-50 duration-150 rounded-lg border border-neutral-100 bg-white px-1 py-2 shadow-2",
               open
                 ? "animate-in fade-in-0 zoom-in-95 slide-in-from-top-2"
                 : "animate-out fade-out-0 zoom-out-95 slide-out-to-top-2",
@@ -306,15 +308,13 @@ function Dropdown<T>({
           {search ? (
             <View className="relative mb-1">
               <Search
-                color={colors.neutral[600]}
                 size={20}
-                style={{ position: "absolute", left: 12, top: 10, zIndex: 1 }}
+                className="absolute left-3 top-2.5 z-10 text-neutral-600"
               />
               <TextInput
                 accessibilityLabel="Search"
-                className="w-full rounded-lg px-3 py-2 pl-11 font-p-2 text-neutral-950 outline outline-neutral-600 focus-visible:outline-2"
+                className="w-full rounded-lg px-3 py-2 pl-11 font-p-2 text-neutral-950 outline outline-neutral-600 placeholder:text-neutral-300 focus-visible:outline-2"
                 onChangeText={setSearchValue}
-                placeholderTextColor={colors.neutral[300]}
                 value={searchValue}
               />
             </View>
@@ -329,7 +329,7 @@ function Dropdown<T>({
                     accessibilityRole="menuitem"
                     accessibilityState={{ selected }}
                     className={cn(
-                      "min-h-11 rounded-sm p-3 font-ui-6 text-neutral-950",
+                      "min-h-11 rounded-sm p-3 font-p-1 text-neutral-950",
                       "focus-visible:bg-primary-200 focus-visible:outline focus-visible:outline-primary",
                       selected && "bg-primary-200 outline outline-primary",
                     )}
@@ -341,7 +341,7 @@ function Dropdown<T>({
                   >
                     {typeof option.label === "string" ||
                     typeof option.label === "number" ? (
-                      <Text className="font-ui-6 text-neutral-950">
+                      <Text className="font-p-1 text-neutral-950">
                         {option.label}
                       </Text>
                     ) : (
@@ -351,7 +351,7 @@ function Dropdown<T>({
                 );
               })
             ) : (
-              <Text className="min-h-11 py-3 text-center font-ui-6 text-neutral-1000">
+              <Text className="min-h-11 py-3 text-center font-p-1 text-black">
                 {noResultsText}
               </Text>
             )}

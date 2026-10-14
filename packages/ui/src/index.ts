@@ -86,5 +86,4 @@ export {
   MimeTypeDescriptions,
   type FileMimeType,
 } from "./lib/consts";
-export * from "./theme";
 export { useImageFallback, useResponsiveElementSize } from "./hooks";

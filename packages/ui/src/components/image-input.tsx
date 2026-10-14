@@ -132,9 +132,9 @@ function ImageInput({
               resizeMode="cover"
             />
           ) : null}
-          <View className="absolute inset-0 z-10 flex-col items-center justify-center gap-5 bg-neutral-1000/80 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+          <View className="absolute inset-0 z-10 flex-col items-center justify-center gap-5 bg-black/80 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
             <Button
-              className="min-w-55 bg-neutral-0"
+              className="min-w-55 bg-white"
               onPress={pickImage}
               variant="secondary"
             >

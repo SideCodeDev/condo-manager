@@ -67,11 +67,11 @@ function SelectorList({
     <>
       <Indicator checked={checked} variant={variant} />
       <View className="shrink-0 gap-1">
-        <Text className="font-p-2 font-medium text-neutral-1000 text-start">
+        <Text className="font-p-2 font-medium text-black text-start">
           {label}
         </Text>
         {subLabel ? (
-          <Text className="font-ui-7 font-light text-neutral-1000 text-start">
+          <Text className="font-p-1 font-light text-black text-start">
             {subLabel}
           </Text>
         ) : null}

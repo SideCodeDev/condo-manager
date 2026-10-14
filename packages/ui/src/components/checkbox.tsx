@@ -5,7 +5,6 @@ import { Pressable, Text, View } from "react-native-css/components";
 import { Check, Minus } from "lucide-react-native";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 
 type CheckboxState = boolean | "indeterminate";
 
@@ -15,9 +14,9 @@ const checkboxVariants = cva(
     variants: {
       state: {
         unchecked: "border-neutral-600",
-        checked: "border-primary bg-primary text-neutral-0",
-        indeterminate: "border-primary bg-primary text-neutral-0",
-        "disabled-checked": "border-neutral-600 bg-neutral-600 text-neutral-0",
+        checked: "border-primary bg-primary text-white",
+        indeterminate: "border-primary bg-primary text-white",
+        "disabled-checked": "border-neutral-600 bg-neutral-600 text-white",
       },
       disabled: {
         true: "cursor-not-allowed border-neutral-400",
@@ -97,18 +96,18 @@ function Checkbox({
         onPress={toggle}
       >
         {isIndeterminate ? (
-          <Minus color={colors.neutral[0]} size={16} strokeWidth={2} />
+          <Minus className="text-white" size={16} strokeWidth={2} />
         ) : isChecked ? (
-          <Check color={colors.neutral[0]} size={16} strokeWidth={2} />
+          <Check className="text-white" size={16} strokeWidth={2} />
         ) : null}
       </Pressable>
       {label ? (
         <Text
           className={cn(
-            "font-ui-6",
+            "font-p-1",
             disabled
               ? "cursor-not-allowed text-neutral-600"
-              : "cursor-pointer text-neutral-1000",
+              : "cursor-pointer text-black",
           )}
           onPress={toggle}
         >

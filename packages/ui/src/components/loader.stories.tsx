@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native-css/components";
 
 import { Loader } from "./loader";
-import { colors, fontFamilies, typography } from "../theme";
 
 const meta = {
   title: "UI/Misc/Loader",
@@ -10,11 +9,11 @@ const meta = {
   tags: ["autodocs"],
   args: {
     size: 36,
+    className: "bg-primary",
   },
   argTypes: {
-    size: {
-      control: { min: 12, step: 1, type: "number" },
-    },
+    size: { control: { min: 12, step: 1, type: "number" } },
+    className: { control: "text" },
   },
 } satisfies Meta<typeof Loader>;
 
@@ -24,34 +23,15 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 
 export const Sizes: Story = {
-  parameters: {
-    controls: { disable: true },
-  },
+  parameters: { controls: { disable: true } },
   render: () => (
-    <View style={styles.row}>
+    <View className="flex-row items-end gap-6">
       {[24, 36, 48].map((size) => (
-        <View key={size} style={styles.example}>
-          <Loader size={size} />
-          <Text style={styles.label}>{size}px</Text>
+        <View className="items-center gap-2" key={size}>
+          <Loader className="bg-primary" size={size} />
+          <Text className="font-p-3 text-neutral-500">{size}px</Text>
         </View>
       ))}
     </View>
   ),
 };
-
-const styles = StyleSheet.create({
-  example: {
-    alignItems: "center",
-    gap: 8,
-  },
-  label: {
-    ...typography.p4,
-    color: colors.neutral[500],
-    fontFamily: fontFamilies.sans,
-  },
-  row: {
-    alignItems: "flex-end",
-    flexDirection: "row",
-    gap: 24,
-  },
-});

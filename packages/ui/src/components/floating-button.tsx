@@ -4,12 +4,11 @@ import type { PressableProps } from "react-native";
 import { Pressable, Text } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 import { Loader } from "./loader";
 import { getSlotChild, Slot } from "./slot";
 
 const floatingButtonVariants = cva(
-  "shrink-0 min-w-14 h-14 flex-row items-center justify-center gap-2 rounded-full bg-primary p-3 font-ui-6 font-semibold text-neutral-0 shadow-floating hover:bg-primary-900 focus-visible:bg-primary-900",
+  "shrink-0 min-w-14 h-14 flex-row items-center justify-center gap-2 rounded-full bg-primary p-3 font-p-1 font-semibold text-white shadow-floating hover:bg-primary-900 focus-visible:bg-primary-900",
 );
 
 export type FloatingButtonProps = Omit<PressableProps, "children"> & {
@@ -30,7 +29,7 @@ function renderChildren(children: React.ReactNode): React.ReactNode {
   return React.Children.map(children, (child) => {
     if (typeof child === "string" || typeof child === "number") {
       return (
-        <Text className="font-ui-6 font-semibold text-neutral-0" numberOfLines={1}>
+        <Text className="font-p-1 font-semibold text-white" numberOfLines={1}>
           {child}
         </Text>
       );
@@ -45,14 +44,15 @@ function renderChildren(children: React.ReactNode): React.ReactNode {
     if (child.type === Text) {
       return React.cloneElement(child, {
         className: cn(
-          "font-ui-6 font-semibold text-neutral-0",
+          "font-p-1 font-semibold text-white",
           child.props.className,
         ),
       });
     }
 
     return React.cloneElement(child, {
-      color: child.props.color ?? colors.neutral[0],
+      className: cn("text-white", child.props.className),
+      color: undefined,
       size: child.props.size ?? 32,
     });
   });
@@ -68,7 +68,7 @@ function FloatingButton({
   const buttonClassName = floatingButtonVariants({ className });
   const disabled = loading || Boolean(props.disabled);
   const content = loading ? (
-    <Loader color={colors.neutral[0]} size={24} />
+    <Loader className="bg-white" size={24} />
   ) : (
     renderChildren(children)
   );

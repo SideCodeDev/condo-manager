@@ -4,11 +4,10 @@ import type { PressableProps } from "react-native";
 import { Pressable, Text } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 import { getSlotChild, Slot } from "./slot";
 
 const listButtonVariants = cva(
-  "flex-row shrink-0 items-center justify-center outline-none gap-2 rounded text-neutral-1000 font-ui-6 transition-all hover:bg-neutral-100 focus-visible:bg-neutral-100",
+  "flex-row shrink-0 items-center justify-center outline-none gap-2 rounded text-black font-p-1 transition-all hover:bg-neutral-100 focus-visible:bg-neutral-100",
   {
     variants: {
       variant: {
@@ -77,7 +76,8 @@ function renderChildren(
     }
 
     return React.cloneElement(child, {
-      color: child.props.color ?? colors.neutral[1000],
+      className: cn(child.props.className, textClassName),
+      color: undefined,
       size: child.props.size ?? 24,
     });
   });
@@ -99,7 +99,7 @@ function ListButton({
   const disabled = Boolean(props.disabled);
   const isSelected = Boolean(selected);
   const textClassName = cn(
-    "font-ui-6 text-neutral-1000",
+    "font-p-1 text-black",
     variant === "dropdown" && "font-semibold",
   );
 

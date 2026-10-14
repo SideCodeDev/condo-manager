@@ -5,7 +5,6 @@ import { CircleX } from "lucide-react-native";
 import { cva } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 import { Slot } from "./slot";
 
 const inputVariants = cva(
@@ -59,7 +58,7 @@ type InputIconProps = {
   size?: number;
 };
 
-export type InputProps = Omit<TextInputProps, "children"> & {
+export type InputProps = Omit<TextInputProps, "children" | "placeholderTextColor"> & {
   id: string;
   label: string;
   leadingIcon?: React.ReactNode;
@@ -76,16 +75,13 @@ export type InputProps = Omit<TextInputProps, "children"> & {
 
 function renderIcon(
   icon: React.ReactNode,
-  disabled: boolean,
   className?: string,
 ): React.ReactNode {
   if (!React.isValidElement<InputIconProps>(icon)) return icon;
 
   return React.cloneElement(icon, {
     className: cn(className, icon.props.className),
-    color: disabled
-      ? colors.neutral[400]
-      : (icon.props.color ?? colors.neutral[600]),
+    color: undefined,
     size: icon.props.size ?? 20,
   });
 }
@@ -101,7 +97,6 @@ function Input({
   id,
   label,
   leadingIcon,
-  placeholderTextColor,
   trailingIcon,
   variant = "outline",
   ...props
@@ -126,7 +121,6 @@ function Input({
     },
     editable: isDisabled ? false : props.editable,
     nativeID: id,
-    placeholderTextColor: placeholderTextColor ?? colors.neutral[300],
   };
 
   const input = asChild ? (
@@ -147,13 +141,13 @@ function Input({
       <View className="relative">
         {leadingIcon ? (
           <View className="absolute left-3 top-1/2 z-10 -translate-y-1/2">
-            {renderIcon(leadingIcon, isDisabled, iconClassName)}
+            {renderIcon(leadingIcon, iconClassName)}
           </View>
         ) : null}
         {input}
         {trailingIcon ? (
           <View className="absolute right-3 top-1/2 z-10 -translate-y-1/2">
-            {renderIcon(trailingIcon, isDisabled, iconClassName)}
+            {renderIcon(trailingIcon, iconClassName)}
           </View>
         ) : null}
       </View>
@@ -161,7 +155,7 @@ function Input({
         <View className="gap-1">
           {errors?.map((error) => (
             <View className="flex-row items-center gap-1" key={error}>
-              <CircleX color={colors.red.DEFAULT} size={16} />
+              <CircleX className="text-red" size={16} />
               <Text className="font-p-3 text-red">{error}</Text>
             </View>
           ))}

@@ -14,13 +14,12 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 import { getSlotChild, Slot } from "./slot";
 
 type TabsVariant = "chip" | "line" | "line-spaced";
 
 const tabItemVariants = cva(
-  "isolate relative flex-row shrink-0 items-center gap-2 font-ui-6 text-neutral-1000 focus-visible:outline-primary focus-visible:outline-2",
+  "isolate relative flex-row shrink-0 items-center gap-2 font-p-1 text-black focus-visible:outline-primary focus-visible:outline-2",
   {
     variants: {
       variant: {
@@ -42,7 +41,7 @@ const tabIndicatorVariants = cva(
   {
     variants: {
       variant: {
-        chip: "z-0 rounded-4xl bg-neutral-0 shadow-card",
+        chip: "z-0 rounded-4xl bg-white shadow-card",
         line: "z-0 rounded-3xl bg-primary",
       },
     },
@@ -73,7 +72,6 @@ type TabChildProps = {
 function renderTabChildren(
   children: React.ReactNode,
   textClassName: string,
-  iconColor: string,
   iconClassName?: string,
 ): React.ReactNode {
   return React.Children.map(children, (child) => {
@@ -85,7 +83,6 @@ function renderTabChildren(
       return renderTabChildren(
         child.props.children,
         textClassName,
-        iconColor,
         iconClassName,
       );
     }
@@ -95,8 +92,8 @@ function renderTabChildren(
       });
     }
     return React.cloneElement(child, {
-      color: child.props.color ?? iconColor,
-      className: cn(iconClassName, child.props.className),
+      color: undefined,
+      className: cn(child.props.className, iconClassName, textClassName),
       size: child.props.size ?? 20,
     });
   });
@@ -136,18 +133,14 @@ function TabItem({
   const isActive = context.activeTab === value;
   const variant = context.variant === "line-spaced" ? "line" : context.variant;
   const textClassName = cn(
-    "font-ui-6",
+    "font-p-1",
     context.variant !== "chip" && "transition-colors delay-200",
     context.variant === "line" || context.variant === "line-spaced"
       ? isActive
         ? "text-primary"
-        : "text-neutral-1000"
-      : "text-neutral-1000",
+        : "text-black"
+      : "text-black",
   );
-  const iconColor =
-    context.variant !== "chip" && isActive
-      ? colors.primary.DEFAULT
-      : colors.neutral[1000];
   const handleLayout = (event: LayoutChangeEvent) => {
     if (Platform.OS !== "web") {
       context.registerLayout(value, event.nativeEvent.layout);
@@ -163,7 +156,6 @@ function TabItem({
   const content = renderTabChildren(
     children,
     textClassName,
-    iconColor,
     context.variant !== "chip" ? "transition-colors delay-200" : undefined,
   );
 
@@ -311,24 +303,6 @@ function Tabs({
         width: activeLayout.width,
       }
     : undefined;
-  const indicatorBaseStyle = {
-    backgroundColor:
-      variant === "chip" ? colors.neutral[0] : colors.primary.DEFAULT,
-    borderRadius: variant === "chip" ? 32 : 24,
-    position: "absolute" as const,
-    zIndex: 0,
-    ...(variant === "chip" && Platform.OS === "web"
-      ? { boxShadow: "1px 1px 3px 0px #0000000f, 0px 4px 12px -2px #00000014" }
-      : {}),
-    ...(Platform.OS === "web"
-      ? {
-          transitionDuration: "200ms",
-          transitionProperty: "left, top, width, height",
-          transitionTimingFunction: "cubic-bezier(0.42, 0, 0.58, 1)",
-        }
-      : {}),
-  };
-
   return (
     <TabsContext.Provider
       value={{ activeTab, registerLayout, setActiveTab, variant }}
@@ -347,10 +321,7 @@ function Tabs({
             variant: variant === "line-spaced" ? "line" : variant,
           })}
           pointerEvents="none"
-          style={[
-            indicatorBaseStyle,
-            Platform.OS === "web" ? webIndicatorStyle : indicatorStyle,
-          ]}
+          style={Platform.OS === "web" ? webIndicatorStyle : indicatorStyle}
         />
         {tabChildren}
       </View>

@@ -102,10 +102,10 @@ function Radio({
       {label ? (
         <Text
           className={cn(
-            "font-ui-6",
+            "font-p-1",
             disabled
               ? "cursor-not-allowed text-neutral-600"
-              : "cursor-pointer text-neutral-1000",
+              : "cursor-pointer text-black",
           )}
           onPress={toggle}
         >

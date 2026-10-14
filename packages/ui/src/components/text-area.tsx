@@ -5,7 +5,6 @@ import { CircleX } from "lucide-react-native";
 import { cva } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
 
 const textAreaVariants = cva(
   "w-full min-h-21.5 rounded-lg px-3 py-2 font-p-2 font-medium",
@@ -64,7 +63,7 @@ type TextAreaIconProps = {
   size?: number;
 };
 
-export type TextAreaProps = Omit<TextInputProps, "children"> & {
+export type TextAreaProps = Omit<TextInputProps, "children" | "placeholderTextColor"> & {
   id: string;
   label: string;
   leadingIcon?: React.ReactNode;
@@ -80,16 +79,13 @@ export type TextAreaProps = Omit<TextInputProps, "children"> & {
 
 function renderIcon(
   icon: React.ReactNode,
-  disabled: boolean,
   className?: string,
 ): React.ReactNode {
   if (!React.isValidElement<TextAreaIconProps>(icon)) return icon;
 
   return React.cloneElement(icon, {
     className: cn(className, icon.props.className),
-    color: disabled
-      ? colors.neutral[400]
-      : (icon.props.color ?? colors.neutral[600]),
+    color: undefined,
     size: icon.props.size ?? 20,
   });
 }
@@ -103,7 +99,6 @@ function TextArea({
   id,
   label,
   leadingIcon,
-  placeholderTextColor,
   resize = "none",
   trailingIcon,
   variant = "outline",
@@ -130,7 +125,6 @@ function TextArea({
     editable: isDisabled ? false : props.editable,
     multiline: true,
     nativeID: id,
-    placeholderTextColor: placeholderTextColor ?? colors.neutral[300],
     textAlignVertical: "top" as const,
   };
 
@@ -146,7 +140,6 @@ function TextArea({
           <View className="absolute left-3 top-2 z-10">
             {renderIcon(
               leadingIcon,
-              isDisabled,
               isDisabled ? "text-neutral-400" : "text-neutral-600",
             )}
           </View>
@@ -156,7 +149,6 @@ function TextArea({
           <View className="absolute right-3 top-2 z-10">
             {renderIcon(
               trailingIcon,
-              isDisabled,
               isDisabled ? "text-neutral-400" : "text-neutral-600",
             )}
           </View>
@@ -166,7 +158,7 @@ function TextArea({
         <View className="gap-1">
           {errors?.map((error) => (
             <View className="flex-row items-center gap-1" key={error}>
-              <CircleX color={colors.red.DEFAULT} size={16} />
+              <CircleX className="text-red" size={16} />
               <Text className="font-p-3 text-red">{error}</Text>
             </View>
           ))}
