@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
 import { Mail, Search } from "lucide-react-native";
+import { Text, View } from "react-native-css/components";
 
 import { Input } from "./input";
 
@@ -10,9 +11,13 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["outline", "ghost"],
+      options: ["outline"],
     },
     disabled: { control: "boolean" },
+    size: {
+      control: "select",
+      options: ["default", "lg"],
+    },
   },
   args: {
     id: "input",
@@ -27,10 +32,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
-
-export const Ghost: Story = {
-  args: { variant: "ghost" },
-};
 
 export const WithLeadingIcon: Story = {
   args: { leadingIcon: <Mail /> },
@@ -62,6 +63,13 @@ export const WithValue: Story = {
   args: { defaultValue: "user@example.com" },
 };
 
+export const ValueWithoutPlaceholder: Story = {
+  args: {
+    placeholder: undefined,
+    defaultValue: "user@example.com",
+  },
+};
+
 export const WithIconAndError: Story = {
   args: {
     leadingIcon: <Mail />,
@@ -74,14 +82,6 @@ export const WithIconAndHelper: Story = {
     leadingIcon: <Mail />,
     helper: ["We'll never share your email."],
   },
-};
-
-export const GhostWithLeadingIcon: Story = {
-  args: { variant: "ghost", leadingIcon: <Search /> },
-};
-
-export const GhostWithError: Story = {
-  args: { variant: "ghost", errors: ["This field is required."] },
 };
 
 export const Disabled: Story = {
@@ -100,18 +100,70 @@ export const DisabledWithIcon: Story = {
   },
 };
 
-export const AllVariants: Story = {
+export const Large: Story = {
+  args: { size: "lg" },
+};
+
+export const AllSizes: Story = {
   render: (args) => (
-    <div className="flex flex-col gap-4">
-      {(["outline", "ghost"] as const).map((variant) => (
+    <View className="gap-4">
+      {(["default", "lg"] as const).map((size) => (
         <Input
-          key={variant}
+          key={size}
           {...args}
-          id={variant}
-          label={variant.charAt(0).toUpperCase() + variant.slice(1)}
-          variant={variant}
+          id={size}
+          label={size === "default" ? "Default" : "Large"}
+          size={size}
         />
       ))}
-    </div>
+    </View>
+  ),
+};
+
+const errorIconCombinations = [
+  { name: "No icons", leadingIcon: undefined, trailingIcon: undefined },
+  { name: "Leading icon", leadingIcon: <Mail />, trailingIcon: undefined },
+  { name: "Trailing icon", leadingIcon: undefined, trailingIcon: <Search /> },
+  { name: "Both icons", leadingIcon: <Mail />, trailingIcon: <Search /> },
+];
+
+const errorStateCombinations = [
+  { name: "Error", disabled: false, helper: false },
+  { name: "Error + helper", disabled: false, helper: true },
+  { name: "Disabled + error", disabled: true, helper: false },
+  { name: "Disabled + error + helper", disabled: true, helper: true },
+];
+
+export const ErrorCombinations: Story = {
+  render: (args) => (
+    <View className="flex-row flex-wrap gap-6">
+      {errorIconCombinations.flatMap((icons) =>
+        errorStateCombinations.map((state) => {
+          const id = `${icons.name}-${state.name}`
+            .toLowerCase()
+            .replaceAll(" ", "-")
+            .replaceAll("+", "and");
+
+          return (
+            <View className="w-80 gap-2" key={id}>
+              <Text className="font-p-2 font-medium text-neutral-700">
+                {icons.name} / {state.name}
+              </Text>
+              <Input
+                {...args}
+                id={id}
+                label="Email address"
+                defaultValue="invalid-email"
+                leadingIcon={icons.leadingIcon}
+                trailingIcon={icons.trailingIcon}
+                disabled={state.disabled}
+                errors={["Enter a valid email address."]}
+                helper={state.helper ? ["Use the address linked to your account."] : undefined}
+              />
+            </View>
+          );
+        }),
+      )}
+    </View>
   ),
 };

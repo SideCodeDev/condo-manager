@@ -16,7 +16,7 @@ export {
   iconButtonVariants,
 } from "./components/icon-button";
 export { Indicator, type IndicatorProps, indicatorVariants } from "./components/indicator";
-export { Input, type InputProps, inputVariants } from "./components/input";
+export { Input, type InputProps } from "./components/input";
 export { ImageInput, type ImageInputProps } from "./components/image-input";
 export {
   Else,

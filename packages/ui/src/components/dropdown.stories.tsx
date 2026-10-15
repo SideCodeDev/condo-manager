@@ -33,9 +33,9 @@ const meta = {
   argTypes: {
     disabled: { control: "boolean" },
     search: { control: "boolean" },
-    variant: {
+    size: {
       control: "select",
-      options: ["outline", "ghost"],
+      options: ["default", "lg"],
     },
   },
   args: {
@@ -62,9 +62,9 @@ export const Searchable: Story = {
   },
 };
 
-export const Ghost: Story = {
+export const Large: Story = {
   args: {
-    variant: "ghost",
+    size: "lg",
   },
 };
 

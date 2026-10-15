@@ -116,11 +116,11 @@
 
 @layer base {
   body {
-    font-family: var(--font-app);
+    font-family: var(--font-app) !important;
   }
 
   * {
-    font-family: var(--font-app);
+    font-family: var(--font-app) !important;
   }
 
   button:not(:disabled),
