@@ -6,6 +6,7 @@ import { Text, TextInput, View } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
 import { Slot } from "./slot";
+import { If } from "./if";
 
 type InputIconProps = {
   className?: string;
@@ -212,33 +213,29 @@ function Input({
           </View>
         ) : null}
       </View>
-      {hasError ? (
-        <>
-          {errors?.map((error) => (
-            <Text
-              key={error}
-              className={cn(
-                "font-medium font-p2",
-                disabled ? "text-neutral-400" : "text-red",
-              )}
-            >
-              {error}
+      <If condition={hasError}>
+        {errors?.map((error) => (
+          <Text
+            key={error}
+            className={cn(
+              "font-medium font-p2",
+              disabled ? "text-neutral-400" : "text-red",
+            )}
+          >
+            {error}
+          </Text>
+        ))}
+      </If>
+      <If condition={!!helper?.length}>
+        {helper?.map((help) => (
+          <View key={help} className="flex gap-1 items-start flex-row">
+            <CircleAlert className="text-primary mt-0.5" size={16} />
+            <Text className="font-p-2 font-normal text-neutral-800">
+              {help}
             </Text>
-          ))}
-        </>
-      ) : null}
-      {helper?.length ? (
-        <>
-          {helper.map((help) => (
-            <View key={help} className="flex gap-1 items-start flex-row">
-              <CircleAlert className="text-primary mt-0.5" size={16} />
-              <Text className="font-p-2 font-normal text-neutral-800">
-                {help}
-              </Text>
-            </View>
-          ))}
-        </>
-      ) : null}
+          </View>
+        ))}
+      </If>
     </View>
   );
 }
