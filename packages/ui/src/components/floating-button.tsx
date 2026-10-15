@@ -8,7 +8,7 @@ import { Loader } from "./loader";
 import { getSlotChild, Slot } from "./slot";
 
 const floatingButtonVariants = cva(
-  "shrink-0 min-w-14 h-14 flex-row items-center justify-center gap-2 rounded-full bg-primary p-3 font-p-1 font-semibold text-white shadow-floating hover:bg-primary-900 focus-visible:bg-primary-900",
+  "shrink-0 min-w-14 h-14 flex-row items-center justify-center gap-2 rounded-full bg-primary p-3 font-p-1 font-semibold text-white shadow-center-2 hover:bg-primary-900 focus-visible:bg-primary-900 focus-visible:outline-none disabled:pointer-events-none disabled:bg-primary",
 );
 
 export type FloatingButtonProps = Omit<PressableProps, "children"> & {
@@ -87,6 +87,7 @@ function FloatingButton({
 
   return (
     <Pressable
+      {...props}
       accessibilityLabel={
         props.accessibilityLabel ??
         (loading && typeof children === "string" ? children : undefined)
@@ -94,7 +95,6 @@ function FloatingButton({
       accessibilityRole="button"
       className={buttonClassName}
       disabled={disabled}
-      {...props}
     >
       {content}
     </Pressable>
