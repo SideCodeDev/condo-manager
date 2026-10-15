@@ -8,17 +8,16 @@ import { Loader } from "./loader";
 import { getSlotChild, Slot } from "./slot";
 
 const buttonVariants = cva(
-  "group min-w-36 shrink-0 flex-row items-center justify-center gap-2 rounded-md font-semibold transition-all disabled:pointer-events-none",
+  "group min-w-36 shrink-0 flex-row items-center justify-center gap-2 rounded-md font-medium transition-all disabled:pointer-events-none",
   {
     variants: {
       variant: {
         primary:
-          "bg-neutral-950 text-white hover:bg-neutral-800 focus-visible:bg-neutral-800 active:bg-neutral-800 disabled:bg-neutral-700 disabled:text-neutral-300",
+          "bg-black text-white hover:bg-neutral-700 focus-visible:bg-neutral-700 active:bg-neutral-700 disabled:bg-neutral-400 disabled:text-neutral-600",
         secondary:
-          "border border-neutral-950 text-neutral-950 hover:border-neutral-800 hover:text-neutral-800 focus-visible:border-neutral-800 focus-visible:text-neutral-800 active:border-neutral-800 active:text-neutral-800 disabled:border-neutral-600 disabled:text-neutral-600",
-        link: "text-neutral-950 hover:text-neutral-800 focus-visible:text-neutral-800 active:text-neutral-800 disabled:text-neutral-600",
-        ghost:
-          "text-primary hover:text-primary-900 focus-visible:text-primary-900 active:text-primary-900 disabled:text-neutral-600",
+          "border border-black text-black hover:bg-neutral-300 focus-visible:bg-neutral-300 active:bg-neutral-300 disabled:border-neutral-400 disabled:text-neutral-400",
+        link: "text-black hover:text-neutral-800 focus-visible:text-neutral-800 active:text-neutral-800 disabled:text-neutral-400",
+        ghost: "text-primary disabled:text-neutral-400",
       },
       size: {
         standard: "px-3 py-2.5",
@@ -34,25 +33,25 @@ const buttonVariants = cva(
         variant: "primary",
         destructive: true,
         class:
-          "bg-red hover:bg-red-600 focus-visible:bg-red-600 active:bg-red-600 disabled:bg-red disabled:text-white",
+          "bg-red hover:bg-red-800 focus-visible:bg-red-800 active:bg-red-800 disabled:bg-neutral-400 disabled:text-neutral-600",
       },
       {
         variant: "secondary",
         destructive: true,
         class:
-          "border-red text-red hover:border-red-600 hover:text-red-600 focus-visible:border-red-600 focus-visible:text-red-600 active:border-red-600 active:text-red-600 disabled:border-red disabled:text-red",
+          "border-red text-red hover:border-red-800 hover:text-red-800 focus-visible:border-red-800 focus-visible:text-red-800 active:border-red-800 active:text-red-800 disabled:border-neutral-400 disabled:text-neutral-400",
       },
       {
         variant: "link",
         destructive: true,
         class:
-          "text-red hover:text-red-600 focus-visible:text-red-600 active:text-red-600 disabled:text-red",
+          "text-red hover:text-red-800 focus-visible:text-red-800 active:text-red-800 disabled:text-neutral-400",
       },
       {
         variant: "ghost",
         destructive: true,
         class:
-          "text-red hover:text-red-600 focus-visible:text-red-600 active:text-red-600 disabled:text-red",
+          "text-red hover:text-red-800 focus-visible:text-red-800 active:text-red-800 disabled:text-neutral-400",
       },
     ],
     defaultVariants: {
@@ -63,16 +62,14 @@ const buttonVariants = cva(
   },
 );
 
-const buttonTextVariants = cva("font-semibold", {
+const buttonTextVariants = cva("font-medium", {
   variants: {
     variant: {
-      primary:
-        "text-white group-disabled:text-neutral-300 group-hover:text-white group-focus-visible:text-white group-active:text-white",
-      secondary:
-        "text-neutral-950 group-disabled:text-neutral-600 group-hover:text-neutral-800 group-focus-visible:text-neutral-800 group-active:text-neutral-800",
-      link: "text-neutral-950 underline group-disabled:text-neutral-600 group-hover:text-neutral-800 group-focus-visible:text-neutral-800 group-active:text-neutral-800",
+      primary: "text-white group-disabled:text-neutral-600",
+      secondary: "text-black group-disabled:text-neutral-600",
+      link: "text-black underline underline-offset-4 group-disabled:text-neutral-400 group-hover:decoration-2 group-focus-visible:no-underline group-active:no-underline",
       ghost:
-        "text-primary group-disabled:text-neutral-600 group-hover:text-primary-900 group-focus-visible:text-primary-900 group-active:text-primary-900",
+        "text-primary group-disabled:text-neutral-400 group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4",
     },
     size: {
       standard: "font-p-1",
@@ -103,30 +100,66 @@ const buttonTextVariants = cva("font-semibold", {
   },
 });
 
-const buttonLoaderVariants = cva("", {
+const loadingButtonVariants = cva(
+  "group min-w-36 shrink-0 flex-row items-center justify-center gap-2 rounded-md font-medium transition-all disabled:pointer-events-none focus:outline-none focus-visible:outline-none",
+  {
+    variants: {
+      variant: {
+        primary: "bg-black text-white",
+        secondary: "border border-black text-black",
+        link: "text-black",
+        ghost: "text-primary",
+      },
+      size: {
+        standard: "px-3 py-2.5",
+        sm: "px-3 py-2",
+      },
+      destructive: { true: "", false: "" },
+    },
+    compoundVariants: [
+      { variant: "primary", destructive: true, class: "bg-red text-white" },
+      { variant: "secondary", destructive: true, class: "border-red text-red" },
+      { variant: ["link", "ghost"], destructive: true, class: "text-red" },
+    ],
+    defaultVariants: {
+      variant: "primary",
+      size: "standard",
+      destructive: false,
+    },
+  },
+);
+
+const loadingTextVariants = cva("font-medium", {
   variants: {
     variant: {
-      primary: "bg-white group-disabled:bg-neutral-300",
-      secondary:
-        "bg-neutral-950 group-disabled:bg-neutral-600 group-hover:bg-neutral-800 group-focus-visible:bg-neutral-800 group-active:bg-neutral-800",
-      link: "bg-neutral-950 group-disabled:bg-neutral-600 group-hover:bg-neutral-800 group-focus-visible:bg-neutral-800 group-active:bg-neutral-800",
-      ghost:
-        "bg-primary group-disabled:bg-neutral-600 group-hover:bg-primary-900 group-focus-visible:bg-primary-900 group-active:bg-primary-900",
+      primary: "text-white",
+      secondary: "text-black",
+      link: "text-black underline underline-offset-4",
+      ghost: "text-primary",
+    },
+    size: { standard: "font-p-1", sm: "font-p-1" },
+    destructive: { true: "", false: "" },
+  },
+  compoundVariants: [
+    { variant: "primary", destructive: true, class: "text-white" },
+    { variant: ["secondary", "link", "ghost"], destructive: true, class: "text-red" },
+  ],
+  defaultVariants: { variant: "primary", size: "standard", destructive: false },
+});
+
+const loadingLoaderVariants = cva("", {
+  variants: {
+    variant: {
+      primary: "bg-white",
+      secondary: "bg-neutral-950",
+      link: "bg-neutral-950",
+      ghost: "bg-primary",
     },
     destructive: { true: "", false: "" },
   },
   compoundVariants: [
-    {
-      variant: "primary",
-      destructive: true,
-      class: "bg-white group-disabled:bg-white",
-    },
-    {
-      variant: ["secondary", "link", "ghost"],
-      destructive: true,
-      class:
-        "bg-red group-disabled:bg-red group-hover:bg-red-600 group-focus-visible:bg-red-600 group-active:bg-red-600",
-    },
+    { variant: "primary", destructive: true, class: "bg-white" },
+    { variant: ["secondary", "link", "ghost"], destructive: true, class: "bg-red" },
   ],
   defaultVariants: { variant: "primary", destructive: false },
 });
@@ -202,20 +235,31 @@ function Button({
   const disabled = hasDisabledProp
     ? Boolean(props.disabled)
     : Boolean(loading || props.disabled);
-  const buttonClassName = cn(
-    buttonVariants({
-      className,
-      destructive,
-      size: resolvedSize,
-      variant: resolvedVariant,
-    }),
-  );
-  const textClassName = buttonTextVariants({
-    destructive,
-    size: resolvedSize,
-    variant: resolvedVariant,
-  });
-  const loaderClassName = buttonLoaderVariants({
+  const buttonClassName = loading
+    ? loadingButtonVariants({
+        className,
+        destructive,
+        size: resolvedSize,
+        variant: resolvedVariant,
+      })
+    : buttonVariants({
+        className,
+        destructive,
+        size: resolvedSize,
+        variant: resolvedVariant,
+      });
+  const textClassName = loading
+    ? loadingTextVariants({
+        destructive,
+        size: resolvedSize,
+        variant: resolvedVariant,
+      })
+    : buttonTextVariants({
+        destructive,
+        size: resolvedSize,
+        variant: resolvedVariant,
+      });
+  const loaderClassName = loadingLoaderVariants({
     destructive,
     variant: resolvedVariant,
   });
@@ -248,8 +292,8 @@ function Button({
       }
       accessibilityRole="button"
       className={buttonClassName}
-      disabled={loading || props.disabled}
       {...props}
+      disabled={Boolean(loading || props.disabled)}
     >
       {renderContent()}
     </Pressable>

@@ -4,6 +4,7 @@ import {
   Easing,
   View,
 } from "react-native";
+import { View as CssView } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
 
@@ -160,6 +161,8 @@ const paths = [
 ] as const;
 
 const cssEase = Easing.bezier(0.25, 0.1, 0.25, 1);
+const AnimatedCssView = Animated.createAnimatedComponent(CssView);
+
 export function Loader({
   className,
   size = BASE_SIZE,
@@ -206,7 +209,7 @@ export function Loader({
         });
 
         return (
-          <Animated.View
+          <AnimatedCssView
             className={cn("absolute", className)}
             key={index}
             style={{
