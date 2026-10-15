@@ -171,24 +171,24 @@ function Input({
             )}
           </View>
         ) : null}
-        {
-          <Inputcomponent
-            {...props}
-            accessibilityLabel={props.accessibilityLabel ?? label}
-            accessibilityState={{
-              ...props.accessibilityState,
-              disabled: disabled,
-            }}
-            editable={!disabled}
-            nativeID={id}
-            className={cn(
-              inputElementVariants({
-                disabled,
-              }),
-            )}
-            children={asChild ? children : undefined}
-          />
-        }
+
+        <Inputcomponent
+          {...props}
+          accessibilityLabel={props.accessibilityLabel ?? label}
+          accessibilityState={{
+            ...props.accessibilityState,
+            disabled: disabled,
+          }}
+          editable={!disabled}
+          nativeID={id}
+          className={cn(
+            inputElementVariants({
+              disabled,
+            }),
+          )}
+          children={asChild ? children : undefined}
+        />
+
         {trailingIcon ? (
           <View
             className={cn(
