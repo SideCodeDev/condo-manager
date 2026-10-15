@@ -33,7 +33,6 @@ export {
 export {
   TextArea,
   type TextAreaProps,
-  textAreaVariants,
 } from "./components/text-area";
 export {
   ListButton,
