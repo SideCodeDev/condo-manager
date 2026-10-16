@@ -81,6 +81,12 @@ export const SelectedOption: Story = {
   },
 };
 
+export const NoSelection: Story = {
+  args: {
+    value: "",
+  },
+};
+
 export const Large: Story = {
   args: {
     size: "lg",

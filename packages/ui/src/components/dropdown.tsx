@@ -381,6 +381,9 @@ function Dropdown<T>({
             className="text-start"
             disabled={isDisabled}
             nativeID={anchorId}
+            onFocus={() => {
+              if (!open) openDropdown();
+            }}
             onPress={toggleOpen}
             ref={triggerRef}
           >
