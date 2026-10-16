@@ -37,11 +37,11 @@ const tabItemVariants = cva(
 );
 
 const tabIndicatorVariants = cva(
-  "absolute transition-[left,top,width,height] duration-200 ease-in-out",
+  "h-full w-full rounded-4xl transition-[left,top,width,height] duration-200 ease-in-out",
   {
     variants: {
       variant: {
-        chip: "z-0 rounded-4xl bg-white shadow-card",
+        chip: "z-0 rounded-4xl bg-white shadow-bottom-0",
         line: "z-0 rounded-3xl bg-primary",
       },
     },
@@ -54,7 +54,7 @@ const tabsVariants = cva(
   {
     variants: {
       variant: {
-        chip: "rounded-3xl border border-neutral-200 bg-neutral-100 p-1",
+        chip: "rounded-3xl border border-neutral-200 p-1",
         line: "",
       },
     },
@@ -303,6 +303,17 @@ function Tabs({
         width: activeLayout.width,
       }
     : undefined;
+  const animatedIndicatorStyle =
+    Platform.OS === "web"
+      ? {
+          ...webIndicatorStyle,
+          position: "absolute" as const,
+          transitionDuration: "200ms",
+          transitionProperty: "left, top, width, height",
+          transitionTimingFunction: "cubic-bezier(0.42, 0, 0.58, 1)",
+          zIndex: 0,
+        }
+      : [{ position: "absolute" as const, zIndex: 0 }, indicatorStyle];
   return (
     <TabsContext.Provider
       value={{ activeTab, registerLayout, setActiveTab, variant }}
@@ -316,13 +327,13 @@ function Tabs({
         )}
         nativeID={tabsRootId}
       >
-        <Animated.View
-          className={tabIndicatorVariants({
-            variant: variant === "line-spaced" ? "line" : variant,
-          })}
-          pointerEvents="none"
-          style={Platform.OS === "web" ? webIndicatorStyle : indicatorStyle}
-        />
+        <Animated.View pointerEvents="none" style={animatedIndicatorStyle}>
+          <View
+            className={tabIndicatorVariants({
+              variant: variant === "line-spaced" ? "line" : variant,
+            })}
+          />
+        </Animated.View>
         {tabChildren}
       </View>
       {contentChildren}

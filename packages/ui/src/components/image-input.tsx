@@ -7,6 +7,7 @@ import { cn, getValidFiles } from "../lib/utils";
 import { useImageFallback } from "../hooks/image-fallback";
 import { Button } from "./button";
 import { FileUpload, type FileUploadFile } from "./file-upload";
+import { InputFeedback } from "./input-feedback";
 
 const imageMimeTypes = ["image/png", "image/jpeg", "image/gif"] as const;
 
@@ -24,6 +25,8 @@ export type ImageInputProps = {
   onChange: (value: FileUploadFile | null) => void;
   className?: string;
   alt: string;
+  errors?: string[];
+  helper?: string[];
   maxFileSizeMB?: number;
   labels?: ImageInputLabels;
 };
@@ -41,6 +44,8 @@ function getImageUri(value: ImageInputProps["value"]): string | undefined {
 function ImageInput({
   alt,
   className,
+  errors,
+  helper,
   id,
   labels,
   maxFileSizeMB = 10,
@@ -68,11 +73,7 @@ function ImageInput({
   }, [value]);
 
   const handleWebFiles = (files: FileList | null) => {
-    const [file] = getValidFiles(
-      files,
-      [...imageMimeTypes],
-      maxFileSizeMB,
-    );
+    const [file] = getValidFiles(files, [...imageMimeTypes], maxFileSizeMB);
     if (file) onChange(file);
   };
 
@@ -91,7 +92,9 @@ function ImageInput({
 
     const [asset] = result.assets.filter(
       (item) =>
-        imageMimeTypes.includes(item.mimeType as (typeof imageMimeTypes)[number]) &&
+        imageMimeTypes.includes(
+          item.mimeType as (typeof imageMimeTypes)[number],
+        ) &&
         (!maxFileSizeMB ||
           item.size === undefined ||
           item.size <= maxFileSizeMB * 1024 * 1024),
@@ -100,53 +103,59 @@ function ImageInput({
   };
 
   return (
-    <View className={cn("size-89.75", className)}>
-      {!value ? (
-        <FileUpload
-          className="size-full"
-          id={id}
-          labels={labels}
-          maxFileSizeMB={maxFileSizeMB}
-          onFileSelect={onChange}
-          type="single"
-          validTypes={[...imageMimeTypes]}
-        />
-      ) : (
-        <View className="group relative isolate size-full overflow-clip rounded border border-neutral-200">
-          {Platform.OS === "web" ? (
-            <input
-              ref={inputRef}
-              accept={imageMimeTypes.join(",")}
-              aria-hidden
-              className="sr-only"
-              onChange={(event) => handleWebFiles(event.target.files)}
-              type="file"
-            />
-          ) : null}
-          {!hasError && imgSrc ? (
-            <Image
-              accessibilityLabel={alt}
-              className="size-full"
-              onError={onError}
-              source={{ uri: imgSrc }}
-              resizeMode="cover"
-            />
-          ) : null}
-          <View className="absolute inset-0 z-10 flex-col items-center justify-center gap-5 bg-black/80 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
-            <Button
-              className="min-w-55 bg-white"
-              onPress={pickImage}
-              variant="secondary"
-            >
-              {labels?.replace ?? "Change image"}
-            </Button>
-            <Button destructive className="min-w-55" onPress={() => onChange(null)}>
-              {labels?.remove ?? "Remove"}
-            </Button>
+    <InputFeedback errors={errors} helper={helper} errorIcon>
+      <View className={cn("size-89.75", className)}>
+        {!value ? (
+          <FileUpload
+            className="size-full"
+            id={id}
+            labels={labels}
+            maxFileSizeMB={maxFileSizeMB}
+            onFileSelect={onChange}
+            type="single"
+            validTypes={[...imageMimeTypes]}
+          />
+        ) : (
+          <View className="group relative isolate size-full overflow-clip rounded border border-neutral-200">
+            {Platform.OS === "web" ? (
+              <input
+                ref={inputRef}
+                accept={imageMimeTypes.join(",")}
+                aria-hidden
+                className="sr-only"
+                onChange={(event) => handleWebFiles(event.target.files)}
+                type="file"
+              />
+            ) : null}
+            {!hasError && imgSrc ? (
+              <Image
+                accessibilityLabel={alt}
+                className="size-full"
+                onError={onError}
+                source={{ uri: imgSrc }}
+                resizeMode="cover"
+              />
+            ) : null}
+            <View className="absolute inset-0 z-10 flex-col items-center justify-center gap-5 bg-black/80 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+              <Button
+                className="min-w-55 bg-white"
+                onPress={pickImage}
+                variant="secondary"
+              >
+                {labels?.replace ?? "Change image"}
+              </Button>
+              <Button
+                destructive
+                className="min-w-55"
+                onPress={() => onChange(null)}
+              >
+                {labels?.remove ?? "Remove"}
+              </Button>
+            </View>
           </View>
-        </View>
-      )}
-    </View>
+        )}
+      </View>
+    </InputFeedback>
   );
 }
 
