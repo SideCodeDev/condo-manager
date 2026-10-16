@@ -10,12 +10,12 @@ const radioVariants = cva(
   {
     variants: {
       state: {
-        unchecked: "border-neutral-600",
+        unchecked: "border-neutral-900",
         checked: "border-primary",
-        "disabled-checked": "border-neutral-600",
+        "disabled-checked": "border-neutral-400",
       },
       disabled: {
-        true: "cursor-not-allowed border-neutral-400",
+        true: "cursor-not-allowed border-neutral-900",
         false: "",
       },
     },
@@ -80,7 +80,7 @@ function Radio({
       className={cn(
         "font-p-1",
         disabled
-          ? "cursor-not-allowed text-neutral-600"
+          ? "cursor-not-allowed text-neutral-400"
           : "cursor-pointer text-black",
       )}
       onPress={toggle}
@@ -111,7 +111,7 @@ function Radio({
           <View
             className={cn(
               "h-2.5 w-2.5 rounded-full",
-              disabled ? "bg-neutral-600" : "bg-primary",
+              disabled ? "bg-neutral-400" : "bg-primary",
             )}
           />
         ) : null}

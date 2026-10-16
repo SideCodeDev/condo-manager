@@ -1,11 +1,11 @@
 import * as React from "react";
 import type { TextInputProps } from "react-native";
 import { TextInput, Text, View } from "react-native-css/components";
-import { CircleAlert, CircleX } from "lucide-react-native";
+import { CircleX } from "lucide-react-native";
 import { cva } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
-import { If } from "./if";
+import { InputFeedback } from "./input-feedback";
 
 type TextAreaIconProps = {
   className?: string;
@@ -226,7 +226,13 @@ function TextArea({
     active || !!props.placeholder || !!props.value || !!props.defaultValue;
 
   return (
-    <View className={cn("grid gap-1", className)}>
+    <InputFeedback
+      className={className}
+      disabled={disabled}
+      errorIcon={false}
+      errors={errors}
+      helper={helper}
+    >
       <View
         className={cn(
           textareaContainerVariants({
@@ -302,30 +308,7 @@ function TextArea({
           </View>
         ) : null}
       </View>
-      <If condition={hasError}>
-        {errors?.map((error) => (
-          <Text
-            key={error}
-            className={cn(
-              "font-medium font-p2",
-              disabled ? "text-neutral-400" : "text-red",
-            )}
-          >
-            {error}
-          </Text>
-        ))}
-      </If>
-      <If condition={!!helper?.length}>
-        {helper?.map((help) => (
-          <View key={help} className="flex gap-1 items-start flex-row">
-            <CircleAlert className="text-primary mt-0.5" size={16} />
-            <Text className="font-p-2 font-normal text-neutral-800">
-              {help}
-            </Text>
-          </View>
-        ))}
-      </If>
-    </View>
+    </InputFeedback>
   );
 }
 

@@ -71,3 +71,25 @@ export const DisabledWithLabel: Story = {
     disabled: true,
   },
 };
+
+export const WithError: Story = {
+  args: {
+    errors: ["This field is required."],
+    label: "Accept terms and conditions",
+  },
+};
+
+export const WithHelper: Story = {
+  args: {
+    helper: ["You must accept the terms to continue."],
+    label: "Accept terms and conditions",
+  },
+};
+
+export const WithErrorAndHelper: Story = {
+  args: {
+    errors: ["This field is required."],
+    helper: ["You must accept the terms to continue."],
+    label: "Accept terms and conditions",
+  },
+};

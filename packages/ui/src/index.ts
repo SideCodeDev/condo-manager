@@ -17,6 +17,10 @@ export {
 } from "./components/icon-button";
 export { Indicator, type IndicatorProps, indicatorVariants } from "./components/indicator";
 export { Input, type InputProps } from "./components/input";
+export {
+  InputFeedback,
+  type InputFeedbackProps,
+} from "./components/input-feedback";
 export { ImageInput, type ImageInputProps } from "./components/image-input";
 export {
   Else,

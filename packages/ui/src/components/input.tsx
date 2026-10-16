@@ -1,12 +1,12 @@
 import { cva } from "class-variance-authority";
-import { CircleAlert, CircleX } from "lucide-react-native";
+import { CircleX } from "lucide-react-native";
 import * as React from "react";
 import type { TextInputProps } from "react-native";
 import { Text, TextInput, View } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
 import { Slot } from "./slot";
-import { If } from "./if";
+import { InputFeedback } from "./input-feedback";
 
 type InputIconProps = {
   className?: string;
@@ -150,7 +150,13 @@ function Input({
   const Inputcomponent = asChild ? Slot : TextInput;
 
   return (
-    <View className={cn("grid gap-1", className)}>
+    <InputFeedback
+      className={className}
+      disabled={disabled}
+      errorIcon={false}
+      errors={errors}
+      helper={helper}
+    >
       <View
         nativeID={`${id}-container`}
         ref={containerRef}
@@ -224,30 +230,7 @@ function Input({
           </View>
         ) : null}
       </View>
-      <If condition={hasError}>
-        {errors?.map((error) => (
-          <Text
-            key={error}
-            className={cn(
-              "font-medium font-p2",
-              disabled ? "text-neutral-400" : "text-red",
-            )}
-          >
-            {error}
-          </Text>
-        ))}
-      </If>
-      <If condition={!!helper?.length}>
-        {helper?.map((help) => (
-          <View key={help} className="flex gap-1 items-start flex-row">
-            <CircleAlert className="text-primary mt-0.5" size={16} />
-            <Text className="font-p-2 font-normal text-neutral-800">
-              {help}
-            </Text>
-          </View>
-        ))}
-      </If>
-    </View>
+    </InputFeedback>
   );
 }
 

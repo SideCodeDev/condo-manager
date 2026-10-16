@@ -5,6 +5,7 @@ import { Pressable, Text, View } from "react-native-css/components";
 import { Check, Minus } from "lucide-react-native";
 
 import { cn } from "../lib/utils";
+import { InputFeedback } from "./input-feedback";
 
 type CheckboxState = boolean | "indeterminate";
 
@@ -13,13 +14,13 @@ const checkboxVariants = cva(
   {
     variants: {
       state: {
-        unchecked: "border-neutral-600",
+        unchecked: "border-neutral-900",
         checked: "border-primary bg-primary text-white",
         indeterminate: "border-primary bg-primary text-white",
-        "disabled-checked": "border-neutral-600 bg-neutral-600 text-white",
+        "disabled-checked": "border-neutral-200 bg-neutral-200 text-white",
       },
       disabled: {
-        true: "cursor-not-allowed border-neutral-400",
+        true: "cursor-not-allowed border-neutral-200",
         false: "",
       },
     },
@@ -38,6 +39,8 @@ export type CheckboxProps = Omit<
   className?: string;
   defaultChecked?: CheckboxState;
   disabled?: boolean;
+  errors?: string[];
+  helper?: string[];
   id?: string;
   label?: string;
   labelPosition?: "left" | "right";
@@ -50,6 +53,8 @@ function Checkbox({
   className,
   defaultChecked = false,
   disabled = false,
+  errors,
+  helper,
   label,
   labelPosition = "right",
   onCheckedChange,
@@ -86,8 +91,10 @@ function Checkbox({
   const labelElement = label ? (
     <Text
       className={cn(
-        "font-p-1 text-black",
-        disabled ? "cursor-not-allowed" : "cursor-pointer",
+        "font-p-1",
+        disabled
+          ? "cursor-not-allowed text-neutral-200"
+          : "cursor-pointer text-black",
       )}
       onPress={toggle}
     >
@@ -96,36 +103,36 @@ function Checkbox({
   ) : null;
 
   return (
-    <View className={cn("flex-row items-center gap-2", className)}>
-      {labelPosition === "left" ? labelElement : null}
-      <Pressable
-        {...props}
-        accessibilityLabel={accessibilityLabel ?? label}
-        accessibilityRole="checkbox"
-        accessibilityState={{
-          checked: isIndeterminate ? "mixed" : isChecked,
-          disabled,
-        }}
-        className={cn(checkboxVariants({ disabled, state }))}
-        disabled={disabled}
-        onPress={toggle}
-      >
-        {isIndeterminate ? (
-          <Minus
-            className={disabled ? "text-neutral-200" : "text-white"}
-            size={16}
-            strokeWidth={2}
-          />
-        ) : isChecked ? (
-          <Check
-            className={disabled ? "text-neutral-200" : "text-white"}
-            size={16}
-            strokeWidth={2}
-          />
-        ) : null}
-      </Pressable>
-      {labelPosition === "right" ? labelElement : null}
-    </View>
+    <InputFeedback
+      disabled={disabled}
+      errorIcon
+      errors={errors}
+      helper={helper}
+      className={className}
+    >
+      <View className={cn("flex-row items-center gap-2")}>
+        {labelPosition === "left" ? labelElement : null}
+        <Pressable
+          {...props}
+          accessibilityLabel={accessibilityLabel ?? label}
+          accessibilityRole="checkbox"
+          accessibilityState={{
+            checked: isIndeterminate ? "mixed" : isChecked,
+            disabled,
+          }}
+          className={cn(checkboxVariants({ disabled, state }))}
+          disabled={disabled}
+          onPress={toggle}
+        >
+          {isIndeterminate ? (
+            <Minus className="text-white" size={16} strokeWidth={2} />
+          ) : isChecked ? (
+            <Check className="text-white" size={16} strokeWidth={2} />
+          ) : null}
+        </Pressable>
+        {labelPosition === "right" ? labelElement : null}
+      </View>
+    </InputFeedback>
   );
 }
 
