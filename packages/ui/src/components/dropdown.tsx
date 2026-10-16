@@ -12,17 +12,16 @@ import {
 import { cn } from "../lib/utils";
 import { Input, type InputProps } from "./input";
 import { DropdownPortal } from "./dropdown-portal";
+import { Indicator } from "./indicator";
 
 export interface DropdownOption<T> {
   value: T;
   label: React.ReactNode;
 }
 
-export type DropdownProps<T> = {
-  options: Array<DropdownOption<T>>;
-  value: T;
-  onChange?: (value: T) => void;
-  valueMapper?: (value: T) => React.ReactNode;
+type DropdownBaseProps<OptionValue> = {
+  /** Each option always contains one selectable value, including in multi-select. */
+  options: Array<DropdownOption<OptionValue>>;
   search?: boolean;
   noResultsText?: string;
   clearValueOnSelect?: boolean;
@@ -31,28 +30,67 @@ export type DropdownProps<T> = {
   popupLabel: string;
 } & Omit<InputProps, "value" | "onChange" | "active" | "children" | "asChild">;
 
+type DropdownSingleSelectProps<OptionValue> = {
+  value: NoInfer<OptionValue>;
+  onChange?: (value: OptionValue) => void;
+  valueMapper?: (value: OptionValue) => React.ReactNode;
+};
+
+type DropdownMultiSelectProps<OptionValue> = {
+  value: NoInfer<OptionValue>[];
+  onChange?: (value: OptionValue[]) => void;
+  valueMapper?: (value: OptionValue[]) => React.ReactNode;
+};
+
+/** `OptionValue` is the value of one option; `value` may be one or many. */
+export type DropdownProps<OptionValue> = DropdownBaseProps<OptionValue> &
+  (
+    | DropdownSingleSelectProps<OptionValue>
+    | DropdownMultiSelectProps<OptionValue>
+  );
+
 function getOptionLabel<T>(option: DropdownOption<T>): string {
   return typeof option.label === "string" || typeof option.label === "number"
     ? String(option.label)
     : "";
 }
 
-function Dropdown<T>({
-  "data-tid": dataTid,
-  clearValueOnSelect = false,
-  className,
-  container,
-  noResultsText = "Sem resultados",
-  onChange,
-  options,
-  popupLabel,
-  search = false,
-  value,
-  valueMapper = (nextValue) =>
-    options.find((option) => option.value === nextValue)?.label ??
-    String(nextValue),
-  ...props
-}: DropdownProps<T>) {
+function Dropdown<T>(props: DropdownProps<T>) {
+  const {
+    "data-tid": dataTid,
+    clearValueOnSelect = false,
+    className,
+    container,
+    noResultsText = "Sem resultados",
+    onChange: dropdownOnChange,
+    options,
+    popupLabel,
+    search = false,
+    value,
+    valueMapper,
+    ...inputProps
+  } = props;
+  const isMultiSelect = Array.isArray(value);
+  const selectedValues = (isMultiSelect ? value : [value]) as T[];
+  const selectedValue = selectedValues[0];
+  const displayValue = isMultiSelect
+    ? ((valueMapper as ((value: T[]) => React.ReactNode) | undefined)?.(
+        value,
+      ) ??
+      selectedValues
+        .map((selected) => {
+          const option = options.find((item) => item.value === selected);
+          return option
+            ? getOptionLabel(option) || String(selected)
+            : String(selected);
+        })
+        .join(", "))
+    : ((valueMapper as ((value: T) => React.ReactNode) | undefined)?.(value) ??
+      options.find((option) => option.value === value)?.label ??
+      String(value));
+  const inputValue = isMultiSelect
+    ? selectedValues.map(String).join(", ")
+    : String(value ?? "");
   const [open, setOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
@@ -68,13 +106,19 @@ function Dropdown<T>({
     Record<string, React.ElementRef<typeof Pressable> | null>
   >({});
   const [focusedOptionIndex, setFocusedOptionIndex] = React.useState(-1);
-  const isDisabled = Boolean(props.disabled);
+  const [isKeyboardNavigationActive, setIsKeyboardNavigationActive] =
+    React.useState(false);
+  const isDisabled = Boolean(inputProps.disabled);
   const isWeb = Platform.OS === "web";
-  const anchorId = `dropdown-trigger-${props.id}`;
+  const anchorId = `dropdown-trigger-${inputProps.id}`;
   const isSearchInputVisible = search && open;
   const searchInputRef = React.useRef<React.ElementRef<typeof TextInput>>(null);
-  const selectedOption = options.find((option) => option.value === value);
-  const [priorityOptionValue, setPriorityOptionValue] = React.useState(value);
+  const selectedOption = options.find(
+    (option) => option.value === selectedValue,
+  );
+  const [priorityOptionValue, setPriorityOptionValue] = React.useState<
+    T | undefined
+  >(selectedValue);
   const orderedOptions = React.useMemo(() => {
     const priorityOption = options.find(
       (option) => option.value === priorityOptionValue,
@@ -102,8 +146,8 @@ function Dropdown<T>({
   React.useEffect(() => {
     if (open || isClosing) return;
 
-    setPriorityOptionValue(value);
-  }, [isClosing, open, value]);
+    setPriorityOptionValue(selectedValue);
+  }, [isClosing, open, selectedValue]);
 
   const close = () => {
     if (isWeb) {
@@ -127,6 +171,7 @@ function Dropdown<T>({
     setIsClosing(false);
     setAnchorRect(null);
     setSearchValue("");
+    setIsKeyboardNavigationActive(false);
     setOpen(true);
   };
 
@@ -144,7 +189,7 @@ function Dropdown<T>({
 
     const updatePosition = () => {
       if (isWeb) {
-        const element = document.getElementById(`${props.id}-container`);
+        const element = document.getElementById(`${inputProps.id}-container`);
         if (!element) return;
 
         const rect = element.getBoundingClientRect();
@@ -214,19 +259,29 @@ function Dropdown<T>({
     open,
     options,
     selectedOption,
-    value,
+    selectedValue,
   ]);
 
   const selectOption = (option: DropdownOption<T>) => {
+    if (isMultiSelect) {
+      const nextValues = selectedValues.includes(option.value)
+        ? selectedValues.filter((selected) => selected !== option.value)
+        : [...selectedValues, option.value];
+      (dropdownOnChange as ((nextValue: T[]) => void) | undefined)?.(
+        nextValues,
+      );
+      return;
+    }
+
     if (option.value === value) {
       if (clearValueOnSelect) {
-        onChange?.(null as T);
+        (dropdownOnChange as ((nextValue: T) => void) | undefined)?.(null as T);
         close();
       }
       return;
     }
 
-    onChange?.(option.value);
+    (dropdownOnChange as ((nextValue: T) => void) | undefined)?.(option.value);
     close();
   };
 
@@ -245,17 +300,22 @@ function Dropdown<T>({
     if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(key)) return;
     if (!filteredOptions.length) return;
 
+    const isFirstNavigationKey = !isKeyboardNavigationActive;
     const nextIndex =
       key === "Home"
         ? 0
         : key === "End"
           ? filteredOptions.length - 1
           : key === "ArrowDown"
-            ? (focusedOptionIndex + 1 + filteredOptions.length) %
-              filteredOptions.length
-            : (focusedOptionIndex - 1 + filteredOptions.length) %
-              filteredOptions.length;
+            ? isFirstNavigationKey
+              ? 0
+              : (focusedOptionIndex + 1) % filteredOptions.length
+            : isFirstNavigationKey
+              ? filteredOptions.length - 1
+              : (focusedOptionIndex - 1 + filteredOptions.length) %
+                filteredOptions.length;
 
+    setIsKeyboardNavigationActive(true);
     setFocusedOptionIndex(nextIndex);
   };
 
@@ -301,16 +361,22 @@ function Dropdown<T>({
       event.preventDefault();
       if (!filteredOptions.length) return;
 
+      const isFirstNavigationKey = !isKeyboardNavigationActive;
       const nextIndex =
         event.key === "Home"
           ? 0
           : event.key === "End"
             ? filteredOptions.length - 1
             : event.key === "ArrowDown"
-              ? (focusedOptionIndex + 1) % filteredOptions.length
-              : (focusedOptionIndex - 1 + filteredOptions.length) %
-                filteredOptions.length;
+              ? isFirstNavigationKey
+                ? 0
+                : (focusedOptionIndex + 1) % filteredOptions.length
+              : isFirstNavigationKey
+                ? filteredOptions.length - 1
+                : (focusedOptionIndex - 1 + filteredOptions.length) %
+                  filteredOptions.length;
 
+      setIsKeyboardNavigationActive(true);
       setFocusedOptionIndex(nextIndex);
       const nextKey = String(filteredOptions[nextIndex]?.value);
       if (!isSearchInput) {
@@ -327,6 +393,7 @@ function Dropdown<T>({
     close,
     filteredOptions,
     focusedOptionIndex,
+    isKeyboardNavigationActive,
     isWeb,
     open,
     selectOption,
@@ -336,13 +403,13 @@ function Dropdown<T>({
   return (
     <View className={cn("relative", className)} nativeID={dataTid}>
       <Input
-        {...props}
+        {...inputProps}
         asChild
         containerRef={inputContainerRef}
         active={open}
-        value={String(value ?? "")}
+        value={inputValue}
         disabled={isDisabled}
-        label={props.label}
+        label={inputProps.label}
         trailingIcon={
           <View
             className={cn(
@@ -360,7 +427,7 @@ function Dropdown<T>({
       >
         {isSearchInputVisible ? (
           <TextInput
-            accessibilityLabel={props.label}
+            accessibilityLabel={inputProps.label}
             accessibilityRole="combobox"
             accessibilityState={{ disabled: isDisabled, expanded: open }}
             autoFocus
@@ -375,7 +442,7 @@ function Dropdown<T>({
           />
         ) : (
           <Pressable
-            accessibilityLabel={props.label}
+            accessibilityLabel={inputProps.label}
             accessibilityRole="combobox"
             accessibilityState={{ disabled: isDisabled, expanded: open }}
             className="text-start"
@@ -394,7 +461,7 @@ function Dropdown<T>({
               )}
               numberOfLines={1}
             >
-              {valueMapper(value)}
+              {displayValue}
             </Text>
           </Pressable>
         )}
@@ -428,7 +495,7 @@ function Dropdown<T>({
             <ScrollView className="max-h-56.5">
               {filteredOptions.length ? (
                 filteredOptions.map((option, index) => {
-                  const selected = option.value === value;
+                  const selected = selectedValues.includes(option.value);
                   const focused = index === focusedOptionIndex;
 
                   return (
@@ -436,10 +503,31 @@ function Dropdown<T>({
                       accessibilityRole="menuitem"
                       accessibilityState={{ selected }}
                       className={cn(
-                        "h-14 shrink-0 flex-row items-center justify-between px-4 font-normal font-p-1 text-black hover:bg-primary-100 focus-visible:bg-primary-100 focus-visible:outline-none",
+                        "h-14 shrink-0 flex-row items-center pl-2 pr-4 font-normal font-p-1 text-black",
+                        isMultiSelect
+                          ? cn(
+                              "justify-start gap-2.5 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-primary",
+                              isKeyboardNavigationActive &&
+                                "focus-visible:bg-neutral-100",
+                            )
+                          : cn(
+                              "justify-between hover:bg-neutral-100 focus-visible:outline-none",
+                              isKeyboardNavigationActive &&
+                                "focus-visible:bg-neutral-100",
+                            ),
                         index < filteredOptions.length - 1 &&
                           "border-b border-neutral-300",
-                        (selected || focused) && "bg-primary-100",
+                        isMultiSelect
+                          ? isKeyboardNavigationActive &&
+                              focused &&
+                              "bg-neutral-100"
+                          : selected
+                            ? isKeyboardNavigationActive && focused
+                              ? "bg-neutral-100"
+                              : "bg-primary-100"
+                            : isKeyboardNavigationActive &&
+                              focused &&
+                              "bg-neutral-100",
                       )}
                       key={String(option.value)}
                       onPress={() => selectOption(option)}
@@ -447,15 +535,28 @@ function Dropdown<T>({
                         optionRefs.current[String(option.value)] = element;
                       }}
                     >
+                      {isMultiSelect ? (
+                        <Indicator
+                          checked={selected}
+                          className="shrink-0 bg-white"
+                          variant="checkbox"
+                        />
+                      ) : null}
                       {typeof option.label === "string" ||
                       typeof option.label === "number" ? (
-                        <Text className="font-normal font-p-1 text-black">
+                        <Text
+                          className={cn(
+                            "font-normal font-p-1 text-black",
+                            isMultiSelect && "flex-1",
+                          )}
+                          numberOfLines={isMultiSelect ? 1 : undefined}
+                        >
                           {option.label}
                         </Text>
                       ) : (
                         option.label
                       )}
-                      {selected ? (
+                      {!isMultiSelect && selected ? (
                         <Check className="text-black" size={24} />
                       ) : null}
                     </Pressable>

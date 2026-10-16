@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
-import { useState, type ComponentProps } from "react";
+import { useState, type ReactNode } from "react";
 
-import { Dropdown } from "./dropdown";
+import { Dropdown, type DropdownProps } from "./dropdown";
 
 const options = [
   { value: "option-1", label: "Option 1" },
@@ -14,16 +14,46 @@ const manyOptions = Array.from({ length: 10 }, (_, index) => ({
   label: `Option ${index + 1}`,
 }));
 
-type DropdownStoryProps = ComponentProps<typeof Dropdown<string>>;
+type SingleDropdownStoryProps = Omit<
+  DropdownProps<string>,
+  "onChange" | "value" | "valueMapper"
+> & {
+  onChange?: (value: string) => void;
+  value: string;
+  valueMapper?: (value: string) => ReactNode;
+};
+type MultiDropdownStoryProps = Omit<
+  DropdownProps<string>,
+  "onChange" | "value" | "valueMapper"
+> & {
+  onChange?: (value: string[]) => void;
+  value: string[];
+  valueMapper?: (value: string[]) => ReactNode;
+};
 
-function StatefulDropdown(args: DropdownStoryProps) {
+function StatefulDropdown(args: SingleDropdownStoryProps) {
   const [value, setValue] = useState(args.value);
 
   return (
     <Dropdown
       {...args}
       value={value}
-      onChange={(nextValue) => {
+      onChange={(nextValue: string) => {
+        setValue(nextValue);
+        args.onChange?.(nextValue);
+      }}
+    />
+  );
+}
+
+function StatefulMultiDropdown(args: MultiDropdownStoryProps) {
+  const [value, setValue] = useState(args.value);
+
+  return (
+    <Dropdown
+      {...args}
+      value={value}
+      onChange={(nextValue: string[]) => {
         setValue(nextValue);
         args.onChange?.(nextValue);
       }}
@@ -53,7 +83,12 @@ const meta = {
     disabled: false,
     search: false,
   },
-  render: (args) => <StatefulDropdown {...args} />,
+  render: (args) =>
+    Array.isArray(args.value) ? (
+      <StatefulMultiDropdown {...(args as MultiDropdownStoryProps)} />
+    ) : (
+      <StatefulDropdown {...(args as SingleDropdownStoryProps)} />
+    ),
 } satisfies Meta<typeof Dropdown<string>>;
 
 export default meta;
@@ -84,6 +119,25 @@ export const SelectedOption: Story = {
 export const NoSelection: Story = {
   args: {
     value: "",
+  },
+};
+
+export const MultiSelect: Story = {
+  args: {
+    value: ["option-1", "option-3"],
+  },
+};
+
+export const MultiSelectSearchable: Story = {
+  args: {
+    search: true,
+    value: ["option-2", "option-4"],
+  },
+};
+
+export const MultiSelectNoSelection: Story = {
+  args: {
+    value: [],
   },
 };
 
