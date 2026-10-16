@@ -36,6 +36,7 @@ export type RadioProps = Omit<
   disabled?: boolean;
   id?: string;
   label?: string;
+  labelPosition?: "left" | "right";
   onCheckedChange?: (checked: boolean) => void;
   onPress?: PressableProps["onPress"];
 };
@@ -46,6 +47,7 @@ function Radio({
   defaultChecked = false,
   disabled = false,
   label,
+  labelPosition = "right",
   onCheckedChange,
   onPress,
   accessibilityLabel,
@@ -73,14 +75,29 @@ function Radio({
     if (event) onPress?.(event);
   };
 
+  const labelElement = label ? (
+    <Text
+      className={cn(
+        "font-p-1",
+        disabled
+          ? "cursor-not-allowed text-neutral-600"
+          : "cursor-pointer text-black",
+      )}
+      onPress={toggle}
+    >
+      {label}
+    </Text>
+  ) : null;
+
   return (
     <View
       className={cn(
-        "flex-row items-center gap-2.5",
+        "flex-row items-center gap-2",
         disabled && "cursor-not-allowed",
         className,
       )}
     >
+      {labelPosition === "left" ? labelElement : null}
       <Pressable
         {...props}
         accessibilityLabel={accessibilityLabel ?? label}
@@ -99,19 +116,7 @@ function Radio({
           />
         ) : null}
       </Pressable>
-      {label ? (
-        <Text
-          className={cn(
-            "font-p-1",
-            disabled
-              ? "cursor-not-allowed text-neutral-600"
-              : "cursor-pointer text-black",
-          )}
-          onPress={toggle}
-        >
-          {label}
-        </Text>
-      ) : null}
+      {labelPosition === "right" ? labelElement : null}
     </View>
   );
 }

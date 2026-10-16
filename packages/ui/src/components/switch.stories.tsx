@@ -9,6 +9,7 @@ const meta = {
   argTypes: {
     disabled: { control: "boolean" },
     checked: { control: "boolean" },
+    labelPosition: { control: "select", options: ["left", "right"] },
   },
   args: {
     disabled: false,
@@ -30,6 +31,14 @@ export const Disabled: Story = {
 
 export const DisabledChecked: Story = {
   args: { disabled: true, checked: true },
+};
+
+export const WithLabel: Story = {
+  args: { label: "Notifications" },
+};
+
+export const LabelOnLeft: Story = {
+  args: { label: "Notifications", labelPosition: "left" },
 };
 
 export const AllStates: Story = {

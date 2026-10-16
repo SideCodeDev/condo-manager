@@ -9,7 +9,7 @@ import { cn } from "../lib/utils";
 type CheckboxState = boolean | "indeterminate";
 
 const checkboxVariants = cva(
-  "h-5 w-5 shrink-0 flex-row items-center justify-center rounded-[2px] border transition-colors",
+  "h-5 w-5 shrink-0 flex-row items-center justify-center rounded-xs border transition-colors",
   {
     variants: {
       state: {
@@ -40,6 +40,7 @@ export type CheckboxProps = Omit<
   disabled?: boolean;
   id?: string;
   label?: string;
+  labelPosition?: "left" | "right";
   onCheckedChange?: (checked: CheckboxState) => void;
   onPress?: PressableProps["onPress"];
 };
@@ -50,6 +51,7 @@ function Checkbox({
   defaultChecked = false,
   disabled = false,
   label,
+  labelPosition = "right",
   onCheckedChange,
   onPress,
   accessibilityLabel,
@@ -81,8 +83,21 @@ function Checkbox({
     if (event) onPress?.(event);
   };
 
+  const labelElement = label ? (
+    <Text
+      className={cn(
+        "font-p-1 text-black",
+        disabled ? "cursor-not-allowed" : "cursor-pointer",
+      )}
+      onPress={toggle}
+    >
+      {label}
+    </Text>
+  ) : null;
+
   return (
-    <View className={cn("flex-row items-center gap-2.5", className)}>
+    <View className={cn("flex-row items-center gap-2", className)}>
+      {labelPosition === "left" ? labelElement : null}
       <Pressable
         {...props}
         accessibilityLabel={accessibilityLabel ?? label}
@@ -91,29 +106,25 @@ function Checkbox({
           checked: isIndeterminate ? "mixed" : isChecked,
           disabled,
         }}
-        className={checkboxVariants({ disabled, state })}
+        className={cn(checkboxVariants({ disabled, state }))}
         disabled={disabled}
         onPress={toggle}
       >
         {isIndeterminate ? (
-          <Minus className="text-white" size={16} strokeWidth={2} />
+          <Minus
+            className={disabled ? "text-neutral-200" : "text-white"}
+            size={16}
+            strokeWidth={2}
+          />
         ) : isChecked ? (
-          <Check className="text-white" size={16} strokeWidth={2} />
+          <Check
+            className={disabled ? "text-neutral-200" : "text-white"}
+            size={16}
+            strokeWidth={2}
+          />
         ) : null}
       </Pressable>
-      {label ? (
-        <Text
-          className={cn(
-            "font-p-1",
-            disabled
-              ? "cursor-not-allowed text-neutral-600"
-              : "cursor-pointer text-black",
-          )}
-          onPress={toggle}
-        >
-          {label}
-        </Text>
-      ) : null}
+      {labelPosition === "right" ? labelElement : null}
     </View>
   );
 }

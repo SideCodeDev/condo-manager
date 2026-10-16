@@ -7,11 +7,11 @@ import { cn } from "../lib/utils";
 import { getSlotChild, Slot } from "./slot";
 
 const tagVariants = cva(
-  "group inline-flex shrink-0 flex-row items-center gap-2 rounded-lg p-3 font-p-1 font-semibold text-black outline-none transition-colors hover:bg-neutral-200 focus-visible:bg-neutral-200",
+  "group inline-flex shrink-0 flex-row items-center gap-2 rounded-lg p-3 font-p-2 font-semibold text-black outline-none transition-colors hover:bg-neutral-300 focus-visible:bg-neutral-300",
   {
     variants: {
       selected: {
-        true: "bg-primary text-white hover:bg-primary-200 hover:text-black focus-visible:bg-primary-200 focus-visible:text-black",
+        true: "bg-primary text-white hover:bg-primary-300 hover:text-black focus-visible:bg-primary-200 focus-visible:text-black",
         false: "bg-neutral-100",
       },
     },
@@ -88,7 +88,7 @@ function Tag({
     const child = getSlotChild(children) as React.ReactElement<TagChildProps>;
 
     return (
-      <Slot {...props} className={buttonClassName}>
+      <Slot {...props} className={cn(buttonClassName)}>
         {React.cloneElement(child, {
           children: renderChildren(child.props.children, textClassName),
         })}
@@ -101,7 +101,7 @@ function Tag({
       {...props}
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
-      className={buttonClassName}
+      className={cn(buttonClassName)}
     >
       {content}
     </Pressable>

@@ -35,9 +35,7 @@ function UploadedFile({
         <FileText className="text-primary" size={24} />
       </View>
       <View className="min-w-0 flex-1 gap-0">
-        <Text className="font-p-3 text-black">
-          {file.name}
-        </Text>
+        <Text className="font-p-2 text-black">{file.name}</Text>
         <Text className="font-p-3 text-neutral-700">{formattedSize}</Text>
       </View>
       <Pressable

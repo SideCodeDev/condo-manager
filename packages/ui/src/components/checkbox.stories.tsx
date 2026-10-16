@@ -9,6 +9,7 @@ const meta = {
   argTypes: {
     disabled: { control: "boolean" },
     checked: { control: "boolean" },
+    labelPosition: { control: "select", options: ["left", "right"] },
   },
   args: {
     id: "checkbox",
@@ -31,6 +32,14 @@ export const WithLabel: Story = {
   args: {
     id: "checkbox-label",
     label: "Accept terms and conditions",
+  },
+};
+
+export const LabelOnLeft: Story = {
+  args: {
+    id: "checkbox-label-left",
+    label: "Accept terms and conditions",
+    labelPosition: "left",
   },
 };
 
