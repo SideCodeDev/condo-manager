@@ -9,6 +9,7 @@ const meta = {
   argTypes: {
     disabled: { control: "boolean" },
     checked: { control: "boolean" },
+    labelPosition: { control: "select", options: ["left", "right"] },
   },
   args: {
     id: "radio",
@@ -31,6 +32,14 @@ export const WithLabel: Story = {
   args: {
     id: "radio-label",
     label: "Option A",
+  },
+};
+
+export const LabelOnLeft: Story = {
+  args: {
+    id: "radio-label-left",
+    label: "Option A",
+    labelPosition: "left",
   },
 };
 

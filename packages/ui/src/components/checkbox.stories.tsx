@@ -9,6 +9,7 @@ const meta = {
   argTypes: {
     disabled: { control: "boolean" },
     checked: { control: "boolean" },
+    labelPosition: { control: "select", options: ["left", "right"] },
   },
   args: {
     id: "checkbox",
@@ -31,6 +32,14 @@ export const WithLabel: Story = {
   args: {
     id: "checkbox-label",
     label: "Accept terms and conditions",
+  },
+};
+
+export const LabelOnLeft: Story = {
+  args: {
+    id: "checkbox-label-left",
+    label: "Accept terms and conditions",
+    labelPosition: "left",
   },
 };
 
@@ -60,5 +69,27 @@ export const DisabledWithLabel: Story = {
     id: "checkbox-disabled-label",
     label: "Accept terms and conditions",
     disabled: true,
+  },
+};
+
+export const WithError: Story = {
+  args: {
+    errors: ["This field is required."],
+    label: "Accept terms and conditions",
+  },
+};
+
+export const WithHelper: Story = {
+  args: {
+    helper: ["You must accept the terms to continue."],
+    label: "Accept terms and conditions",
+  },
+};
+
+export const WithErrorAndHelper: Story = {
+  args: {
+    errors: ["This field is required."],
+    helper: ["You must accept the terms to continue."],
+    label: "Accept terms and conditions",
   },
 };

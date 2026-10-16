@@ -55,7 +55,11 @@ function SelectorList({
   variant,
   ...props
 }: SelectorListProps) {
-  const buttonClassName = selectorListVariants({ checked, className, disabled });
+  const buttonClassName = selectorListVariants({
+    checked,
+    className,
+    disabled,
+  });
 
   const handlePress = (event: GestureResponderEvent) => {
     if (disabled) return;
@@ -67,11 +71,11 @@ function SelectorList({
     <>
       <Indicator checked={checked} variant={variant} />
       <View className="shrink-0 gap-1">
-        <Text className="font-p-2 font-medium text-neutral-1000 text-start">
+        <Text className="font-p-1 font-normal text-neutral-950 text-start">
           {label}
         </Text>
         {subLabel ? (
-          <Text className="font-ui-7 font-light text-neutral-1000 text-start">
+          <Text className="font-p-2 font-light text-neutral-950 text-start">
             {subLabel}
           </Text>
         ) : null}

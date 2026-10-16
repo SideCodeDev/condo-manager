@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
 import { Home, Settings } from "lucide-react-native";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native-css/components";
 
 import { ListButton } from "./list-button";
 
@@ -70,7 +70,7 @@ export const DropdownSelected: Story = {
 export const DropdownList: Story = {
   args: { variant: "dropdown" },
   render: (args) => (
-    <View style={styles.list}>
+    <View className="w-48 gap-0">
       <ListButton {...args} selected accessibilityLabel="Home">
         <Home />
         Home
@@ -86,10 +86,3 @@ export const DropdownList: Story = {
     </View>
   ),
 };
-
-const styles = StyleSheet.create({
-  list: {
-    width: 192,
-    gap: 0,
-  },
-});

@@ -5,22 +5,22 @@ import { Pressable, Text, View } from "react-native-css/components";
 import { Check, Minus } from "lucide-react-native";
 
 import { cn } from "../lib/utils";
-import { colors } from "../theme";
+import { InputFeedback } from "./input-feedback";
 
 type CheckboxState = boolean | "indeterminate";
 
 const checkboxVariants = cva(
-  "h-5 w-5 shrink-0 flex-row items-center justify-center rounded-[2px] border transition-colors",
+  "h-6 w-6 shrink-0 flex-row items-center justify-center rounded-sm border-2 transition-colors",
   {
     variants: {
       state: {
-        unchecked: "border-neutral-600",
-        checked: "border-primary bg-primary text-neutral-0",
-        indeterminate: "border-primary bg-primary text-neutral-0",
-        "disabled-checked": "border-neutral-600 bg-neutral-600 text-neutral-0",
+        unchecked: "border-neutral-900",
+        checked: "border-primary bg-primary text-white",
+        indeterminate: "border-primary bg-primary text-white",
+        "disabled-checked": "border-neutral-200 bg-neutral-200 text-white",
       },
       disabled: {
-        true: "cursor-not-allowed border-neutral-400",
+        true: "cursor-not-allowed border-neutral-200",
         false: "",
       },
     },
@@ -39,8 +39,11 @@ export type CheckboxProps = Omit<
   className?: string;
   defaultChecked?: CheckboxState;
   disabled?: boolean;
+  errors?: string[];
+  helper?: string[];
   id?: string;
   label?: string;
+  labelPosition?: "left" | "right";
   onCheckedChange?: (checked: CheckboxState) => void;
   onPress?: PressableProps["onPress"];
 };
@@ -50,7 +53,10 @@ function Checkbox({
   className,
   defaultChecked = false,
   disabled = false,
+  errors,
+  helper,
   label,
+  labelPosition = "right",
   onCheckedChange,
   onPress,
   accessibilityLabel,
@@ -82,40 +88,51 @@ function Checkbox({
     if (event) onPress?.(event);
   };
 
+  const labelElement = label ? (
+    <Text
+      className={cn(
+        "font-p-1",
+        disabled
+          ? "cursor-not-allowed text-neutral-200"
+          : "cursor-pointer text-black",
+      )}
+      onPress={toggle}
+    >
+      {label}
+    </Text>
+  ) : null;
+
   return (
-    <View className={cn("flex-row items-center gap-2.5", className)}>
-      <Pressable
-        {...props}
-        accessibilityLabel={accessibilityLabel ?? label}
-        accessibilityRole="checkbox"
-        accessibilityState={{
-          checked: isIndeterminate ? "mixed" : isChecked,
-          disabled,
-        }}
-        className={checkboxVariants({ disabled, state })}
-        disabled={disabled}
-        onPress={toggle}
-      >
-        {isIndeterminate ? (
-          <Minus color={colors.neutral[0]} size={16} strokeWidth={2} />
-        ) : isChecked ? (
-          <Check color={colors.neutral[0]} size={16} strokeWidth={2} />
-        ) : null}
-      </Pressable>
-      {label ? (
-        <Text
-          className={cn(
-            "font-ui-6",
-            disabled
-              ? "cursor-not-allowed text-neutral-600"
-              : "cursor-pointer text-neutral-1000",
-          )}
+    <InputFeedback
+      disabled={disabled}
+      errorIcon
+      errors={errors}
+      helper={helper}
+      className={className}
+    >
+      <View className={cn("flex-row items-center gap-2")}>
+        {labelPosition === "left" ? labelElement : null}
+        <Pressable
+          {...props}
+          accessibilityLabel={accessibilityLabel ?? label}
+          accessibilityRole="checkbox"
+          accessibilityState={{
+            checked: isIndeterminate ? "mixed" : isChecked,
+            disabled,
+          }}
+          className={cn(checkboxVariants({ disabled, state }))}
+          disabled={disabled}
           onPress={toggle}
         >
-          {label}
-        </Text>
-      ) : null}
-    </View>
+          {isIndeterminate ? (
+            <Minus className="text-white" size={24} strokeWidth={2} />
+          ) : isChecked ? (
+            <Check className="text-white" size={24} strokeWidth={2} />
+          ) : null}
+        </Pressable>
+        {labelPosition === "right" ? labelElement : null}
+      </View>
+    </InputFeedback>
   );
 }
 

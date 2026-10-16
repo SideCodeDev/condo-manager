@@ -35,8 +35,10 @@ case use a development build for the project.
 
 ## App structure
 
-- `src/app/_layout.tsx`: Clerk and Convex providers, shared font loading, root
-  navigation layout, and NativeWind stylesheet import.
+- `src/app/_layout.tsx`: Clerk and Convex providers, shared DM Sans loading,
+  root navigation layout, and NativeWind stylesheet import. The shared
+  stylesheet applies DM Sans globally to native text; do not add font-family
+  classes or styles to individual components.
 - `src/app/index.tsx`: current home screen and sign-in/sign-up entry points.
 - `src/components/`: app-specific organization gate, tabs, and billing view.
 - `src/global.css` and `metro.config.js`: NativeWind and shared UI styling.
@@ -51,6 +53,10 @@ Use `@condo-manager/ui` for shared components. Native styles are imported in
 `src/global.css`; the root layout loads DM Sans from the shared package. If a
 shared component's visuals or API change, update its Storybook stories under
 `packages/ui/src/components/`.
+
+Prefer Tailwind/NativeWind `className` for fixed visual styling. Use style props
+or `StyleSheet.create` only for genuinely dynamic values or native API
+integration, and keep them limited to those values.
 
 ## Checks
 

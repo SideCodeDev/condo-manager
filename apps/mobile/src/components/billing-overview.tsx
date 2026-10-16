@@ -3,7 +3,7 @@ import { useAction, useQuery } from "convex/react";
 import { useOrganization } from "@clerk/expo";
 import { useConvexAuth } from "convex/react";
 import { useEffect, useRef } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native-css/components";
 
 export function BillingOverview() {
   const convexAuth = useConvexAuth();
@@ -33,16 +33,16 @@ export function BillingOverview() {
   }, [convexAuth.isAuthenticated, organization, refreshSubscription]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Organizações e billing</Text>
+    <View className="self-stretch gap-3">
+      <Text className="text-lg font-bold">Organizações e billing</Text>
       {organizations === undefined ? (
         <Text>A carregar billing…</Text>
       ) : organizations.length === 0 ? (
         <Text>Não existem organizações disponíveis.</Text>
       ) : (
         organizations.map(({ organization: item, billing }) => (
-          <View key={item.clerkOrganizationId} style={styles.organization}>
-            <Text style={styles.organizationName}>{item.name}</Text>
+          <View className="gap-1" key={item.clerkOrganizationId}>
+            <Text className="font-semibold">{item.name}</Text>
             <Text>
               Plano: {billing.currentPlan?.name ?? "Sem plano"} · Estado: {billing.state}
             </Text>
@@ -55,20 +55,3 @@ export function BillingOverview() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignSelf: "stretch",
-    gap: 12,
-  },
-  heading: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  organization: {
-    gap: 4,
-  },
-  organizationName: {
-    fontWeight: "600",
-  },
-});

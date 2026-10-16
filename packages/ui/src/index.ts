@@ -16,7 +16,11 @@ export {
   iconButtonVariants,
 } from "./components/icon-button";
 export { Indicator, type IndicatorProps, indicatorVariants } from "./components/indicator";
-export { Input, type InputProps, inputVariants } from "./components/input";
+export { Input, type InputProps } from "./components/input";
+export {
+  InputFeedback,
+  type InputFeedbackProps,
+} from "./components/input-feedback";
 export { ImageInput, type ImageInputProps } from "./components/image-input";
 export {
   Else,
@@ -33,7 +37,6 @@ export {
 export {
   TextArea,
   type TextAreaProps,
-  textAreaVariants,
 } from "./components/text-area";
 export {
   ListButton,
@@ -86,5 +89,4 @@ export {
   MimeTypeDescriptions,
   type FileMimeType,
 } from "./lib/consts";
-export * from "./theme";
 export { useImageFallback, useResponsiveElementSize } from "./hooks";

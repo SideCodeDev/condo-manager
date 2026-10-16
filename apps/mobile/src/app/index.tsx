@@ -4,14 +4,9 @@ import { OrganizationGate } from "@/components/organization-gate";
 import { useAuth, useClerk } from "@clerk/expo";
 import { useHostedAuth } from "@clerk/expo/hosted-auth";
 import { useState } from "react";
+import { ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ScrollView, Text, View } from "react-native-css/components";
 
 const dropdownOptions = [
   { value: "building-a", label: "Edifício A" },
@@ -38,8 +33,8 @@ export default function HomeScreen() {
 
   if (!isLoaded) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.centered}>
+      <SafeAreaView className="flex-1">
+        <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" />
         </View>
       </SafeAreaView>
@@ -48,10 +43,10 @@ export default function HomeScreen() {
 
   if (!isSignedIn) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.authContainer}>
-          <Text style={styles.title}>Condo Manager</Text>
-          <Text style={styles.description}>
+      <SafeAreaView className="flex-1">
+        <View className="flex-1 items-center justify-center gap-4 p-6">
+          <Text className="text-2xl font-bold">Condo Manager</Text>
+          <Text className="text-center font-p-1">
             Inicia sessão para continuares para a aplicação.
           </Text>
           <Button onPress={() => void handleHostedAuth("sign-in")}>
@@ -63,16 +58,18 @@ export default function HomeScreen() {
           >
             Criar conta
           </Button>
-          {authError ? <Text style={styles.error}>{authError}</Text> : null}
+          {authError ? (
+            <Text className="text-center text-red-600">{authError}</Text>
+          ) : null}
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Condo Manager</Text>
+    <SafeAreaView className="flex-1">
+      <ScrollView contentContainerClassName="w-full grow items-center gap-6 p-6">
+        <Text className="text-2xl font-bold">Condo Manager</Text>
         <Button loading>HELLO WORLD</Button>
 
         <Dropdown
@@ -109,40 +106,3 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  authContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-    padding: 24,
-  },
-  container: {
-    flexGrow: 1,
-    alignItems: "center",
-    gap: 24,
-    padding: 24,
-    width: "100%",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-  },
-  description: {
-    fontSize: 16,
-    textAlign: "center",
-  },
-  error: {
-    color: "#b91c1c",
-    textAlign: "center",
-  },
-});

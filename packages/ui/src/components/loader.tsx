@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 import {
   Animated,
-  type ColorValue,
   Easing,
-  Platform,
-  StyleSheet,
   View,
 } from "react-native";
+import { View as CssView } from "react-native-css/components";
+
+import { cn } from "../lib/utils";
 
 const ANIMATION_DURATION = 4_000;
 const ANIMATION_STEPS = 11;
@@ -161,13 +161,13 @@ const paths = [
 ] as const;
 
 const cssEase = Easing.bezier(0.25, 0.1, 0.25, 1);
-const boxColor = Platform.select({ default: "#000000", web: "currentColor" });
+const AnimatedCssView = Animated.createAnimatedComponent(CssView);
 
 export function Loader({
-  color,
+  className,
   size = BASE_SIZE,
 }: {
-  color?: ColorValue;
+  className?: string;
   size?: number;
 }) {
   const progress = useRef(new Animated.Value(0)).current;
@@ -209,29 +209,20 @@ export function Loader({
         });
 
         return (
-          <Animated.View
+          <AnimatedCssView
+            className={cn("absolute", className)}
             key={index}
-            style={[
-              styles.box,
-              {
-                backgroundColor: color ?? boxColor,
-                borderRadius: BOX_RADIUS * scale,
-                height: BOX_SIZE * scale,
-                left: left * scale,
-                top: top * scale,
-                transform: [{ translateX }, { translateY }],
-                width: BOX_SIZE * scale,
-              },
-            ]}
+            style={{
+              borderRadius: BOX_RADIUS * scale,
+              height: BOX_SIZE * scale,
+              left: left * scale,
+              top: top * scale,
+              transform: [{ translateX }, { translateY }],
+              width: BOX_SIZE * scale,
+            }}
           />
         );
       })}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  box: {
-    position: "absolute",
-  },
-});

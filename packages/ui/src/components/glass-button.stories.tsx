@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
 import { Plus, Trash } from "lucide-react-native";
 import { View } from "react-native-css/components";
-import { StyleSheet } from "react-native";
 
 import { GlassButton } from "./glass-button";
 
@@ -20,7 +19,7 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <View className="w-fit grow-0 self-start rounded-xl bg-[linear-gradient(90deg,_#103CE7_3.99%,_#64E9FF_95.74%)]" style={styles.decorator}>
+      <View className="w-fit grow-0 self-start rounded-xl bg-[linear-gradient(90deg,_#103CE7_3.99%,_#64E9FF_95.74%)] p-6">
         <Story />
       </View>
     ),
@@ -64,9 +63,3 @@ export const Disabled: Story = {
     </GlassButton>
   ),
 };
-
-const styles = StyleSheet.create({
-  decorator: {
-    padding: 24,
-  },
-});

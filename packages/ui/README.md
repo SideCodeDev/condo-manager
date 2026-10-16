@@ -9,7 +9,7 @@ requires different behavior.
 ## What's included
 
 - Shared controls such as buttons, inputs, selectors, tabs, and file upload.
-- Design tokens for colors, shadows, and typography, plus DM Sans assets.
+- Shared Tailwind CSS v4 tokens and DM Sans assets.
 - Hooks and small utilities used by shared components.
 - Storybook stories for components and design tokens.
 
@@ -20,7 +20,38 @@ variants, or public API changes.
 
 ## Styling and fonts
 
-Tailwind CSS v4 / NativeWind v5 provide the shared design tokens and utilities.
+Tailwind CSS v4 / NativeWind v5 are the single source of truth for visual
+tokens and utilities on web and native mobile. Define tokens in the Tailwind
+theme in `src/styles.base.css` and consume them with Tailwind/NativeWind classes
+(for example, `text-neutral-600`, `bg-primary`, or `shadow-card`). Do not add a
+TypeScript `theme` folder, duplicate token values in TypeScript, or pass token
+colors through inline styles or component color props. This applies equally to
+shared components and app-specific UI in `apps/web` and `apps/mobile`.
+
+The default DM Sans family is applied globally in `src/styles.base.css` on the
+web document body and through the native base rule for React Native text. The
+mobile root layout loads the font asset. Font family is global: do not add
+`font-sans` or `fontFamily` to individual components. Font-size and
+font-weight utilities remain valid. Add a local family override only when a
+design intentionally uses a different typeface.
+
+Prefer Tailwind/NativeWind `className` for fixed visual styling on both web and
+native. Use `style` props or `StyleSheet.create` only for values computed at
+runtime or required by a native API, keeping those styles limited to the
+dynamic/integration values. Do not duplicate fixed utilities or design-token
+values in style objects. The shared `Loader` keeps runtime animation styles and
+its numeric `size` prop for dimensions.
+
+Use the same web-style class logic in React Native and React Native Web; do not
+add platform-specific branches for visual colors. For SVG icons (including
+Lucide icons), pass the component's Tailwind text-color class through
+`className` so it matches the surrounding text and responds to the same
+`hover:`, `focus-visible:`, `active:`, and `disabled:` states. Do not set an
+icon's `color` prop when its color comes from the design; remove a conflicting
+`color` prop when forwarding the class to a child icon. Keep visual state in
+Tailwind classes on the component and its child SVGs, not in JavaScript color
+calculations or inline styles.
+
 The web stylesheet is:
 
 ```tsx

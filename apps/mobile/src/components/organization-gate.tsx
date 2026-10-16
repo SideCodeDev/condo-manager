@@ -2,7 +2,8 @@ import { useOrganization, useOrganizationList } from "@clerk/expo";
 import { api } from "@condo-manager/backend";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useEffect, useRef, type ReactNode } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator } from "react-native";
+import { Text, View } from "react-native-css/components";
 
 type OrganizationGateProps = {
   children: ReactNode;
@@ -96,7 +97,11 @@ export function OrganizationGate({ children }: OrganizationGateProps) {
   ]);
 
   if (provisioning?.status === "failed") {
-    return <Text style={styles.message}>Não foi possível preparar a organização.</Text>;
+    return (
+      <Text className="text-center">
+        Não foi possível preparar a organização.
+      </Text>
+    );
   }
 
   if (
@@ -114,22 +119,12 @@ export function OrganizationGate({ children }: OrganizationGateProps) {
         : "A preparar a tua organização…";
 
     return (
-      <View style={styles.loading}>
+      <View className="items-center gap-2">
         <ActivityIndicator />
-        <Text style={styles.message}>{message}</Text>
+        <Text className="text-center">{message}</Text>
       </View>
     );
   }
 
   return children;
 }
-
-const styles = StyleSheet.create({
-  loading: {
-    alignItems: "center",
-    gap: 8,
-  },
-  message: {
-    textAlign: "center",
-  },
-});

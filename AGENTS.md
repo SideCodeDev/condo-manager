@@ -66,6 +66,33 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 - Keep the universal UI package free of app-specific routing, authentication,
   billing, and Convex concerns. Export public APIs through `packages/ui` entry
   points and include platform-specific files only where behavior must differ.
+- Use Tailwind CSS v4 tokens as the single source of truth for visual styling
+  across web and native mobile. Apply colors, typography, spacing, borders,
+  shadows, and other visual tokens with Tailwind/NativeWind class names; do not
+  add or use a parallel TypeScript `theme`/design-token folder or read color
+  values into component styles. Define or change shared tokens in the UI
+  package's Tailwind CSS theme, and consume them through classes on both
+  platforms.
+- Prefer Tailwind/NativeWind `className` for fixed visual styling across every
+  app and package. Use `style` props or `StyleSheet.create` only when a value is
+  genuinely computed at runtime or required by a native API, and keep those
+  styles limited to the dynamic/integration values. Do not duplicate fixed
+  Tailwind utilities or design-token values in style objects. The shared
+  `Loader` keeps its numeric `size` prop for dimensions and its runtime
+  animation styles.
+- Use the web Tailwind class-based styling model for all visual behavior in
+  React, React Native Web, and React Native. Do not branch visual styles by
+  platform or pass token colors through `color`, `backgroundColor`, or similar
+  props. For SVG icons, apply the matching Tailwind text-color class with
+  `className` so the icon uses the same color as its text; remove or avoid a
+  conflicting `color` prop. Keep hover, focus, active, and disabled colors in
+  Tailwind state classes, including when forwarding classes to child icons.
+- Set the app's default font once in the shared global stylesheet: on `body`
+  for `apps/web` and `apps/website`, and through the native global base rule
+  for React Native text. Font family is global; do not repeat `font-sans` or
+  `fontFamily` on individual components. Tailwind classes may still set font
+  size and weight. Add a local family override only when the design
+  intentionally requires a different typeface.
 - Add or update Storybook stories when a shared component's visible behavior or
   public variants change.
 - Keep Expo/React Native dependency versions compatible with the Expo SDK in

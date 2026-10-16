@@ -13,6 +13,36 @@
     U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
+@layer base {
+  * {
+    scrollbar-color: var(--color-neutral-400) transparent;
+    scrollbar-width: thin;
+  }
+
+  *::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: var(--color-neutral-400);
+    background-clip: content-box;
+  }
+
+  *::-webkit-scrollbar-thumb:vertical {
+    border-right: 4px solid transparent;
+  }
+
+  *::-webkit-scrollbar-thumb:horizontal {
+    border-bottom: 4px solid transparent;
+  }
+}
+
 @font-face {
   font-family: "DM Sans";
   font-style: normal;

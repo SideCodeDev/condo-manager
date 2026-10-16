@@ -42,3 +42,10 @@ export const WithBrokenUrl: Story = {
     />
   ),
 };
+
+export const WithErrorAndHelper: Story = {
+  args: {
+    errors: ["A valid image is required."],
+    helper: ["Use a PNG, JPEG, or GIF image."],
+  },
+};

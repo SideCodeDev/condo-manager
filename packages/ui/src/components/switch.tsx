@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { GestureResponderEvent, PressableProps } from "react-native";
-import { Pressable, View } from "react-native-css/components";
+import { Pressable, Text, View } from "react-native-css/components";
 import { cva } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
@@ -11,7 +11,7 @@ const switchVariants = cva(
     variants: {
       checked: {
         true: "bg-primary",
-        false: "bg-neutral-300",
+        false: "bg-neutral-400",
       },
       disabled: {
         true: "cursor-not-allowed bg-neutral-600",
@@ -26,7 +26,7 @@ const switchVariants = cva(
 );
 
 const switchThumbVariants = cva(
-  "pointer-events-none h-5 w-5 rounded-full bg-neutral-0 transition-transform",
+  "pointer-events-none h-5 w-5 rounded-full bg-white transition-transform",
   {
     variants: {
       checked: {
@@ -34,7 +34,7 @@ const switchThumbVariants = cva(
         false: "translate-x-0",
       },
       disabled: {
-        true: "bg-neutral-400",
+        true: "bg-neutral-200",
         false: "",
       },
     },
@@ -53,6 +53,8 @@ export type SwitchProps = Omit<
   className?: string;
   defaultChecked?: boolean;
   disabled?: boolean;
+  label?: string;
+  labelPosition?: "left" | "right";
   onCheckedChange?: (checked: boolean) => void;
   onPress?: PressableProps["onPress"];
 };
@@ -62,8 +64,11 @@ function Switch({
   className,
   defaultChecked = false,
   disabled = false,
+  label,
+  labelPosition = "right",
   onCheckedChange,
   onPress,
+  accessibilityLabel,
   ...props
 }: SwitchProps) {
   const [uncontrolledChecked, setUncontrolledChecked] =
@@ -81,19 +86,44 @@ function Switch({
     onPress?.(event);
   };
 
-  return (
+  const switchElement = (
     <Pressable
       {...props}
+      accessibilityLabel={accessibilityLabel ?? label}
       accessibilityRole="switch"
       accessibilityState={{ checked: currentChecked, disabled }}
-      className={cn(switchVariants({ checked: currentChecked, disabled }), className)}
+      className={cn(
+        switchVariants({ checked: currentChecked, disabled }),
+        className,
+      )}
       disabled={disabled}
       onPress={toggle}
     >
       <View
-        className={switchThumbVariants({ checked: currentChecked, disabled })}
+        className={cn(
+          switchThumbVariants({ checked: currentChecked, disabled }),
+        )}
       />
     </Pressable>
+  );
+  const labelElement = label ? (
+    <Text
+      className={cn(
+        "font-p-1 text-black",
+        disabled ? "cursor-not-allowed" : "cursor-pointer",
+      )}
+      onPress={toggle}
+    >
+      {label}
+    </Text>
+  ) : null;
+
+  return (
+    <View className="flex-row items-center gap-2.5">
+      {labelPosition === "left" ? labelElement : null}
+      {switchElement}
+      {labelPosition === "right" ? labelElement : null}
+    </View>
   );
 }
 

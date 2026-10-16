@@ -1,13 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-native-web-vite";
-import type { TextStyle } from "react-native";
-import { StyleSheet, Text, View } from "react-native";
-
-import {
-  colors,
-  fontFamilies,
-  typography,
-  type TypographyTokenName,
-} from "../theme";
+import { Text, View } from "react-native-css/components";
 
 function TypographyShowcase() {
   return null;
@@ -17,82 +9,51 @@ const meta = {
   title: "Design Tokens/Typography",
   component: TypographyShowcase,
   tags: ["autodocs"],
-  parameters: {
-    controls: { disable: true },
-  },
+  parameters: { controls: { disable: true } },
 } satisfies Meta<typeof TypographyShowcase>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 const sampleText = "The quick brown fox jumps over the lazy dog";
+const typographyTokens = [
+  { label: "Display", className: "font-display", size: "64px", lineHeight: "72px" },
+  { label: "H1", className: "font-h1", size: "56px", lineHeight: "64px" },
+  { label: "H2", className: "font-h2", size: "48px", lineHeight: "56px" },
+  { label: "H3", className: "font-h3", size: "40px", lineHeight: "48px" },
+  { label: "H4", className: "font-h4", size: "32px", lineHeight: "40px" },
+  { label: "H5", className: "font-h5", size: "24px", lineHeight: "32px" },
+  { label: "H6", className: "font-h6", size: "20px", lineHeight: "28px" },
+  { label: "P1", className: "font-p-1", size: "16px", lineHeight: "24px" },
+  { label: "P2", className: "font-p-2", size: "14px", lineHeight: "22px" },
+  { label: "P3", className: "font-p-3", size: "12px", lineHeight: "20px" },
+] as const;
 
-const weights: { label: string; value: TextStyle["fontWeight"] }[] = [
-  { label: "Extra Bold", value: "800" },
-  { label: "Bold", value: "700" },
-  { label: "Semi-bold", value: "600" },
-  { label: "Medium", value: "500" },
-  { label: "Regular", value: "400" },
-  { label: "Light", value: "300" },
-  { label: "Extra Light", value: "200" },
-];
+const weights = [
+  { label: "Bold", className: "font-bold" },
+  { label: "Medium", className: "font-medium" },
+  { label: "Regular", className: "font-normal" },
+  { label: "Light", className: "font-light" },
+] as const;
 
-type FontDefinition = {
-  label: string;
-  token: TypographyTokenName;
-};
-
-const uiElements: FontDefinition[] = [
-  { label: "font-ui-1", token: "ui1" },
-  { label: "font-ui-2", token: "ui2" },
-  { label: "font-ui-3", token: "ui3" },
-  { label: "font-ui-4", token: "ui4" },
-  { label: "font-ui-5", token: "ui5" },
-  { label: "font-ui-6", token: "ui6" },
-  { label: "font-ui-7", token: "ui7" },
-  { label: "font-ui-8", token: "ui8" },
-  { label: "font-ui-9", token: "ui9" },
-  { label: "font-ui-10", token: "ui10" },
-];
-
-const paragraphs: FontDefinition[] = [
-  { label: "font-p-1", token: "p1" },
-  { label: "font-p-2", token: "p2" },
-  { label: "font-p-3", token: "p3" },
-  { label: "font-p-4", token: "p4" },
-];
-
-const desktopHeadings: FontDefinition[] = [
-  { label: "font-desktop-h1", token: "desktopH1" },
-  { label: "font-desktop-h2", token: "desktopH2" },
-  { label: "font-desktop-h3", token: "desktopH3" },
-  { label: "font-desktop-h4", token: "desktopH4" },
-];
-
-const mobileHeadings: FontDefinition[] = [
-  { label: "font-mobile-d1", token: "mobileD1" },
-  { label: "font-mobile-d2", token: "mobileD2" },
-  { label: "font-mobile-h1", token: "mobileH1" },
-  { label: "font-mobile-h2", token: "mobileH2" },
-];
-
-function FontRow({ label, token }: FontDefinition) {
+function WeightShowcase({ label, className }: (typeof weights)[number]) {
   return (
-    <View style={styles.fontRow}>
-      <Text style={styles.tokenLabel}>{label}</Text>
-      <View>
-        {weights.map((weight) => (
-          <View key={weight.label} style={styles.weightRow}>
-            <Text style={styles.weightLabel}>{weight.label}</Text>
-            <Text
-              style={[
-                styles.sample,
-                typography[token],
-                { fontWeight: weight.value },
-              ]}
-            >
-              {sampleText}
-            </Text>
+    <View className="overflow-hidden rounded-lg bg-white">
+      <View className="flex-row items-center justify-between bg-neutral-950 px-4 py-6">
+        <Text className="font-h5 font-bold text-secondary">DM Sans – {label}</Text>
+        <Text className="font-h5 text-secondary">Aa</Text>
+      </View>
+      <View className="px-4">
+        {typographyTokens.map((token) => (
+          <View className="gap-2 border-b border-neutral-200 py-3" key={token.label}>
+            <View className="flex-row items-center justify-between">
+              <Text className="rounded bg-neutral-200 px-2 font-p-3 text-neutral-800">{label} / {token.label}</Text>
+              <View className="flex-row gap-6">
+                <Text className="font-p-3 text-neutral-700">{token.size}</Text>
+                <Text className="font-p-3 text-neutral-700">{token.lineHeight}</Text>
+              </View>
+            </View>
+            <Text className={`${token.className} ${className}`}>{sampleText}</Text>
           </View>
         ))}
       </View>
@@ -100,88 +61,16 @@ function FontRow({ label, token }: FontDefinition) {
   );
 }
 
-function FontGroup({
-  title,
-  definitions,
-}: {
-  title?: string;
-  definitions: FontDefinition[];
-}) {
+function WeightGroup({ weightsToShow = weights }: { weightsToShow?: typeof weights }) {
   return (
-    <View style={styles.group}>
-      {title ? <Text style={styles.heading}>{title}</Text> : null}
-      {definitions.map((definition) => (
-        <FontRow key={definition.token} {...definition} />
-      ))}
+    <View className="gap-6">
+      {weightsToShow.map((weight) => <WeightShowcase key={weight.label} {...weight} />)}
     </View>
   );
 }
 
-export const UIElements: Story = {
-  render: () => <FontGroup definitions={uiElements} />,
-};
-
-export const Paragraphs: Story = {
-  render: () => <FontGroup definitions={paragraphs} />,
-};
-
-export const DesktopHeadings: Story = {
-  render: () => <FontGroup definitions={desktopHeadings} />,
-};
-
-export const MobileHeadings: Story = {
-  render: () => <FontGroup definitions={mobileHeadings} />,
-};
-
-export const AllFonts: Story = {
-  render: () => (
-    <View style={styles.page}>
-      <FontGroup title="UI Elements" definitions={uiElements} />
-      <FontGroup title="Paragraphs" definitions={paragraphs} />
-      <FontGroup title="Desktop Headings" definitions={desktopHeadings} />
-      <FontGroup title="Mobile Headings" definitions={mobileHeadings} />
-    </View>
-  ),
-};
-
-const styles = StyleSheet.create({
-  page: {
-    gap: 40,
-  },
-  group: {
-    gap: 32,
-  },
-  heading: {
-    ...typography.desktopH4,
-    borderBottomColor: colors.neutral[200],
-    borderBottomWidth: 1,
-    color: colors.neutral[500],
-    fontFamily: fontFamilies.sans,
-    paddingBottom: 4,
-  },
-  fontRow: {
-    gap: 4,
-  },
-  tokenLabel: {
-    ...typography.p4,
-    color: colors.neutral[500],
-    fontFamily: fontFamilies.sans,
-  },
-  weightRow: {
-    alignItems: "baseline",
-    flexDirection: "row",
-    gap: 12,
-  },
-  weightLabel: {
-    ...typography.p4,
-    color: colors.neutral[400],
-    flexShrink: 0,
-    fontFamily: fontFamilies.sans,
-    width: 80,
-  },
-  sample: {
-    color: colors.neutral[1000],
-    fontFamily: fontFamilies.sans,
-    flexShrink: 1,
-  },
-});
+export const Bold: Story = { render: () => <WeightShowcase {...weights[0]} /> };
+export const Medium: Story = { render: () => <WeightShowcase {...weights[1]} /> };
+export const Regular: Story = { render: () => <WeightShowcase {...weights[2]} /> };
+export const Light: Story = { render: () => <WeightShowcase {...weights[3]} /> };
+export const AllWeights: Story = { render: () => <WeightGroup /> };

@@ -112,10 +112,20 @@ rules and agent-specific safety constraints.
 
 ## Shared UI
 
-`@condo-manager/ui` provides cross-platform React Native components, design
-tokens, DM Sans fonts, hooks, and helpers for the web apps and the native app.
+`@condo-manager/ui` provides cross-platform React Native components, Tailwind
+tokens, DM Sans font assets, hooks, and helpers for the web apps and the native app.
 Its public API is exported from `packages/ui/src/index.ts`; add/update stories
 when changing visible behavior or public variants.
+
+Prefer Tailwind/NativeWind `className` for fixed visual styling across web and
+mobile. Keep `style` props or `StyleSheet.create` for values computed at runtime
+or required by native APIs, and limit them to those dynamic/integration values.
+Do not duplicate fixed utilities or design-token values in style objects. The
+shared `Loader` keeps its runtime animation styles and numeric size prop.
+
+The shared stylesheet applies DM Sans globally to the web document body and to
+native text. Do not add font-family classes or styles to individual components;
+use local font overrides only for intentional alternate typefaces.
 
 Web apps import the web stylesheet once at their entry point:
 

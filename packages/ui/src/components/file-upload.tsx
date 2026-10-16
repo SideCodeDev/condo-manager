@@ -7,7 +7,6 @@ import { Upload } from "lucide-react-native";
 
 import { type FileMimeType, MimeTypeDescriptions } from "../lib/consts";
 import { cn, formatFileSize, getValidFiles } from "../lib/utils";
-import { colors } from "../theme";
 import { Button } from "./button";
 
 type FileUploadLabels = {
@@ -52,8 +51,8 @@ function FileUploadContent({
   return (
     <>
       <View className="w-fit shrink-0 items-center gap-3">
-        <Upload color={colors.neutral[600]} size={40} />
-        <Text className="font-ui-8 text-center text-neutral-600">
+        <Upload className="text-neutral-600" size={40} />
+        <Text className="font-p-2 text-center text-neutral-600">
           {types.join(", ")}
           {maxFileSizeMB
             ? (sizeLabel?.(formatFileSize(maxFileSizeMB)) ??
@@ -65,7 +64,7 @@ function FileUploadContent({
         <Button variant="ghost" onPress={onPick}>
           {addLabel}
         </Button>
-        <Text className="font-ui-8 text-center text-neutral-600">
+        <Text className="font-p-2 text-center text-neutral-600">
           {dragAndDropLabel}
         </Text>
       </View>
@@ -130,7 +129,7 @@ function FileUpload({
       : validTypes.map((item) => MimeTypeDescriptions[item]);
   const surfaceClassName = cn(
     "flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed p-6 transition-colors",
-    isDragging ? "border-primary bg-primary-50" : "border-neutral-400",
+    isDragging ? "border-primary bg-primary-100" : "border-neutral-400",
     className,
   );
   const content = (

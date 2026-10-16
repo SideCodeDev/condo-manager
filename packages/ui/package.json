@@ -10,13 +10,12 @@
     ".": "./src/index.ts",
     "./fonts/*": "./src/fonts/*",
     "./styles.css": "./src/styles.css",
-    "./styles.native.css": "./src/styles.native.css",
-    "./theme": "./src/theme/index.ts"
+    "./styles.native.css": "./src/styles.native.css"
   },
   "scripts": {
     "check-types": "tsc --noEmit",
     "lint": "eslint src .storybook vitest.config.ts",
-    "storybook": "storybook dev -p 6007",
+    "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "test-storybook": "vitest --project storybook"
   },
