@@ -7,7 +7,12 @@ const options = [
   { value: "option-1", label: "Option 1" },
   { value: "option-2", label: "Option 2" },
   { value: "option-3", label: "Option 3" },
+  { value: "option-4", label: "Option 4" },
 ];
+const manyOptions = Array.from({ length: 10 }, (_, index) => ({
+  value: `option-${index + 1}`,
+  label: `Option ${index + 1}`,
+}));
 
 type DropdownStoryProps = ComponentProps<typeof Dropdown<string>>;
 
@@ -59,6 +64,20 @@ export const Default: Story = {};
 export const Searchable: Story = {
   args: {
     search: true,
+    value: "option-3",
+  },
+};
+
+export const ManyOptions: Story = {
+  args: {
+    options: manyOptions,
+    value: "option-1",
+  },
+};
+
+export const SelectedOption: Story = {
+  args: {
+    value: "option-3",
   },
 };
 

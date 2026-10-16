@@ -15,7 +15,7 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "lint": "eslint src .storybook vitest.config.ts",
-    "storybook": "storybook dev -p 6007",
+    "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "test-storybook": "vitest --project storybook"
   },

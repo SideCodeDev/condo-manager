@@ -31,6 +31,7 @@ export type InputProps = Omit<
   className?: string;
   disabled?: boolean;
   size?: "default" | "lg";
+  containerRef?: React.Ref<React.ElementRef<typeof View>>;
 };
 
 function renderIcon(
@@ -74,6 +75,10 @@ const inputContainerVariants = cva(
         true: "border-neutral-400 focus-within:outline-none",
         false: "",
       },
+      active: {
+        true: "outline-2 outline-primary -outline-offset-1",
+        false: "",
+      },
     },
     compoundVariants: [{ error: true, trailing: true, class: "pr-20" }],
     defaultVariants: {
@@ -82,6 +87,8 @@ const inputContainerVariants = cva(
       leading: false,
       trailing: false,
       disabled: false,
+      error: false,
+      active: false,
     },
   },
 );
@@ -125,6 +132,7 @@ function Input({
   asChild = false,
   children,
   className,
+  containerRef,
   disabled = false,
   errors,
   helper,
@@ -144,6 +152,8 @@ function Input({
   return (
     <View className={cn("grid gap-1", className)}>
       <View
+        nativeID={`${id}-container`}
+        ref={containerRef}
         className={cn(
           inputContainerVariants({
             variant,
@@ -152,6 +162,7 @@ function Input({
             error: hasError,
             leading: !!leadingIcon,
             trailing: !!trailingIcon,
+            active,
           }),
         )}
       >

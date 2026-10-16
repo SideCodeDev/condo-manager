@@ -1,7 +1,13 @@
 import * as React from "react";
-import { ChevronDown, Search } from "lucide-react-native";
+import { Check, ChevronDown } from "lucide-react-native";
 import { findNodeHandle, Platform, UIManager } from "react-native";
-import { Pressable, Text, TextInput, View } from "react-native-css/components";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native-css/components";
 
 import { cn } from "../lib/utils";
 import { Input, type InputProps } from "./input";
@@ -56,6 +62,7 @@ function Dropdown<T>({
     width: number;
   } | null>(null);
   const triggerRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
+  const inputContainerRef = React.useRef<React.ElementRef<typeof View>>(null);
   const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const optionRefs = React.useRef<
     Record<string, React.ElementRef<typeof Pressable> | null>
@@ -64,15 +71,46 @@ function Dropdown<T>({
   const isDisabled = Boolean(props.disabled);
   const isWeb = Platform.OS === "web";
   const anchorId = `dropdown-trigger-${props.id}`;
-  const filteredOptions = searchValue.trim()
-    ? options.filter((option) =>
-        getOptionLabel(option)
-          .toLocaleLowerCase()
-          .includes(searchValue.trim().toLocaleLowerCase()),
-      )
-    : options;
+  const isSearchInputVisible = search && open;
+  const searchInputRef = React.useRef<React.ElementRef<typeof TextInput>>(null);
+  const selectedOption = options.find((option) => option.value === value);
+  const [priorityOptionValue, setPriorityOptionValue] = React.useState(value);
+  const orderedOptions = React.useMemo(() => {
+    const priorityOption = options.find(
+      (option) => option.value === priorityOptionValue,
+    );
+
+    return priorityOption
+      ? [
+          priorityOption,
+          ...options.filter((option) => option.value !== priorityOptionValue),
+        ]
+      : options;
+  }, [options, priorityOptionValue]);
+  const filteredOptions = React.useMemo(
+    () =>
+      searchValue.trim()
+        ? orderedOptions.filter((option) =>
+            getOptionLabel(option)
+              .toLocaleLowerCase()
+              .includes(searchValue.trim().toLocaleLowerCase()),
+          )
+        : orderedOptions,
+    [orderedOptions, searchValue],
+  );
+
+  React.useEffect(() => {
+    if (open || isClosing) return;
+
+    setPriorityOptionValue(value);
+  }, [isClosing, open, value]);
 
   const close = () => {
+    if (isWeb) {
+      document.getElementById(anchorId)?.blur();
+    } else {
+      searchInputRef.current?.blur?.();
+    }
     setOpen(false);
     setIsClosing(true);
     setSearchValue("");
@@ -82,9 +120,14 @@ function Dropdown<T>({
       setAnchorRect(null);
       closeTimer.current = null;
     }, 150);
-    if (isWeb) {
-      window.requestAnimationFrame(() => triggerRef.current?.focus?.());
-    }
+  };
+
+  const openDropdown = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setIsClosing(false);
+    setAnchorRect(null);
+    setSearchValue("");
+    setOpen(true);
   };
 
   const toggleOpen = () => {
@@ -93,10 +136,7 @@ function Dropdown<T>({
       return;
     }
 
-    if (closeTimer.current) clearTimeout(closeTimer.current);
-    setIsClosing(false);
-    setAnchorRect(null);
-    setOpen(true);
+    openDropdown();
   };
 
   React.useEffect(() => {
@@ -104,24 +144,27 @@ function Dropdown<T>({
 
     const updatePosition = () => {
       if (isWeb) {
-        const element = document.getElementById(anchorId);
+        const element = document.getElementById(`${props.id}-container`);
         if (!element) return;
 
         const rect = element.getBoundingClientRect();
         setAnchorRect({
-          bottom: rect.bottom + 8,
+          bottom: rect.bottom + 4,
           left: rect.left,
           width: rect.width,
         });
         return;
       }
 
-      const node = findNodeHandle(triggerRef.current);
+      const node = findNodeHandle(
+        inputContainerRef.current ??
+          (isSearchInputVisible ? searchInputRef.current : triggerRef.current),
+      );
       if (node == null) return;
 
       UIManager.measureInWindow(node, (left, top, width, height) => {
         setAnchorRect({
-          bottom: top + height + 8,
+          bottom: top + height + 4,
           left,
           width,
         });
@@ -146,19 +189,33 @@ function Dropdown<T>({
     if (!isWeb || !open || !anchorRect) return;
 
     const selectedKey = String(
-      options.find((option) => option.value === value)?.value ??
-        filteredOptions[0]?.value,
+      selectedOption?.value ?? filteredOptions[0]?.value,
     );
     const selectedIndex = filteredOptions.findIndex(
       (option) => String(option.value) === selectedKey,
     );
-    setFocusedOptionIndex(selectedIndex);
+    setFocusedOptionIndex(
+      selectedIndex >= 0 ? selectedIndex : filteredOptions.length ? 0 : -1,
+    );
     const focusFrame = window.requestAnimationFrame(() => {
-      optionRefs.current[selectedKey]?.focus?.();
+      if (isSearchInputVisible) {
+        searchInputRef.current?.focus?.();
+      } else {
+        optionRefs.current[selectedKey]?.focus?.();
+      }
     });
 
     return () => window.cancelAnimationFrame(focusFrame);
-  }, [anchorRect, filteredOptions, isWeb, open, options, value]);
+  }, [
+    anchorRect,
+    filteredOptions,
+    isSearchInputVisible,
+    isWeb,
+    open,
+    options,
+    selectedOption,
+    value,
+  ]);
 
   const selectOption = (option: DropdownOption<T>) => {
     if (option.value === value) {
@@ -173,19 +230,49 @@ function Dropdown<T>({
     close();
   };
 
+  const handleSearchKeyPress = (key: string) => {
+    if (key === "Escape") {
+      close();
+      return;
+    }
+
+    if (key === "Enter") {
+      const option = filteredOptions[focusedOptionIndex];
+      if (option) selectOption(option);
+      return;
+    }
+
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(key)) return;
+    if (!filteredOptions.length) return;
+
+    const nextIndex =
+      key === "Home"
+        ? 0
+        : key === "End"
+          ? filteredOptions.length - 1
+          : key === "ArrowDown"
+            ? (focusedOptionIndex + 1 + filteredOptions.length) %
+              filteredOptions.length
+            : (focusedOptionIndex - 1 + filteredOptions.length) %
+              filteredOptions.length;
+
+    setFocusedOptionIndex(nextIndex);
+  };
+
   React.useEffect(() => {
     if (!isWeb) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       const trigger = document.getElementById(anchorId);
+      const searchInput = document.getElementById(anchorId);
       const isTrigger = target === trigger || trigger?.contains(target);
-      const isSearchInput = target?.tagName === "INPUT";
+      const isSearchInput = target === searchInput;
 
       if (!open) {
         if (isTrigger && event.key === "ArrowDown") {
           event.preventDefault();
-          setOpen(true);
+          openDropdown();
         }
         return;
       }
@@ -196,6 +283,8 @@ function Dropdown<T>({
         return;
       }
 
+      // Search input handles its keyboard events directly through TextInput's
+      // onKeyPress, which is reliable across React Native Web implementations.
       if (isSearchInput) return;
 
       if (event.key === "Enter" && focusedOptionIndex >= 0) {
@@ -224,9 +313,11 @@ function Dropdown<T>({
 
       setFocusedOptionIndex(nextIndex);
       const nextKey = String(filteredOptions[nextIndex]?.value);
-      window.requestAnimationFrame(() => {
-        optionRefs.current[nextKey]?.focus?.();
-      });
+      if (!isSearchInput) {
+        window.requestAnimationFrame(() => {
+          optionRefs.current[nextKey]?.focus?.();
+        });
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -239,6 +330,7 @@ function Dropdown<T>({
     isWeb,
     open,
     selectOption,
+    openDropdown,
   ]);
 
   return (
@@ -246,7 +338,9 @@ function Dropdown<T>({
       <Input
         {...props}
         asChild
+        containerRef={inputContainerRef}
         active={open}
+        value={String(value ?? "")}
         disabled={isDisabled}
         label={props.label}
         trailingIcon={
@@ -264,20 +358,43 @@ function Dropdown<T>({
           </View>
         }
       >
-        <Pressable
-          accessibilityLabel={props.label}
-          accessibilityRole="combobox"
-          accessibilityState={{ disabled: isDisabled, expanded: open }}
-          className="text-start"
-          disabled={isDisabled}
-          nativeID={anchorId}
-          onPress={toggleOpen}
-          ref={triggerRef}
-        >
-          <Text className="font-p-2 font-medium" numberOfLines={1}>
-            {valueMapper(value)}
-          </Text>
-        </Pressable>
+        {isSearchInputVisible ? (
+          <TextInput
+            accessibilityLabel={props.label}
+            accessibilityRole="combobox"
+            accessibilityState={{ disabled: isDisabled, expanded: open }}
+            autoFocus
+            className="w-full font-p-2 font-medium text-neutral-950 outline-none"
+            editable={!isDisabled}
+            nativeID={anchorId}
+            onChangeText={setSearchValue}
+            onKeyPress={(event) => handleSearchKeyPress(event.nativeEvent.key)}
+            ref={searchInputRef}
+            selectTextOnFocus
+            value={searchValue}
+          />
+        ) : (
+          <Pressable
+            accessibilityLabel={props.label}
+            accessibilityRole="combobox"
+            accessibilityState={{ disabled: isDisabled, expanded: open }}
+            className="text-start"
+            disabled={isDisabled}
+            nativeID={anchorId}
+            onPress={toggleOpen}
+            ref={triggerRef}
+          >
+            <Text
+              className={cn(
+                "font-medium font-p-1",
+                isDisabled ? "text-neutral-400" : "text-neutral-950",
+              )}
+              numberOfLines={1}
+            >
+              {valueMapper(value)}
+            </Text>
+          </Pressable>
+        )}
       </Input>
       {(open || isClosing) && anchorRect ? (
         <DropdownPortal
@@ -298,64 +415,57 @@ function Dropdown<T>({
             accessibilityLabel={popupLabel}
             accessibilityRole="menu"
             className={cn(
-              "z-50 duration-150 rounded-lg border border-neutral-100 bg-white px-1 py-2 shadow-2",
+              "z-50 overflow-hidden rounded-lg border border-neutral-400 bg-white shadow-2 duration-150",
               open
                 ? "animate-in fade-in-0 zoom-in-95 slide-in-from-top-2"
                 : "animate-out fade-out-0 zoom-out-95 slide-out-to-top-2",
             )}
             nativeID={dataTid ? `${dataTid}-dropdown-content` : undefined}
           >
-          {search ? (
-            <View className="relative mb-1">
-              <Search
-                size={20}
-                className="absolute left-3 top-2.5 z-10 text-neutral-600"
-              />
-              <TextInput
-                accessibilityLabel="Search"
-                className="w-full rounded-lg px-3 py-2 pl-11 font-p-2 text-neutral-950 outline outline-neutral-600 placeholder:text-neutral-300 focus-visible:outline-2"
-                onChangeText={setSearchValue}
-                value={searchValue}
-              />
-            </View>
-          ) : null}
-            <View className="gap-1">
-            {filteredOptions.length ? (
-              filteredOptions.map((option) => {
-                const selected = option.value === value;
+            <ScrollView className="max-h-56.5">
+              {filteredOptions.length ? (
+                filteredOptions.map((option, index) => {
+                  const selected = option.value === value;
+                  const focused = index === focusedOptionIndex;
 
-                return (
-                  <Pressable
-                    accessibilityRole="menuitem"
-                    accessibilityState={{ selected }}
-                    className={cn(
-                      "min-h-11 rounded-sm p-3 font-p-1 text-neutral-950",
-                      "focus-visible:bg-primary-200 focus-visible:outline focus-visible:outline-primary",
-                      selected && "bg-primary-200 outline outline-primary",
-                    )}
-                    key={String(option.value)}
-                    onPress={() => selectOption(option)}
-                    ref={(element) => {
-                      optionRefs.current[String(option.value)] = element;
-                    }}
-                  >
-                    {typeof option.label === "string" ||
-                    typeof option.label === "number" ? (
-                      <Text className="font-p-1 text-neutral-950">
-                        {option.label}
-                      </Text>
-                    ) : (
-                      option.label
-                    )}
-                  </Pressable>
-                );
-              })
-            ) : (
-              <Text className="min-h-11 py-3 text-center font-p-1 text-black">
-                {noResultsText}
-              </Text>
-            )}
-            </View>
+                  return (
+                    <Pressable
+                      accessibilityRole="menuitem"
+                      accessibilityState={{ selected }}
+                      className={cn(
+                        "h-14 shrink-0 flex-row items-center justify-between px-4 font-normal font-p-1 text-black hover:bg-primary-100 focus-visible:bg-primary-100 focus-visible:outline-none",
+                        index < filteredOptions.length - 1 &&
+                          "border-b border-neutral-300",
+                        (selected || focused) && "bg-primary-100",
+                      )}
+                      key={String(option.value)}
+                      onPress={() => selectOption(option)}
+                      ref={(element) => {
+                        optionRefs.current[String(option.value)] = element;
+                      }}
+                    >
+                      {typeof option.label === "string" ||
+                      typeof option.label === "number" ? (
+                        <Text className="font-normal font-p-1 text-black">
+                          {option.label}
+                        </Text>
+                      ) : (
+                        option.label
+                      )}
+                      {selected ? (
+                        <Check className="text-black" size={24} />
+                      ) : null}
+                    </Pressable>
+                  );
+                })
+              ) : (
+                <View className="h-14 shrink-0 items-center justify-center px-4">
+                  <Text className="text-center font-normal font-p-1 text-black">
+                    {noResultsText}
+                  </Text>
+                </View>
+              )}
+            </ScrollView>
           </View>
         </DropdownPortal>
       ) : null}
