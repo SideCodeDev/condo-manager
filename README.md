@@ -13,7 +13,8 @@ apps/
 packages/
   backend/             Convex schema, functions, and HTTP routes
   ui/                  Cross-platform components, tokens, fonts, and Storybook
-  eslint-config/       Shared ESLint and Prettier configuration
+  eslint-config/       Shared ESLint base and framework presets
+  prettier-config/     Shared Prettier configuration
   typescript-config/   Shared TypeScript configurations
 ```
 

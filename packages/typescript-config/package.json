@@ -6,6 +6,7 @@
     "base.json",
     "nextjs.json",
     "react-library.json",
+    "vite-node.json",
     "vite.json"
   ],
   "peerDependencies": {

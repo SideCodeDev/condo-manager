@@ -1,1 +1,1 @@
-export { default } from "@condo-manager/eslint-config/prettier";
+export { default } from "@condo-manager/prettier-config";

@@ -12,21 +12,10 @@ import "../global.css";
 
 import AppTabs from "@/components/app-tabs";
 
-const clerkPublishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
-const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
+const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL!;
+const clerkPublishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
-function requireEnvironmentVariable(value: string | undefined, name: string) {
-  if (!value) throw new Error(`Set ${name} in apps/mobile/.env`);
-  return value;
-}
-
-const convex = new ConvexReactClient(
-  requireEnvironmentVariable(convexUrl, "EXPO_PUBLIC_CONVEX_URL"),
-);
-const publishableKey = requireEnvironmentVariable(
-  clerkPublishableKey,
-  "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY",
-);
+const convex = new ConvexReactClient(convexUrl);
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,9 +34,11 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+    <ClerkProvider publishableKey={clerkPublishableKey} tokenCache={tokenCache}>
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
           <AppTabs />
         </ThemeProvider>
       </ConvexProviderWithClerk>

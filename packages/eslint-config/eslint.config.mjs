@@ -9,6 +9,7 @@ export default tseslint.config(
       "**/.next/**",
       "**/coverage/**",
       "**/dist/**",
+      "**/metro.config.js",
       "**/node_modules/**",
       "**/storybook-static/**",
     ],

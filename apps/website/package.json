@@ -27,7 +27,7 @@
   "devDependencies": {
     "@condo-manager/eslint-config": "workspace:*",
     "@condo-manager/typescript-config": "workspace:*",
-    "@tanstack/eslint-config": "^0.4.0",
+    "@rolldown/plugin-babel": "catalog:",
     "@tanstack/router-cli": "^1.132.0",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
@@ -36,7 +36,6 @@
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
-    "@rolldown/plugin-babel": "catalog:"
+    "vite": "catalog:"
   }
 }

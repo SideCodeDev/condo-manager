@@ -15,6 +15,7 @@
     "dev:backend": "pnpm --filter @condo-manager/backend dev"
   },
   "devDependencies": {
+    "@condo-manager/prettier-config": "workspace:*",
     "@condo-manager/eslint-config": "workspace:*",
     "eslint": "catalog:",
     "prettier": "catalog:",

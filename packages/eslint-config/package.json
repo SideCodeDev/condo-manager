@@ -5,17 +5,20 @@
   "type": "module",
   "exports": {
     ".": "./eslint.config.mjs",
-    "./prettier": "./prettier.config.mjs"
+    "./react-vite": "./react-vite.config.mjs",
+    "./tanstack": "./tanstack.config.mjs"
   },
   "dependencies": {
     "@eslint/js": "^10.0.0",
+    "@tanstack/eslint-config": "^0.4.0",
     "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.4",
     "globals": "^17.0.0",
     "typescript-eslint": "^8.0.0"
   },
   "peerDependencies": {
     "eslint": "catalog:",
-    "prettier": "catalog:",
     "typescript": "catalog:"
   }
 }

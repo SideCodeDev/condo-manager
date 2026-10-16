@@ -1,7 +1,7 @@
 # Condo Manager — Agent Guide
 
-This file is the canonical repository guide for coding agents. It applies to the
-whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
+This is the repository's only `AGENTS.md` guide. It applies to the whole
+repository, including every app and package.
 
 ## Scope
 
@@ -14,15 +14,18 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 
 - `apps/web`: the main React 19 + Vite application. Authentication,
   organizations, and billing come from Clerk; it calls the shared Convex backend.
-- `apps/mobile`: the Expo / React Native application, which can connect to the
-  same Convex backend.
+- `apps/mobile`: the native-only Expo / React Native iOS and Android
+  application, which can connect to the same Convex backend. It uses Expo
+  Router, with route files in `src/app/` and providers in `_layout.tsx`.
 - `apps/website`: TanStack Start sales/marketing application.
 - `packages/backend`: the Convex project, including schema, functions, and HTTP
   routes. Its Convex source lives in `packages/backend/convex/`.
 - `packages/ui`: cross-platform React Native UI, fonts, helpers, styles, and
   Storybook, consumed by the Vite web apps and the Expo app. Keep it independent
   of app routing, authentication, billing, and backend concerns.
-- `packages/eslint-config`: shared ESLint configuration.
+- `packages/eslint-config`: shared ESLint base plus React/Vite and TanStack
+  presets.
+- `packages/prettier-config`: shared Prettier configuration.
 - `packages/typescript-config`: shared TypeScript configurations.
 - `pnpm-workspace.yaml`: workspace membership and the centralized dependency
   catalog. Put versions shared by multiple packages in the catalog.
@@ -35,8 +38,9 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
   Webhook handlers must be idempotent because delivery may be repeated or arrive
   out of order.
 - The active organization preference is stored in Convex as
-  `userSettings.selectedClerkOrganizationId`. The frontend `OrganizationGate`
-  reconciles that preference with the active Clerk session.
+  `userSettings.selectedClerkOrganizationId`. The mobile app's
+  `OrganizationGate` handles organization readiness and selection. Client-side
+  gates are not security boundaries.
 - Enforce organization membership and authorization in Convex functions. Never
   rely only on a client-provided organization ID.
 - Normalize nullable third-party payload fields before passing them to Convex
@@ -56,6 +60,22 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 - Never delete or reset Clerk or Convex data without explicit approval.
 - Never commit secrets. Refer only to environment variable names such as
   `CLERK_SECRET_KEY` and `CLERK_WEBHOOK_SIGNING_SECRET`.
+- For Expo or React Native API changes, check the Expo SDK version in
+  `apps/mobile/package.json` and consult the matching versioned official Expo
+  documentation. For APIs outside Expo, consult their current official docs.
+- Install or change native dependencies through Expo's installer, invoked with
+  pnpm from the repository root: `pnpm --filter @condo-manager/mobile exec expo
+  install <package>`. Verify the package manifest and lockfile, and preserve
+  Expo SDK compatibility and the workspace dependency catalog.
+- The mobile app's `src/global.css` is imported by `src/app/_layout.tsx`, and
+  Metro's NativeWind integration is configured in `apps/mobile/metro.config.js`.
+  Preserve these integration points and the root layout's font loading.
+- Expo generates the `ios/` and `android/` native project directories when
+  needed. Do not create or hand-edit generated native directories; configure
+  native behavior through `app.json` or config plugins. Expo Go may not include
+  every native module, so use the development-build workflow when required.
+- Do not run EAS builds or submissions, change signing credentials, or publish
+  updates unless the user explicitly requests that external action.
 
 ## Dependency and package conventions
 
@@ -98,6 +118,10 @@ whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 - Keep Expo/React Native dependency versions compatible with the Expo SDK in
   `apps/mobile/package.json`. Use Expo's installer through pnpm for native
   packages; do not bypass the workspace package manager.
+- Keep lint, TypeScript, and Prettier rules in their shared config packages.
+  App configs should only compose a shared preset with unavoidable framework
+  settings; do not copy common rules into individual apps. The Expo app should
+  retain Expo's TypeScript base config and add only app-specific options.
 
 ## Common commands
 
@@ -114,6 +138,8 @@ pnpm --filter @condo-manager/web build
 pnpm --filter @condo-manager/ui check-types
 pnpm --filter @condo-manager/ui lint
 pnpm --filter @condo-manager/ui storybook:build
+pnpm --filter @condo-manager/mobile lint
+pnpm --filter @condo-manager/mobile exec tsc --noEmit
 ```
 
 Prefer the narrowest relevant check while iterating, then run all checks affected
