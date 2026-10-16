@@ -10,7 +10,7 @@ import { InputFeedback } from "./input-feedback";
 type CheckboxState = boolean | "indeterminate";
 
 const checkboxVariants = cva(
-  "h-5 w-5 shrink-0 flex-row items-center justify-center rounded-xs border transition-colors",
+  "h-6 w-6 shrink-0 flex-row items-center justify-center rounded-sm border-2 transition-colors",
   {
     variants: {
       state: {
@@ -125,9 +125,9 @@ function Checkbox({
           onPress={toggle}
         >
           {isIndeterminate ? (
-            <Minus className="text-white" size={16} strokeWidth={2} />
+            <Minus className="text-white" size={24} strokeWidth={2} />
           ) : isChecked ? (
-            <Check className="text-white" size={16} strokeWidth={2} />
+            <Check className="text-white" size={24} strokeWidth={2} />
           ) : null}
         </Pressable>
         {labelPosition === "right" ? labelElement : null}

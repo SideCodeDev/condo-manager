@@ -6,7 +6,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "../lib/utils";
 
 const radioVariants = cva(
-  "h-5 w-5 shrink-0 flex-row items-center justify-center rounded-full border transition-colors",
+  "h-6 w-6 shrink-0 flex-row items-center justify-center rounded-full border-2 transition-colors",
   {
     variants: {
       state: {
@@ -15,7 +15,7 @@ const radioVariants = cva(
         "disabled-checked": "border-neutral-400",
       },
       disabled: {
-        true: "cursor-not-allowed border-neutral-900",
+        true: "cursor-not-allowed border-neutral-400",
         false: "",
       },
     },
@@ -103,14 +103,14 @@ function Radio({
         accessibilityLabel={accessibilityLabel ?? label}
         accessibilityRole="radio"
         accessibilityState={{ checked: isChecked, disabled }}
-        className={radioVariants({ disabled, state })}
+        className={cn(radioVariants({ disabled, state }))}
         disabled={disabled}
         onPress={toggle}
       >
         {isChecked ? (
           <View
             className={cn(
-              "h-2.5 w-2.5 rounded-full",
+              "h-3.5 w-3.5 rounded-full",
               disabled ? "bg-neutral-400" : "bg-primary",
             )}
           />

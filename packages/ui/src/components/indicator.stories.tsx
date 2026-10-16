@@ -12,10 +12,12 @@ const meta = {
       options: ["checkbox", "radio"],
     },
     checked: { control: "boolean" },
+    disabled: { control: "boolean" },
   },
   args: {
     variant: "checkbox",
     checked: false,
+    disabled: false,
   },
 } satisfies Meta<typeof Indicator>;
 
@@ -40,5 +42,37 @@ export const RadioChecked: Story = {
   args: {
     variant: "radio",
     checked: true,
+  },
+};
+
+export const CheckboxDisabled: Story = {
+  args: {
+    variant: "checkbox",
+    checked: false,
+    disabled: true,
+  },
+};
+
+export const CheckboxDisabledChecked: Story = {
+  args: {
+    variant: "checkbox",
+    checked: true,
+    disabled: true,
+  },
+};
+
+export const RadioDisabled: Story = {
+  args: {
+    variant: "radio",
+    checked: false,
+    disabled: true,
+  },
+};
+
+export const RadioDisabledChecked: Story = {
+  args: {
+    variant: "radio",
+    checked: true,
+    disabled: true,
   },
 };
