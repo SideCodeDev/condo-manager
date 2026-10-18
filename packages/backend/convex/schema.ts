@@ -91,6 +91,26 @@ const clerkTables = {
 };
 
 const applicationTables = {
+  condos: defineTable({
+    clerkOrganizationId: v.string(),
+    name: v.string(),
+    slug: v.string(),
+    address: v.object({
+      street: v.string(),
+      postalCode: v.string(),
+      city: v.string(),
+      region: v.optional(v.string()),
+      countryCode: v.string(),
+    }),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    archivedAt: v.optional(v.number()),
+  })
+    .index("by_clerk_organization_id", ["clerkOrganizationId"])
+    .index("by_clerk_organization_and_archived_at", [
+      "clerkOrganizationId",
+      "archivedAt",
+    ]),
   userSettings: defineTable({
     userId: v.id("users"),
     selectedClerkOrganizationId: v.optional(v.string()),
