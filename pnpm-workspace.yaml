@@ -36,3 +36,7 @@ allowBuilds:
   core-js: true
   esbuild: true
   unrs-resolver: true
+
+minimumReleaseAgeExclude:
+  - "@clerk/clerk-js@6.39.1"
+  - "@clerk/expo@4.13.0"

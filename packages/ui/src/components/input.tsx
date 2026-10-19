@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 import { CircleX } from "lucide-react-native";
 import * as React from "react";
-import type { TextInputProps } from "react-native";
+import { Platform, type TextInputProps } from "react-native";
 import { Text, TextInput, View } from "react-native-css/components";
 
 import { cn } from "../lib/utils";
@@ -109,11 +109,11 @@ const inputElementVariants = cva(
 );
 
 const labelElementVariants = cva(
-  "font-medium font-p-1 text-neutral-700 absolute top-1/2 -translate-y-1/2 group-focus-within:top-0 group-focus-within:translate-y-0 group-focus-within:font-p-3 group-focus-within:font-normal transition-all",
+  "font-medium font-p-1 text-neutral-700 transition-all",
   {
     variants: {
       active: {
-        true: "top-0 translate-y-0 font-p-3 font-normal",
+        true: "font-p-3 font-normal",
         false: "",
       },
       disabled: {
@@ -123,6 +123,22 @@ const labelElementVariants = cva(
     },
     defaultVariants: {
       active: false,
+    },
+  },
+);
+
+const webLabelPositionVariants = cva(
+  "absolute top-1/2 -translate-y-1/2 group-focus-within:top-0 group-focus-within:translate-y-0 group-focus-within:font-p-3 group-focus-within:font-normal transition-all",
+  {
+    variants: {
+      active: {
+        true: "top-0 translate-y-0",
+        false: "",
+      },
+      leading: {
+        true: "left-9",
+        false: "left-3",
+      },
     },
   },
 );
@@ -139,15 +155,49 @@ function Input({
   id,
   label,
   leadingIcon,
+  onBlur,
+  onFocus,
   trailingIcon,
   variant = "outline",
   size = "default",
   ...props
 }: InputProps) {
+  const [focused, setFocused] = React.useState(false);
+  const inputRef = React.useRef<React.ElementRef<typeof TextInput>>(null);
   const hasError = !!errors?.length;
   const labelActive =
-    active || !!props.placeholder || !!props.value || !!props.defaultValue;
-  const Inputcomponent = asChild ? Slot : TextInput;
+    active ||
+    focused ||
+    !!props.placeholder ||
+    !!props.value ||
+    !!props.defaultValue;
+  const handleFocus: NonNullable<TextInputProps["onFocus"]> = (event) => {
+    setFocused(true);
+    onFocus?.(event);
+  };
+
+  const handleBlur: NonNullable<TextInputProps["onBlur"]> = (event) => {
+    setFocused(false);
+    onBlur?.(event);
+  };
+
+  const focusInputFromContainer = () => {
+    if (!disabled && !asChild) inputRef.current?.focus();
+  };
+
+  const inputComponentProps = {
+    ...props,
+    onBlur: handleBlur,
+    onFocus: handleFocus,
+    accessibilityLabel: props.accessibilityLabel ?? label,
+    accessibilityState: {
+      ...props.accessibilityState,
+      disabled,
+    },
+    editable: !disabled,
+    nativeID: id,
+    className: cn(inputElementVariants({ disabled })),
+  };
 
   return (
     <InputFeedback
@@ -160,6 +210,7 @@ function Input({
       <View
         nativeID={`${id}-container`}
         ref={containerRef}
+        onTouchEnd={focusInputFromContainer}
         className={cn(
           inputContainerVariants({
             variant,
@@ -168,18 +219,42 @@ function Input({
             error: hasError,
             leading: !!leadingIcon,
             trailing: !!trailingIcon,
-            active,
+            active: active || focused,
           }),
         )}
       >
-        <Text
-          className={cn(
-            labelElementVariants({ active: labelActive, disabled }),
-          )}
-          nativeID={`${id}-label`}
-        >
-          {label}
-        </Text>
+        {Platform.OS === "web" ? (
+          <Text
+            className={cn(
+              labelElementVariants({ active: labelActive, disabled }),
+              webLabelPositionVariants({
+                active: labelActive,
+                leading: !!leadingIcon,
+              }),
+            )}
+            nativeID={`${id}-label`}
+          >
+            {label}
+          </Text>
+        ) : (
+          <View
+            className={cn(
+              "absolute top-0 justify-center",
+              labelActive ? "" : "bottom-0",
+              leadingIcon ? "left-9" : "left-3",
+            )}
+            pointerEvents="none"
+          >
+            <Text
+              className={cn(
+                labelElementVariants({ active: labelActive, disabled }),
+              )}
+              nativeID={`${id}-label`}
+            >
+              {label}
+            </Text>
+          </View>
+        )}
         {leadingIcon ? (
           <View className="absolute left-1.5 top-1/2 z-10 -translate-y-1/2">
             {renderIcon(
@@ -189,22 +264,11 @@ function Input({
           </View>
         ) : null}
 
-        <Inputcomponent
-          {...props}
-          accessibilityLabel={props.accessibilityLabel ?? label}
-          accessibilityState={{
-            ...props.accessibilityState,
-            disabled: disabled,
-          }}
-          editable={!disabled}
-          nativeID={id}
-          className={cn(
-            inputElementVariants({
-              disabled,
-            }),
-          )}
-          children={asChild ? children : undefined}
-        />
+        {asChild ? (
+          <Slot {...inputComponentProps}>{children}</Slot>
+        ) : (
+          <TextInput {...inputComponentProps} ref={inputRef} />
+        )}
 
         {trailingIcon ? (
           <View
