@@ -21,7 +21,7 @@ async function getCondoForMember(
   if (!identity) throw new ApplicationError("unauthenticated");
 
   const condo = await ctx.db.get("condos", condoId);
-  if (!condo || condo.archivedAt !== undefined) {
+  if (!condo) {
     throw new ApplicationError("condo_not_found");
   }
 
@@ -71,7 +71,6 @@ function getCondoLimit(featureSlugs: string[]): CondoLimit {
 export const create = mutation({
   args: {
     name: v.string(),
-    slug: v.string(),
     address: condoAddress,
   },
   returns: v.id("condos"),
@@ -137,10 +136,8 @@ export const create = mutation({
     if (limit.kind === "limited") {
       const activeCondos = await ctx.db
         .query("condos")
-        .withIndex("by_clerk_organization_and_archived_at", (q) =>
-          q
-            .eq("clerkOrganizationId", clerkOrganizationId)
-            .eq("archivedAt", undefined),
+        .withIndex("by_clerk_organization_id", (q) =>
+          q.eq("clerkOrganizationId", clerkOrganizationId),
         )
         .take(limit.value);
       if (activeCondos.length >= limit.value) {
@@ -148,7 +145,7 @@ export const create = mutation({
       }
     }
 
-    if (!args.name.trim() || !args.slug.trim()) {
+    if (!args.name.trim()) {
       throw new ApplicationError("cannot_create_condo");
     }
 
@@ -165,7 +162,6 @@ export const update = mutation({
   args: {
     condoId: v.id("condos"),
     name: v.optional(v.string()),
-    slug: v.optional(v.string()),
     address: v.optional(condoAddress),
   },
   returns: v.null(),
@@ -174,7 +170,6 @@ export const update = mutation({
 
     if (
       args.name === undefined &&
-      args.slug === undefined &&
       args.address === undefined
     ) {
       throw new ApplicationError("cannot_update_condo");
@@ -182,29 +177,10 @@ export const update = mutation({
     if (args.name !== undefined && !args.name.trim()) {
       throw new ApplicationError("cannot_update_condo");
     }
-    if (args.slug !== undefined && !args.slug.trim()) {
-      throw new ApplicationError("cannot_update_condo");
-    }
-
     await ctx.db.patch("condos", args.condoId, {
       ...(args.name !== undefined ? { name: args.name.trim() } : {}),
-      ...(args.slug !== undefined ? { slug: args.slug.trim() } : {}),
       ...(args.address !== undefined ? { address: args.address } : {}),
       updatedAt: Date.now(),
-    });
-    return null;
-  },
-});
-
-export const archive = mutation({
-  args: { condoId: v.id("condos") },
-  returns: v.null(),
-  handler: async (ctx, { condoId }) => {
-    await getCondoForMember(ctx, condoId);
-    const now = Date.now();
-    await ctx.db.patch("condos", condoId, {
-      archivedAt: now,
-      updatedAt: now,
     });
     return null;
   },

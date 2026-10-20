@@ -32,10 +32,8 @@ export const listMine = query({
 
         return ctx.db
           .query("condos")
-          .withIndex("by_clerk_organization_and_archived_at", (q) =>
-            q
-              .eq("clerkOrganizationId", clerkOrganizationId)
-              .eq("archivedAt", undefined),
+          .withIndex("by_clerk_organization_id", (q) =>
+            q.eq("clerkOrganizationId", clerkOrganizationId),
           )
           .collect();
       }),
