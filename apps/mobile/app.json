@@ -8,7 +8,8 @@
     "scheme": "condomanager",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.dgviana.condo-manager"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,13 +25,22 @@
       "expo-secure-store",
       "@clerk/expo",
       [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "@clerk/expo-native-components"
     ],
     "experiments": {
       "typedRoutes": true,
