@@ -1,4 +1,19 @@
 import { makeFunctionReference, type FunctionReference } from "convex/server";
+import type { Id } from "../_generated/dataModel";
+
+export const getUserOrgs = makeFunctionReference(
+  "modules/organizations/queries:getUserOrgs",
+) as unknown as FunctionReference<
+  "query",
+  "public",
+  {},
+  {
+    id: Id<"organizations">;
+    clerkOrganizationId: string;
+    name: string;
+    features: { maxCondo: "unlimited" | number };
+  }[]
+>;
 
 export const provisionPersonalOrganization = makeFunctionReference(
   "modules/organizations/actions:provisionPersonalOrganization",

@@ -69,9 +69,7 @@ export const upsertUser = internalMutation({
 
     await ctx.runMutation(
       internal.modules.userSettings.mutations.createUserSettings,
-      {
-        userId: id,
-      },
+      { userId: id },
     );
 
     if (provisionOrganization) {
@@ -102,6 +100,11 @@ export const deleteUserByAuthProviderId = internalMutation({
       )
       .unique();
     if (existing) {
+      const settings = await ctx.db
+        .query("userSettings")
+        .withIndex("by_user_id", (q) => q.eq("userId", existing._id))
+        .unique();
+      if (settings) await ctx.db.delete("userSettings", settings._id);
       await ctx.db.delete("users", existing._id);
     }
   },

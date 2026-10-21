@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { internalQuery, query } from "../../_generated/server";
-import { ApplicationError } from "../../lib/errors";
+import { getCurrentUser } from "../users/currentUser";
 
 export const getUserForProvisioning = internalQuery({
   args: { clerkUserId: v.string() },
@@ -17,32 +17,6 @@ export const getUserForProvisioning = internalQuery({
       firstName: user.firstName,
       lastName: user.lastName,
     };
-  },
-});
-
-export const listMine = query({
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ApplicationError("unauthenticated");
-    const memberships = await ctx.db
-      .query("organizationMemberships")
-      .withIndex("by_clerk_user_id", (q) =>
-        q.eq("clerkUserId", identity.subject),
-      )
-      .collect();
-
-    const activeMemberships = memberships.filter((item) => !item.deletedAt);
-    return Promise.all(
-      activeMemberships.map(async (membership) => {
-        const organization = await ctx.db
-          .query("organizations")
-          .withIndex("by_clerk_organization_id", (q) =>
-            q.eq("clerkOrganizationId", membership.clerkOrganizationId),
-          )
-          .unique();
-        return { membership, organization };
-      }),
-    );
   },
 });
 
@@ -84,13 +58,12 @@ function billingState(
 
 export const listMineWithBilling = query({
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ApplicationError("unauthenticated");
+    const { user } = await getCurrentUser(ctx);
 
     const memberships = await ctx.db
       .query("organizationMemberships")
       .withIndex("by_clerk_user_id", (q) =>
-        q.eq("clerkUserId", identity.subject),
+        q.eq("clerkUserId", user.authProviderId),
       )
       .collect();
 
@@ -174,15 +147,81 @@ export const listMineWithBilling = query({
   },
 });
 
-export const getProvisioningStatus = query({
+function getMaxCondo(featureSlugs: string[] | undefined): "unlimited" | number {
+  const feature = featureSlugs?.find((slug) => slug.startsWith("max_condo_"));
+  if (!feature) return 0;
+
+  const value = feature.slice("max_condo_".length);
+  if (value === "unlimited") return "unlimited";
+
+  const limit = Number(value);
+  return Number.isInteger(limit) && limit >= 0 ? limit : 0;
+}
+
+export const getUserOrgs = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      id: v.id("organizations"),
+      clerkOrganizationId: v.string(),
+      name: v.string(),
+      features: v.object({
+        maxCondo: v.union(v.literal("unlimited"), v.number()),
+      }),
+    }),
+  ),
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ApplicationError("unauthenticated");
-    return ctx.db
-      .query("organizationProvisioning")
+    const { user } = await getCurrentUser(ctx);
+    const memberships = await ctx.db
+      .query("organizationMemberships")
       .withIndex("by_clerk_user_id", (q) =>
-        q.eq("clerkUserId", identity.subject),
+        q.eq("clerkUserId", user.authProviderId),
       )
-      .unique();
+      .collect();
+    const activeMemberships = memberships.filter(
+      (membership) => !membership.deletedAt,
+    );
+    const now = Date.now();
+
+    const organizations = await Promise.all(
+      activeMemberships.map(async (membership) => {
+        const [organization, subscriptionItems] = await Promise.all([
+          ctx.db
+            .query("organizations")
+            .withIndex("by_clerk_organization_id", (q) =>
+              q.eq("clerkOrganizationId", membership.clerkOrganizationId),
+            )
+            .unique(),
+          ctx.db
+            .query("billingSubscriptionItems")
+            .withIndex("by_clerk_organization_id", (q) =>
+              q.eq("clerkOrganizationId", membership.clerkOrganizationId),
+            )
+            .collect(),
+        ]);
+
+        if (!organization || organization.deletedAt) return null;
+
+        const currentItem =
+          subscriptionItems.find((item) => item.status === "active") ??
+          subscriptionItems.find(
+            (item) =>
+              item.status === "canceled" &&
+              item.periodEnd !== undefined &&
+              item.periodEnd > now,
+          );
+
+        return {
+          id: organization._id,
+          clerkOrganizationId: organization.clerkOrganizationId,
+          name: organization.name,
+          features: {
+            maxCondo: getMaxCondo(currentItem?.featureSlugs),
+          },
+        };
+      }),
+    );
+
+    return organizations.filter((organization) => organization !== null);
   },
 });

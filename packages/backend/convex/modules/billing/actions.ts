@@ -5,26 +5,11 @@ import {
   type BillingSubscriptionItem,
 } from "@clerk/backend";
 import { v } from "convex/values";
-import {
-  action,
-  internalAction,
-  type ActionCtx,
-} from "../../_generated/server";
-import { makeFunctionReference, type FunctionReference } from "convex/server";
+import { internalAction, type ActionCtx } from "../../_generated/server";
 import {
   syncBillingSubscription,
   type BillingItemInput,
 } from "../../lib/functionReferences";
-import { ApplicationError } from "../../lib/errors";
-
-const getSelectedOrganizationForUser = makeFunctionReference(
-  "modules/billing/queries:getSelectedOrganizationForUser",
-) as unknown as FunctionReference<
-  "query",
-  "internal",
-  { clerkUserId: string },
-  string | null
->;
 
 function normalizeItem(
   item: BillingSubscriptionItem,
@@ -84,17 +69,4 @@ export const refreshOrganizationSubscription = internalAction({
   args: { clerkOrganizationId: v.string() },
   handler: (ctx, { clerkOrganizationId }) =>
     refreshSubscription(ctx, clerkOrganizationId),
-});
-
-export const refreshSelectedOrganizationSubscription = action({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ApplicationError("unauthenticated");
-    const organizationId = await ctx.runQuery(getSelectedOrganizationForUser, {
-      clerkUserId: identity.subject,
-    });
-    if (!organizationId) throw new ApplicationError("user_has_no_orgs");
-    return refreshSubscription(ctx, organizationId);
-  },
 });
