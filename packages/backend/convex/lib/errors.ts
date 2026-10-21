@@ -19,4 +19,5 @@ export type ErrorCode =
   | "user_settings_not_found"
   | "cannot_create_condo"
   | "cannot_update_condo"
-  | "condo_not_found";
+  | "condo_not_found"
+  | "condo_membership_exists";

@@ -2,6 +2,8 @@ import { v } from "convex/values";
 import { mutation } from "../../_generated/server";
 import { ApplicationError } from "../../lib/errors";
 import { getUserOrgs } from "../../lib/functionReferences";
+import { createCondoMembership } from "../condoMember/mutations";
+import { getCurrentUser } from "../users/currentUser";
 
 const condoAddress = v.object({
   street: v.string(),
@@ -17,6 +19,7 @@ export const create = mutation({
   },
   returns: v.id("condos"),
   handler: async (ctx, args) => {
+    const { user } = await getCurrentUser(ctx);
     const userOrgs = await ctx.runQuery(getUserOrgs, {});
     const selectedOrg = userOrgs.find(
       (organization) => organization.id === args.org,
@@ -43,13 +46,19 @@ export const create = mutation({
       throw new ApplicationError("cannot_create_condo");
     }
 
-    return ctx.db.insert("condos", {
+    const condoId = await ctx.db.insert("condos", {
       name: args.name.trim(),
       address: args.address,
       organizationId: selectedOrg.id,
       createdAt: now,
       updatedAt: now,
     });
+    await createCondoMembership(ctx, {
+      condoId,
+      userId: user._id,
+      type: "admin",
+    });
+    return condoId;
   },
 });
 

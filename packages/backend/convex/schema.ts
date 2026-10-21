@@ -3,6 +3,7 @@ import {
   billingSubscriptionItems,
   billingSubscriptions,
 } from "./modules/billing/schema";
+import { condoMember } from "./modules/condoMember/schema";
 import { condos } from "./modules/condos/schema";
 import {
   organizationMemberships,
@@ -20,5 +21,6 @@ export default defineSchema({
   billingSubscriptions,
   billingSubscriptionItems,
   condos,
+  condoMember,
   userSettings,
 });

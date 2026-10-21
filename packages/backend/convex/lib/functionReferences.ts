@@ -15,6 +15,21 @@ export const getUserOrgs = makeFunctionReference(
   }[]
 >;
 
+export const getAllCondoMemberships = makeFunctionReference(
+  "modules/condoMember/queries:getAllMemberships",
+) as unknown as FunctionReference<
+  "query",
+  "public",
+  {},
+  {
+    _id: Id<"condoMember">;
+    _creationTime: number;
+    condoId: Id<"condos">;
+    userId: Id<"users">;
+    type: "member" | "admin";
+  }[]
+>;
+
 export const provisionPersonalOrganization = makeFunctionReference(
   "modules/organizations/actions:provisionPersonalOrganization",
 ) as unknown as FunctionReference<

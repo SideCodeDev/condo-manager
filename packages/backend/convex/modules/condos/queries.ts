@@ -1,18 +1,14 @@
 import { query } from "../../_generated/server";
-import { getUserOrgs } from "../../lib/functionReferences";
+import { getAllCondoMemberships } from "../../lib/functionReferences";
 
 export const listMine = query({
   handler: async (ctx) => {
-    const userOrgs = await ctx.runQuery(getUserOrgs, {});
+    const memberships = await ctx.runQuery(getAllCondoMemberships, {});
 
-    const condosByOrg = await Promise.all(
-      userOrgs.map((o) =>
-        ctx.db
-          .query("condos")
-          .withIndex("by_organization_id", (q) => q.eq("organizationId", o.id)),
-      ),
+    const condos = await Promise.all(
+      memberships.map((membership) => ctx.db.get("condos", membership.condoId)),
     );
 
-    return condosByOrg.flat();
+    return condos.filter((condo) => !!condo);
   },
 });
