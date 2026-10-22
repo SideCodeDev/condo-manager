@@ -128,7 +128,7 @@ const labelElementVariants = cva(
 );
 
 const webLabelPositionVariants = cva(
-  "absolute top-1/2 -translate-y-1/2 group-focus-within:top-0 group-focus-within:translate-y-0 group-focus-within:font-p-3 group-focus-within:font-normal transition-all",
+  "pointer-events-none absolute top-1/2 -translate-y-1/2 group-focus-within:top-0 group-focus-within:translate-y-0 group-focus-within:font-p-3 group-focus-within:font-normal transition-all",
   {
     variants: {
       active: {

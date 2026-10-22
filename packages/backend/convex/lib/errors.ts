@@ -17,4 +17,10 @@ export type ErrorCode =
   | "org_not_found"
   | "checkout_session_failed"
   | "user_settings_not_found"
-  | "cannot_create_condo";
+  | "cannot_create_condo"
+  | "cannot_update_condo"
+  | "condo_not_found"
+  | "condo_membership_exists"
+  | "uploaded_file_not_found"
+  | "asset_type_mismatch"
+  | "invalid_mime_type";

@@ -8,19 +8,24 @@
  * @module
  */
 
+import type * as authProvider_billing_actions from "../authProvider/billing/actions.js";
+import type * as authProvider_billing_mutations from "../authProvider/billing/mutations.js";
+import type * as authProvider_index from "../authProvider/index.js";
+import type * as authProvider_organizations_actions from "../authProvider/organizations/actions.js";
+import type * as authProvider_organizations_mutations from "../authProvider/organizations/mutations.js";
+import type * as authProvider_organizations_queries from "../authProvider/organizations/queries.js";
+import type * as authProvider_users_currentUser from "../authProvider/users/currentUser.js";
+import type * as authProvider_users_mutations from "../authProvider/users/mutations.js";
 import type * as http from "../http.js";
 import type * as lib_errors from "../lib/errors.js";
 import type * as lib_functionReferences from "../lib/functionReferences.js";
-import type * as modules_billing_actions from "../modules/billing/actions.js";
-import type * as modules_billing_mutations from "../modules/billing/mutations.js";
-import type * as modules_billing_queries from "../modules/billing/queries.js";
-import type * as modules_organizations_actions from "../modules/organizations/actions.js";
-import type * as modules_organizations_mutations from "../modules/organizations/mutations.js";
-import type * as modules_organizations_queries from "../modules/organizations/queries.js";
+import type * as lib_logging from "../lib/logging.js";
+import type * as modules_assets_mutations from "../modules/assets/mutations.js";
+import type * as modules_condoMember_mutations from "../modules/condoMember/mutations.js";
+import type * as modules_condoMember_queries from "../modules/condoMember/queries.js";
+import type * as modules_condos_mutations from "../modules/condos/mutations.js";
+import type * as modules_condos_queries from "../modules/condos/queries.js";
 import type * as modules_userSettings_mutations from "../modules/userSettings/mutations.js";
-import type * as modules_userSettings_queries from "../modules/userSettings/queries.js";
-import type * as modules_users_mutations from "../modules/users/mutations.js";
-import type * as modules_users_queries from "../modules/users/queries.js";
 
 import type {
   ApiFromModules,
@@ -29,19 +34,24 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "authProvider/billing/actions": typeof authProvider_billing_actions;
+  "authProvider/billing/mutations": typeof authProvider_billing_mutations;
+  "authProvider/index": typeof authProvider_index;
+  "authProvider/organizations/actions": typeof authProvider_organizations_actions;
+  "authProvider/organizations/mutations": typeof authProvider_organizations_mutations;
+  "authProvider/organizations/queries": typeof authProvider_organizations_queries;
+  "authProvider/users/currentUser": typeof authProvider_users_currentUser;
+  "authProvider/users/mutations": typeof authProvider_users_mutations;
   http: typeof http;
   "lib/errors": typeof lib_errors;
   "lib/functionReferences": typeof lib_functionReferences;
-  "modules/billing/actions": typeof modules_billing_actions;
-  "modules/billing/mutations": typeof modules_billing_mutations;
-  "modules/billing/queries": typeof modules_billing_queries;
-  "modules/organizations/actions": typeof modules_organizations_actions;
-  "modules/organizations/mutations": typeof modules_organizations_mutations;
-  "modules/organizations/queries": typeof modules_organizations_queries;
+  "lib/logging": typeof lib_logging;
+  "modules/assets/mutations": typeof modules_assets_mutations;
+  "modules/condoMember/mutations": typeof modules_condoMember_mutations;
+  "modules/condoMember/queries": typeof modules_condoMember_queries;
+  "modules/condos/mutations": typeof modules_condos_mutations;
+  "modules/condos/queries": typeof modules_condos_queries;
   "modules/userSettings/mutations": typeof modules_userSettings_mutations;
-  "modules/userSettings/queries": typeof modules_userSettings_queries;
-  "modules/users/mutations": typeof modules_users_mutations;
-  "modules/users/queries": typeof modules_users_queries;
 }>;
 
 /**

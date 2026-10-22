@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internalMutation, type MutationCtx } from "../../_generated/server";
+import { log } from "../../lib/logging";
 
 const billingItem = {
   clerkSubscriptionItemId: v.string(),
@@ -81,6 +82,13 @@ export const syncSubscription = internalMutation({
       )
       .unique();
     const { items, ...subscription } = args;
+    if (existing && existing.status !== subscription.status) {
+      log.info("billing.subscription_status_changed", {
+        clerkSubscriptionId: args.clerkSubscriptionId,
+        previousStatus: existing.status,
+        status: subscription.status,
+      });
+    }
     if (existing) await ctx.db.patch(existing._id, subscription);
     else await ctx.db.insert("billingSubscriptions", subscription);
     for (const item of items) await upsertItem(ctx, item);

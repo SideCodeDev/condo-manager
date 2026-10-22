@@ -84,7 +84,7 @@ function ImageInput({
     }
 
     const result = await DocumentPicker.getDocumentAsync({
-      copyToCacheDirectory: false,
+      copyToCacheDirectory: true,
       multiple: false,
       type: [...imageMimeTypes],
     });

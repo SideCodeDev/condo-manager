@@ -17,6 +17,7 @@ import {
   type OrganizationInput,
 } from "../../lib/functionReferences";
 import { v } from "convex/values";
+import { log } from "../../lib/logging";
 
 const PERSONAL_ORGANIZATION_KIND = "personal";
 const MAX_PROVISIONING_ATTEMPTS = 5;
@@ -207,7 +208,9 @@ export const provisionPersonalOrganization = internalAction({
       } catch (error) {
         // Billing may not yet be materialized when the Organization is created.
         // Its Clerk webhook will populate the local projection afterwards.
-        console.warn("Unable to sync initial Organization billing", error);
+        log.warn("organization.provisioning.initial_billing_unavailable", {
+          errorName: log.errorName(error),
+        });
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -222,6 +225,11 @@ export const provisionPersonalOrganization = internalAction({
           { clerkUserId },
         );
       }
+      log.error("organization.provisioning.failed", {
+        attempt,
+        retryScheduled: attempt < MAX_PROVISIONING_ATTEMPTS,
+        errorName: log.errorName(error),
+      });
       throw error;
     }
     return null;

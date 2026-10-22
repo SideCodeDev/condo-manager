@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internalMutation, type MutationCtx } from "../../_generated/server";
+import { log } from "../../lib/logging";
 
 const organization = {
   clerkOrganizationId: v.string(),
@@ -91,7 +92,10 @@ export const deleteOrganization = internalMutation({
         q.eq("clerkOrganizationId", clerkOrganizationId),
       )
       .unique();
-    if (existing) await ctx.db.patch(existing._id, { deletedAt: Date.now() });
+    if (existing) {
+      await ctx.db.patch(existing._id, { deletedAt: Date.now() });
+      log.info("organization.deleted", { clerkOrganizationId });
+    }
   },
 });
 
@@ -112,45 +116,7 @@ export const deleteMembership = internalMutation({
     if (!existing) return;
 
     await ctx.db.patch(existing._id, { deletedAt: Date.now() });
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_auth_provider_id", (q) =>
-        q.eq("authProviderId", existing.clerkUserId),
-      )
-      .unique();
-    if (!user) return;
-
-    const settings = await ctx.db
-      .query("userSettings")
-      .withIndex("by_user_id", (q) => q.eq("userId", user._id))
-      .unique();
-    if (
-      settings?.selectedClerkOrganizationId === existing.clerkOrganizationId
-    ) {
-      await ctx.db.patch(settings._id, {
-        selectedClerkOrganizationId: undefined,
-      });
-    }
-  },
-});
-
-export const ensureProvisioning = internalMutation({
-  args: { clerkUserId: v.string() },
-  handler: async (ctx, { clerkUserId }) => {
-    const existing = await ctx.db
-      .query("organizationProvisioning")
-      .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", clerkUserId))
-      .unique();
-    if (existing?.status === "complete") return false;
-    if (!existing) {
-      await ctx.db.insert("organizationProvisioning", {
-        clerkUserId,
-        status: "pending",
-        attempts: 0,
-        updatedAt: Date.now(),
-      });
-    }
-    return true;
+    log.info("organization.membership.deleted", { clerkMembershipId });
   },
 });
 
@@ -194,24 +160,6 @@ export const completeProvisioning = internalMutation({
   handler: async (ctx, args) => {
     await upsertOrganization(ctx, args.organization);
     if (args.membership) await upsertMembership(ctx, args.membership);
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_auth_provider_id", (q) =>
-        q.eq("authProviderId", args.clerkUserId),
-      )
-      .unique();
-    if (user) {
-      const settings = await ctx.db
-        .query("userSettings")
-        .withIndex("by_user_id", (q) => q.eq("userId", user._id))
-        .unique();
-      if (settings && !settings.selectedClerkOrganizationId) {
-        await ctx.db.patch(settings._id, {
-          selectedClerkOrganizationId: args.clerkOrganizationId,
-        });
-      }
-    }
 
     const state = await ctx.db
       .query("organizationProvisioning")
