@@ -9,6 +9,7 @@ import {
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import type { GenericId } from "convex/values";
 import type { ErrorBoundaryProps } from "expo-router";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, Text, View } from "react-native-css/components";
@@ -21,7 +22,11 @@ export default function NewCondoScreen() {
     isAuthenticated ? {} : "skip",
   );
   const createCondo = useMutation(api.modules.condos.mutations.create);
+  const selectCondo = useMutation(
+    api.modules.userSettings.mutations.selectCondo,
+  );
   const createAsset = useMutation(api.modules.assets.mutations.createAsset);
+  const router = useRouter();
   const { uploadImage, isUploading } = useImageUpload();
 
   const [name, setName] = useState("");
@@ -36,7 +41,6 @@ export default function NewCondoScreen() {
   >();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const selectedOrganizationId = organizationId ?? organizations?.[0]?.id;
 
@@ -57,7 +61,6 @@ export default function NewCondoScreen() {
 
     setIsSubmitting(true);
     setErrorMessage("");
-    setSuccessMessage("");
 
     try {
       const storageId = backdropImage
@@ -72,19 +75,14 @@ export default function NewCondoScreen() {
         ? await createAsset({ storageId, type: "image", mimeType })
         : undefined;
 
-      await createCondo({
+      const condoId = await createCondo({
         name,
         address: { street, postalCode, city },
         org: selectedOrganizationId,
         ...(assetId ? { backdropImage: assetId } : {}),
       });
-
-      setName("");
-      setStreet("");
-      setPostalCode("");
-      setCity("");
-      setBackdropImage(null);
-      setSuccessMessage("Condomínio criado com sucesso.");
+      await selectCondo({ condoId });
+      router.replace({ pathname: "/condo/[condoId]", params: { condoId } });
     } catch {
       setErrorMessage("Não foi possível criar o condomínio. Tente novamente.");
     } finally {
@@ -202,10 +200,6 @@ export default function NewCondoScreen() {
             {errorMessage}
           </Text>
         ) : null}
-        {successMessage ? (
-          <Text className="text-sm text-green-700">{successMessage}</Text>
-        ) : null}
-
         <Button
           className="w-full"
           loading={isSubmitting || isUploading}

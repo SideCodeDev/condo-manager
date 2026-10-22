@@ -10,7 +10,7 @@ import {
 import { useMutation, useQuery } from "convex/react";
 import type { GenericId } from "convex/values";
 import { useState, type FormEvent } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useImageUpload } from "../hooks/use-image-upload";
 
 export const Route = createFileRoute("/condo/new")({
@@ -23,7 +23,11 @@ function RouteComponent() {
     {},
   );
   const createCondo = useMutation(api.modules.condos.mutations.create);
+  const selectCondo = useMutation(
+    api.modules.userSettings.mutations.selectCondo,
+  );
   const createAsset = useMutation(api.modules.assets.mutations.createAsset);
+  const navigate = useNavigate();
   const { uploadImage, isUploading } = useImageUpload();
   const [name, setName] = useState("");
   const [street, setStreet] = useState("");
@@ -37,7 +41,6 @@ function RouteComponent() {
   >();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const selectedOrganizationId = organizationId ?? organizations?.[0]?.id;
 
@@ -46,7 +49,6 @@ function RouteComponent() {
 
     setIsSubmitting(true);
     setErrorMessage("");
-    setSuccessMessage("");
 
     try {
       const storageId = backdropImage
@@ -63,18 +65,17 @@ function RouteComponent() {
           })
         : undefined;
 
-      await createCondo({
+      const condoId = await createCondo({
         name,
         address: { street, postalCode, city },
         org: selectedOrganizationId,
         ...(assetId ? { backdropImage: assetId } : {}),
       });
-      setName("");
-      setStreet("");
-      setPostalCode("");
-      setCity("");
-      setBackdropImage(null);
-      setSuccessMessage("Condomínio criado com sucesso.");
+      await selectCondo({ condoId });
+      await navigate({
+        to: "/condo/$condoId",
+        params: { condoId },
+      });
     } catch {
       setErrorMessage("Não foi possível criar o condomínio. Tente novamente.");
     } finally {
@@ -176,12 +177,6 @@ function RouteComponent() {
             {errorMessage}
           </p>
         )}
-        {successMessage && (
-          <p className="text-sm text-green-700" role="status">
-            {successMessage}
-          </p>
-        )}
-
         <Button
           onPress={() => void submitForm()}
           loading={isSubmitting}

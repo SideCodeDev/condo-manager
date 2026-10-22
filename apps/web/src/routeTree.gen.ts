@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CondoCondoIdRouteImport } from './routes/condo.$condoId'
 import { Route as CondoNewRouteImport } from './routes/condo.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CondoCondoIdRoute = CondoCondoIdRouteImport.update({
+  id: '/condo/$condoId',
+  path: '/condo/$condoId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CondoNewRoute = CondoNewRouteImport.update({
@@ -25,27 +31,31 @@ const CondoNewRoute = CondoNewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/condo/$condoId': typeof CondoCondoIdRoute
   '/condo/new': typeof CondoNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/condo/$condoId': typeof CondoCondoIdRoute
   '/condo/new': typeof CondoNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/condo/$condoId': typeof CondoCondoIdRoute
   '/condo/new': typeof CondoNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/condo/new'
+  fullPaths: '/' | '/condo/$condoId' | '/condo/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/condo/new'
-  id: '__root__' | '/' | '/condo/new'
+  to: '/' | '/condo/$condoId' | '/condo/new'
+  id: '__root__' | '/' | '/condo/$condoId' | '/condo/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CondoCondoIdRoute: typeof CondoCondoIdRoute
   CondoNewRoute: typeof CondoNewRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/condo/$condoId': {
+      id: '/condo/$condoId'
+      path: '/condo/$condoId'
+      fullPath: '/condo/$condoId'
+      preLoaderRoute: typeof CondoCondoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/condo/new': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CondoCondoIdRoute: CondoCondoIdRoute,
   CondoNewRoute: CondoNewRoute,
 }
 export const routeTree = rootRouteImport
