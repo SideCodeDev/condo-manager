@@ -2,6 +2,7 @@ import { internal } from "../../_generated/api";
 import { internalMutation } from "../../_generated/server";
 import { v } from "convex/values";
 import { provisionPersonalOrganization } from "../../lib/functionReferences";
+import { log } from "../../lib/logging";
 
 export const upsertUser = internalMutation({
   args: {
@@ -66,6 +67,7 @@ export const upsertUser = internalMutation({
       return existing._id;
     }
     const id = await ctx.db.insert("users", { ...patch });
+    log.info("user.created", { userId: id });
 
     await ctx.runMutation(
       internal.modules.userSettings.mutations.createUserSettings,
@@ -106,6 +108,7 @@ export const deleteUserByAuthProviderId = internalMutation({
         .unique();
       if (settings) await ctx.db.delete("userSettings", settings._id);
       await ctx.db.delete("users", existing._id);
+      log.info("user.deleted", { userId: existing._id });
     }
   },
 });

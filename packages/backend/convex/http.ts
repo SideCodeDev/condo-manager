@@ -12,6 +12,7 @@ import type {
   MembershipInput,
   OrganizationInput,
 } from "./lib/functionReferences";
+import { log } from "./lib/logging";
 
 const http = httpRouter();
 
@@ -123,15 +124,18 @@ http.route({
   handler: httpAction(async (ctx, req) => {
     const signingSecret = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
     if (!signingSecret) {
-      console.error("Missing CLERK_WEBHOOK_SIGNING_SECRET");
+      log.error("clerk.webhook.misconfigured", {
+        reason: "missing_signing_secret",
+      });
       return new Response("Webhook is not configured", { status: 500 });
     }
 
+    let eventType: string | undefined;
     try {
       const evt = await verifyWebhook(req as unknown as Request, {
         signingSecret,
       });
-      console.log(`Processing Clerk webhook ${evt.type}`);
+      eventType = evt.type;
 
       switch (evt.type) {
         case "user.created":
@@ -246,10 +250,12 @@ http.route({
         }
       }
 
-      console.log(`Processed Clerk webhook ${evt.type}`);
       return new Response("Webhook received");
     } catch (error) {
-      console.error("Error processing Clerk webhook", error);
+      log.error("clerk.webhook.failed", {
+        eventType,
+        errorName: log.errorName(error),
+      });
       return new Response("Error processing webhook", { status: 500 });
     }
   }),

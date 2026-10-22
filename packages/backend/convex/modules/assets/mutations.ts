@@ -4,6 +4,7 @@ import type { Id } from "../../_generated/dataModel";
 import { internalMutation, mutation } from "../../_generated/server";
 import { getCurrentUser } from "../../authProvider/users/currentUser";
 import { ApplicationError } from "../../lib/errors";
+import { log } from "../../lib/logging";
 import { assetType, type AssetType } from "./schema";
 
 type CreateAssetArgs = {
@@ -104,7 +105,7 @@ export const createAssetInternal = internalMutation({
     const url = await ctx.storage.getUrl(args.storageId);
     if (!url) throw new ApplicationError("uploaded_file_not_found");
 
-    return await ctx.db.insert("assets", {
+    const assetId = await ctx.db.insert("assets", {
       storageId: args.storageId,
       url,
       type,
@@ -114,5 +115,12 @@ export const createAssetInternal = internalMutation({
       createdByUserId: args.createdByUserId,
       createdAt: Date.now(),
     });
+    log.info("asset.created", {
+      assetId,
+      type,
+      size: metadata.size,
+      mimeType,
+    });
+    return assetId;
   },
 });

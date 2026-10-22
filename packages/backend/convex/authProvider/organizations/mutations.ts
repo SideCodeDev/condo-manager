@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internalMutation, type MutationCtx } from "../../_generated/server";
+import { log } from "../../lib/logging";
 
 const organization = {
   clerkOrganizationId: v.string(),
@@ -91,7 +92,10 @@ export const deleteOrganization = internalMutation({
         q.eq("clerkOrganizationId", clerkOrganizationId),
       )
       .unique();
-    if (existing) await ctx.db.patch(existing._id, { deletedAt: Date.now() });
+    if (existing) {
+      await ctx.db.patch(existing._id, { deletedAt: Date.now() });
+      log.info("organization.deleted", { clerkOrganizationId });
+    }
   },
 });
 
@@ -112,6 +116,7 @@ export const deleteMembership = internalMutation({
     if (!existing) return;
 
     await ctx.db.patch(existing._id, { deletedAt: Date.now() });
+    log.info("organization.membership.deleted", { clerkMembershipId });
   },
 });
 

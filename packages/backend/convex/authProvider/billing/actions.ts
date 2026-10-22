@@ -10,6 +10,7 @@ import {
   syncBillingSubscription,
   type BillingItemInput,
 } from "../../lib/functionReferences";
+import { log } from "../../lib/logging";
 
 function normalizeItem(
   item: BillingSubscriptionItem,
@@ -67,6 +68,15 @@ async function refreshSubscription(
 
 export const refreshOrganizationSubscription = internalAction({
   args: { clerkOrganizationId: v.string() },
-  handler: (ctx, { clerkOrganizationId }) =>
-    refreshSubscription(ctx, clerkOrganizationId),
+  handler: async (ctx, { clerkOrganizationId }) => {
+    try {
+      return await refreshSubscription(ctx, clerkOrganizationId);
+    } catch (error) {
+      log.error("billing.subscription_refresh.failed", {
+        clerkOrganizationId,
+        errorName: log.errorName(error),
+      });
+      throw error;
+    }
+  },
 });

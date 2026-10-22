@@ -19,6 +19,7 @@ import type * as authProvider_users_mutations from "../authProvider/users/mutati
 import type * as http from "../http.js";
 import type * as lib_errors from "../lib/errors.js";
 import type * as lib_functionReferences from "../lib/functionReferences.js";
+import type * as lib_logging from "../lib/logging.js";
 import type * as modules_assets_mutations from "../modules/assets/mutations.js";
 import type * as modules_condoMember_mutations from "../modules/condoMember/mutations.js";
 import type * as modules_condoMember_queries from "../modules/condoMember/queries.js";
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "lib/errors": typeof lib_errors;
   "lib/functionReferences": typeof lib_functionReferences;
+  "lib/logging": typeof lib_logging;
   "modules/assets/mutations": typeof modules_assets_mutations;
   "modules/condoMember/mutations": typeof modules_condoMember_mutations;
   "modules/condoMember/queries": typeof modules_condoMember_queries;

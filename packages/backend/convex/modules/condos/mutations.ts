@@ -4,6 +4,7 @@ import { ApplicationError } from "../../lib/errors";
 import { getUserOrgs } from "../../lib/functionReferences";
 import { createCondoMembership } from "../condoMember/mutations";
 import { getCurrentUser } from "../../authProvider/users/currentUser";
+import { log } from "../../lib/logging";
 
 const condoAddress = v.object({
   street: v.string(),
@@ -59,6 +60,11 @@ export const create = mutation({
       userId: user._id,
       type: "admin",
     });
+    log.info("condo.created", {
+      condoId,
+      organizationId: selectedOrg.id,
+      createdByUserId: user._id,
+    });
     return condoId;
   },
 });
@@ -95,6 +101,17 @@ export const update = mutation({
         ? { backdropImage: args.backdropImage ?? undefined }
         : {}),
       updatedAt: Date.now(),
+    });
+    log.info("condo.updated", {
+      condoId: args.condoId,
+      updatedByUserId: user._id,
+      fields: [
+        args.name !== undefined ? "name" : undefined,
+        args.address !== undefined ? "address" : undefined,
+        args.backdropImage !== undefined ? "backdropImage" : undefined,
+      ]
+        .filter((field) => field !== undefined)
+        .join(","),
     });
     return null;
   },

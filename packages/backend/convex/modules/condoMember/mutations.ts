@@ -3,6 +3,7 @@ import type { Id } from "../../_generated/dataModel";
 import { mutation, type MutationCtx } from "../../_generated/server";
 import { ApplicationError } from "../../lib/errors";
 import { getCurrentUser } from "../../authProvider/users/currentUser";
+import { log } from "../../lib/logging";
 
 type MembershipInput = {
   condoId: Id<"condos">;
@@ -24,7 +25,14 @@ export async function createCondoMembership(
     throw new ApplicationError("condo_membership_exists");
   }
 
-  return await ctx.db.insert("condoMember", args);
+  const membershipId = await ctx.db.insert("condoMember", args);
+  log.info("condo.membership.created", {
+    membershipId,
+    condoId: args.condoId,
+    userId: args.userId,
+    type: args.type,
+  });
+  return membershipId;
 }
 
 export const create = mutation({
@@ -49,6 +57,13 @@ export const create = mutation({
       throw new ApplicationError("condo_membership_exists");
     }
 
-    return await ctx.db.insert("condoMember", args);
+    const membershipId = await ctx.db.insert("condoMember", args);
+    log.info("condo.membership.created", {
+      membershipId,
+      condoId: args.condoId,
+      userId: user._id,
+      type: args.type,
+    });
+    return membershipId;
   },
 });
