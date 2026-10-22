@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import type { Id } from "../../_generated/dataModel";
 import { mutation, type MutationCtx } from "../../_generated/server";
 import { ApplicationError } from "../../lib/errors";
-import { getCurrentUser } from "../users/currentUser";
+import { getCurrentUser } from "../../authProvider/users/currentUser";
 
 type MembershipInput = {
   condoId: Id<"condos">;

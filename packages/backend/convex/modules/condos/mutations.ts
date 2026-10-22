@@ -3,7 +3,7 @@ import { mutation } from "../../_generated/server";
 import { ApplicationError } from "../../lib/errors";
 import { getUserOrgs } from "../../lib/functionReferences";
 import { createCondoMembership } from "../condoMember/mutations";
-import { getCurrentUser } from "../users/currentUser";
+import { getCurrentUser } from "../../authProvider/users/currentUser";
 
 const condoAddress = v.object({
   street: v.string(),

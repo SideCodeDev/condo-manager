@@ -5,7 +5,6 @@ import {
   type DefaultFunctionArgs,
   type FunctionReference,
 } from "convex/server";
-import { internal } from "./_generated/api";
 import { httpAction } from "./_generated/server";
 import type {
   BillingItemInput,
@@ -27,26 +26,43 @@ type InternalAction<
 > = FunctionReference<"action", "internal", Args, Result>;
 
 const syncOrganization = makeFunctionReference(
-  "modules/organizations/mutations:syncOrganization",
+  "authProvider/organizations/mutations:syncOrganization",
 ) as unknown as InternalMutation<OrganizationInput, string>;
 const deleteOrganization = makeFunctionReference(
-  "modules/organizations/mutations:deleteOrganization",
+  "authProvider/organizations/mutations:deleteOrganization",
 ) as unknown as InternalMutation<{ clerkOrganizationId: string }>;
 const syncMembership = makeFunctionReference(
-  "modules/organizations/mutations:syncMembership",
+  "authProvider/organizations/mutations:syncMembership",
 ) as unknown as InternalMutation<MembershipInput>;
 const deleteMembership = makeFunctionReference(
-  "modules/organizations/mutations:deleteMembership",
+  "authProvider/organizations/mutations:deleteMembership",
 ) as unknown as InternalMutation<{ clerkMembershipId: string }>;
 const syncSubscription = makeFunctionReference(
-  "modules/billing/mutations:syncSubscription",
+  "authProvider/billing/mutations:syncSubscription",
 ) as unknown as InternalMutation<BillingSubscriptionInput>;
 const syncSubscriptionItem = makeFunctionReference(
-  "modules/billing/mutations:syncSubscriptionItem",
+  "authProvider/billing/mutations:syncSubscriptionItem",
 ) as unknown as InternalMutation<BillingItemInput>;
 const refreshOrganizationSubscription = makeFunctionReference(
-  "modules/billing/actions:refreshOrganizationSubscription",
+  "authProvider/billing/actions:refreshOrganizationSubscription",
 ) as unknown as InternalAction<{ clerkOrganizationId: string }>;
+const upsertUser = makeFunctionReference(
+  "authProvider/users/mutations:upsertUser",
+) as unknown as InternalMutation<
+  {
+    authProviderId: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    imageUrl?: string;
+    raw: string;
+    provisionOrganization?: boolean;
+  },
+  unknown
+>;
+const deleteUserByAuthProviderId = makeFunctionReference(
+  "authProvider/users/mutations:deleteUserByAuthProviderId",
+) as unknown as InternalMutation<{ authProviderId: string }>;
 
 function optionalNumber(value: number | null | undefined) {
   return value ?? undefined;
@@ -122,7 +138,7 @@ http.route({
         case "user.updated": {
           const email = evt.data.email_addresses[0]?.email_address;
           if (!email) throw new Error(`User ${evt.data.id} has no email`);
-          await ctx.runMutation(internal.modules.users.mutations.upsertUser, {
+          await ctx.runMutation(upsertUser, {
             authProviderId: evt.data.id,
             email,
             firstName: evt.data.first_name ?? undefined,
@@ -135,10 +151,9 @@ http.route({
         }
         case "user.deleted":
           if (evt.data.id) {
-            await ctx.runMutation(
-              internal.modules.users.mutations.deleteUserByAuthProviderId,
-              { authProviderId: evt.data.id },
-            );
+            await ctx.runMutation(deleteUserByAuthProviderId, {
+              authProviderId: evt.data.id,
+            });
           }
           break;
         case "organization.created":

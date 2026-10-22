@@ -2,7 +2,7 @@ import { makeFunctionReference, type FunctionReference } from "convex/server";
 import type { Id } from "../_generated/dataModel";
 
 export const getUserOrgs = makeFunctionReference(
-  "modules/organizations/queries:getUserOrgs",
+  "authProvider/organizations/queries:getUserOrgs",
 ) as unknown as FunctionReference<
   "query",
   "public",
@@ -31,7 +31,7 @@ export const getAllCondoMemberships = makeFunctionReference(
 >;
 
 export const provisionPersonalOrganization = makeFunctionReference(
-  "modules/organizations/actions:provisionPersonalOrganization",
+  "authProvider/organizations/actions:provisionPersonalOrganization",
 ) as unknown as FunctionReference<
   "action",
   "internal",
@@ -40,7 +40,7 @@ export const provisionPersonalOrganization = makeFunctionReference(
 >;
 
 export const getUserForProvisioning = makeFunctionReference(
-  "modules/organizations/queries:getUserForProvisioning",
+  "authProvider/organizations/queries:getUserForProvisioning",
 ) as unknown as FunctionReference<
   "query",
   "internal",
@@ -53,7 +53,7 @@ export const getUserForProvisioning = makeFunctionReference(
 >;
 
 export const startProvisioning = makeFunctionReference(
-  "modules/organizations/mutations:startProvisioning",
+  "authProvider/organizations/mutations:startProvisioning",
 ) as unknown as FunctionReference<
   "mutation",
   "internal",
@@ -62,7 +62,7 @@ export const startProvisioning = makeFunctionReference(
 >;
 
 export const completeProvisioning = makeFunctionReference(
-  "modules/organizations/mutations:completeProvisioning",
+  "authProvider/organizations/mutations:completeProvisioning",
 ) as unknown as FunctionReference<
   "mutation",
   "internal",
@@ -76,7 +76,7 @@ export const completeProvisioning = makeFunctionReference(
 >;
 
 export const failProvisioning = makeFunctionReference(
-  "modules/organizations/mutations:failProvisioning",
+  "authProvider/organizations/mutations:failProvisioning",
 ) as unknown as FunctionReference<
   "mutation",
   "internal",
@@ -85,7 +85,7 @@ export const failProvisioning = makeFunctionReference(
 >;
 
 export const syncBillingSubscription = makeFunctionReference(
-  "modules/billing/mutations:syncSubscription",
+  "authProvider/billing/mutations:syncSubscription",
 ) as unknown as FunctionReference<
   "mutation",
   "internal",
