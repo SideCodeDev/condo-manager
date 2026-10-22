@@ -30,8 +30,7 @@ export type FileUploadProps = FileUploadBaseProps &
   );
 
 export type FileUploadFile =
-  | File
-  | (Omit<DocumentPicker.DocumentPickerAsset, "size"> & { size: number });
+  File | (Omit<DocumentPicker.DocumentPickerAsset, "size"> & { size: number });
 
 function FileUploadContent({
   addLabel,
@@ -54,6 +53,7 @@ function FileUploadContent({
         <Upload className="text-neutral-600" size={40} />
         <Text className="font-p-2 text-center text-neutral-600">
           {types.join(", ")}
+          {types.length > 0 && maxFileSizeMB ? " " : null}
           {maxFileSizeMB
             ? (sizeLabel?.(formatFileSize(maxFileSizeMB)) ??
               ` up to ${formatFileSize(maxFileSizeMB)}`)
@@ -157,7 +157,9 @@ function FileUpload({
             setIsDragging(false);
           }
         }}
-        onDragOver={(event: DragEvent<HTMLDivElement>) => event.preventDefault()}
+        onDragOver={(event: DragEvent<HTMLDivElement>) =>
+          event.preventDefault()
+        }
         onDrop={(event: DragEvent<HTMLDivElement>) => {
           event.preventDefault();
           setIsDragging(false);
