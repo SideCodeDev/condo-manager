@@ -70,13 +70,18 @@ export const update = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const userOrgs = await ctx.runQuery(getUserOrgs, {});
-
+    const { user } = await getCurrentUser(ctx);
     const condo = await ctx.db.get("condos", args.condoId);
     if (!condo) throw new ApplicationError("condo_not_found");
 
-    const condoOrg = userOrgs.find((org) => org.id === condo.organizationId);
-    if (!condoOrg) throw new ApplicationError("unauthorized");
+    const condoMembership = await ctx.db
+      .query("condoMember")
+      .withIndex("by_condo_and_user", (e) =>
+        e.eq("condoId", args.condoId).eq("userId", user._id),
+      )
+      .first();
+
+    if (!condoMembership) throw new ApplicationError("unauthorized");
 
     if (!args.name && !args.address)
       throw new ApplicationError("cannot_update_condo");
