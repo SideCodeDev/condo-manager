@@ -1,5 +1,5 @@
 import * as SplashScreen from "expo-splash-screen";
-import { DarkTheme, DefaultTheme, Slot, ThemeProvider } from "expo-router";
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import {
@@ -79,7 +79,7 @@ export default function RootLayout() {
               onStartShouldSetResponderCapture={blurTextInputOnOutsidePress}
             >
               <Show when="signed-in">
-                <Slot />
+                <Stack screenOptions={{ headerShown: false }} />
               </Show>
               <Show when="signed-out">
                 <AuthView isDismissible={false} mode="signInOrUp" />

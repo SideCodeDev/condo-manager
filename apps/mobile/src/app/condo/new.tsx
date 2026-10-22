@@ -104,7 +104,6 @@ export default function NewCondoScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
-        className="flex-1"
         contentContainerClassName="w-full grow gap-5 p-6"
         keyboardShouldPersistTaps="handled"
       >
