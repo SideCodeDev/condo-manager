@@ -9,6 +9,7 @@ export const condos = defineTable({
     postalCode: v.string(),
     city: v.string(),
   }),
+  backdropImage: v.optional(v.id("assets")),
   createdAt: v.number(),
   updatedAt: v.number(),
 }).index("by_organization_id", ["organizationId"]);

@@ -98,7 +98,7 @@ function FileUpload({
   const openPicker = () => inputRef.current?.click();
   const openNativePicker = async () => {
     const result = await DocumentPicker.getDocumentAsync({
-      copyToCacheDirectory: false,
+      copyToCacheDirectory: true,
       multiple: type === "multiple",
       type: validTypes === "*" ? "*/*" : validTypes,
     });

@@ -9,6 +9,25 @@ export const listMine = query({
       memberships.map((membership) => ctx.db.get("condos", membership.condoId)),
     );
 
-    return condos.filter((condo) => !!condo);
+    return Promise.all(
+      condos
+        .filter((condo) => condo !== null)
+        .map(async (condo) => {
+          const backdropImageAsset = condo.backdropImage
+            ? await ctx.db.get("assets", condo.backdropImage)
+            : null;
+          return {
+            ...condo,
+            backdropImageAsset: backdropImageAsset
+              ? {
+                  _id: backdropImageAsset._id,
+                  url: backdropImageAsset.url,
+                  type: backdropImageAsset.type,
+                  mimeType: backdropImageAsset.mimeType,
+                }
+              : null,
+          };
+        }),
+    );
   },
 });

@@ -20,4 +20,7 @@ export type ErrorCode =
   | "cannot_create_condo"
   | "cannot_update_condo"
   | "condo_not_found"
-  | "condo_membership_exists";
+  | "condo_membership_exists"
+  | "uploaded_file_not_found"
+  | "asset_type_mismatch"
+  | "invalid_mime_type";
