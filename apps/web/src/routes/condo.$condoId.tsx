@@ -1,5 +1,5 @@
 import { api } from "@condo-manager/backend";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery as useQueryWithStatus } from "convex-helpers/react";
 import type { GenericId } from "convex/values";
 import { useEffect, useRef } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -11,36 +11,50 @@ export const Route = createFileRoute("/condo/$condoId")({
 function CondoPage() {
   const { condoId } = Route.useParams();
   // Convex validates this route value against the `condos` ID type on the server.
-  const condo = useQuery(api.modules.condos.queries.getById, {
+  const condoQuery = useQueryWithStatus(api.modules.condos.queries.getById, {
     condoId: condoId as GenericId<"condos">,
   });
-  const clearSelectedCondo = useMutation(
-    api.modules.userSettings.mutations.clearSelectedCondo,
-  );
   const navigate = useNavigate();
   const isReturningHome = useRef(false);
 
   useEffect(() => {
-    if (condo !== null || isReturningHome.current) return;
+    if (
+      !condoQuery.isSuccess ||
+      condoQuery.data !== null ||
+      isReturningHome.current
+    )
+      return;
     isReturningHome.current = true;
-    void clearSelectedCondo()
-      .catch(() => null)
-      .finally(() => {
-        void navigate({ to: "/", search: { showList: false }, replace: true });
-      });
-  }, [clearSelectedCondo, condo, navigate]);
+    void navigate({ to: "/", search: { showList: true }, replace: true });
+  }, [condoQuery, navigate]);
 
-  if (condo === undefined || condo === null) {
+  if (condoQuery.isPending) {
     return (
       <main className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center px-6 py-10">
-        <p className="text-neutral-600">
-          {condo === undefined
-            ? "A carregar o condomínio…"
-            : "A regressar aos seus condomínios…"}
+        <p className="text-neutral-600">A carregar o condomínio…</p>
+      </main>
+    );
+  }
+
+  if (condoQuery.isError) {
+    return (
+      <main className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center px-6 py-10">
+        <p className="text-red-700" role="alert">
+          Não foi possível carregar o condomínio. {condoQuery.error.message}
         </p>
       </main>
     );
   }
+
+  if (condoQuery.data === null) {
+    return (
+      <main className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center px-6 py-10">
+        <p className="text-neutral-600">A regressar aos seus condomínios…</p>
+      </main>
+    );
+  }
+
+  const condo = condoQuery.data;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-8 px-6 py-10">

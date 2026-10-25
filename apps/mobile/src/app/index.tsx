@@ -1,7 +1,8 @@
 import { api } from "@condo-manager/backend";
 import { Button } from "@condo-manager/ui";
 import { useClerk } from "@clerk/expo";
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { useQuery as useQueryWithStatus } from "convex-helpers/react";
+import { useConvexAuth, useMutation } from "convex/react";
 import type { GenericId } from "convex/values";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -19,21 +20,14 @@ export default function HomeScreen() {
   const { showList } = useLocalSearchParams<{ showList?: string }>();
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const router = useRouter();
-  const condos = useQuery(
+  const condosQuery = useQueryWithStatus(
     api.modules.condos.queries.listMine,
     isAuthenticated ? {} : "skip",
   );
-  const settings = useQuery(
-    api.modules.userSettings.mutations.getMine,
-    isAuthenticated ? {} : "skip",
-  );
+  const condos = condosQuery.isSuccess ? condosQuery.data : [];
   const selectCondo = useMutation(
     api.modules.userSettings.mutations.selectCondo,
   );
-  const clearSelectedCondo = useMutation(
-    api.modules.userSettings.mutations.clearSelectedCondo,
-  );
-  const clearingCondoId = useRef<string | null>(null);
   const autoOpeningCondoId = useRef<string | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSelecting, setIsSelecting] = useState(false);
@@ -47,66 +41,13 @@ export default function HomeScreen() {
   );
 
   useEffect(() => {
-    if (!condos || !settings) return;
-
-    if (showList === "true") {
-      if (
-        settings.selectedCondoId &&
-        !condos.some((condo) => condo._id === settings.selectedCondoId) &&
-        clearingCondoId.current !== settings.selectedCondoId
-      ) {
-        clearingCondoId.current = settings.selectedCondoId;
-        void clearSelectedCondo().catch(() => {
-          setErrorMessage("Não foi possível atualizar a sua seleção guardada.");
-        });
-      }
+    if (!condosQuery.isSuccess || showList === "true") return;
+    const defaultCondo = condos.find((condo) => condo.isDefault);
+    if (!defaultCondo || autoOpeningCondoId.current === defaultCondo._id)
       return;
-    }
-
-    if (condos.length === 1) {
-      const [onlyCondo] = condos;
-      if (settings.selectedCondoId === onlyCondo._id) {
-        openCondoRoute(onlyCondo._id);
-      } else if (autoOpeningCondoId.current !== onlyCondo._id) {
-        autoOpeningCondoId.current = onlyCondo._id;
-        setErrorMessage("");
-        void selectCondo({ condoId: onlyCondo._id })
-          .then(() => openCondoRoute(onlyCondo._id))
-          .catch(() => {
-            setErrorMessage(
-              "Não foi possível abrir o condomínio. Tente novamente.",
-            );
-          });
-      }
-      return;
-    }
-
-    if (!settings.selectedCondoId) {
-      clearingCondoId.current = null;
-      return;
-    }
-    const selectedCondo = condos.find(
-      (condo) => condo._id === settings.selectedCondoId,
-    );
-    if (selectedCondo) {
-      openCondoRoute(selectedCondo._id);
-      return;
-    }
-    if (clearingCondoId.current !== settings.selectedCondoId) {
-      clearingCondoId.current = settings.selectedCondoId;
-      void clearSelectedCondo().catch(() => {
-        setErrorMessage("Não foi possível atualizar a sua seleção guardada.");
-      });
-    }
-  }, [
-    clearSelectedCondo,
-    condos,
-    openCondoRoute,
-    router,
-    selectCondo,
-    settings,
-    showList,
-  ]);
+    autoOpeningCondoId.current = defaultCondo._id;
+    openCondoRoute(defaultCondo._id);
+  }, [condos, condosQuery.isSuccess, openCondoRoute, showList]);
 
   async function openCondo(condoId: GenericId<"condos">) {
     setIsSelecting(true);
@@ -135,7 +76,8 @@ export default function HomeScreen() {
     );
   }
 
-  const isLoading = condos === undefined || settings === undefined;
+  const isLoading = condosQuery.isPending;
+  const queryError = condosQuery.isError ? condosQuery.error : undefined;
 
   return (
     <SafeAreaView className="flex-1 bg-neutral-50">
@@ -174,7 +116,15 @@ export default function HomeScreen() {
             </Text>
           ) : null}
 
-          {isLoading ? (
+          {queryError ? (
+            <Text
+              accessibilityRole="alert"
+              className="rounded-2xl bg-red-50 p-6 text-red-700"
+            >
+              Não foi possível carregar os seus condomínios.{" "}
+              {queryError.message}
+            </Text>
+          ) : isLoading ? (
             <View className="rounded-2xl border border-neutral-200 bg-white p-6">
               <Text className="text-neutral-600">
                 A carregar os seus condomínios…

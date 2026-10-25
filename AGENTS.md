@@ -49,6 +49,11 @@ in `.github/instructions/`.
   `ConvexProviderWithClerk`. Convex functions must derive identity from the
   authenticated context, typically through
   `packages/backend/convex/authProvider/users/currentUser.ts`.
+- For client-side reactive queries in web and mobile, use `useQuery` from
+  `convex-helpers/react` so screens handle pending, success, and error states
+  explicitly. Use `makeUseQueryWithStatus(useQueries)` when a custom query-hook
+  implementation is needed. Keep using hooks from `convex/react` for client/auth
+  primitives and mutations when `convex-helpers` has no equivalent.
 - The mobile and web condo-selection flow currently stores
   `userSettings.selectedCondoId`. The current code does not implement an
   `OrganizationGate` or `selectedClerkOrganizationId`; organization and condo

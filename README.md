@@ -64,7 +64,9 @@ Copy the relevant `.env.example` to `.env` in each app and set its values:
 - `apps/website`: `VITE_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
 - `apps/mobile`: `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`, `EXPO_PUBLIC_CONVEX_URL`
 - Convex deployment: `CLERK_JWT_ISSUER_DOMAIN`, `CLERK_SECRET_KEY`, and
-  `CLERK_WEBHOOK_SIGNING_SECRET`
+  `CLERK_WEBHOOK_SIGNING_SECRET`; optionally `SELECTED_CONDO_DEFAULT_HOURS`
+  to configure how long a selected condo remains the default (24 hours by
+  default)
 
 Only publishable keys and public Convex URLs belong in client app environment
 files. Never expose or commit `CLERK_SECRET_KEY` or

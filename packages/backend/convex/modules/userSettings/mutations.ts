@@ -3,6 +3,17 @@ import { internalMutation, mutation, query } from "../../_generated/server";
 import { getCurrentUser } from "../../authProvider/users/currentUser";
 import { ApplicationError } from "../../lib/errors";
 
+const DEFAULT_SELECTED_CONDO_HOURS = 24;
+
+function getSelectedCondoExpiresAt(now: number) {
+  const configuredHours = Number(process.env.SELECTED_CONDO_DEFAULT_HOURS);
+  const hours =
+    Number.isFinite(configuredHours) && configuredHours > 0
+      ? configuredHours
+      : DEFAULT_SELECTED_CONDO_HOURS;
+  return now + hours * 60 * 60 * 1000;
+}
+
 export const createUserSettings = internalMutation({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
@@ -47,14 +58,17 @@ export const selectCondo = mutation({
       .query("userSettings")
       .withIndex("by_user_id", (q) => q.eq("userId", user._id))
       .unique();
+    const selectedCondoExpiresAt = getSelectedCondoExpiresAt(Date.now());
     if (settings) {
       await ctx.db.patch("userSettings", settings._id, {
         selectedCondoId: condoId,
+        selectedCondoExpiresAt,
       });
     } else {
       await ctx.db.insert("userSettings", {
         userId: user._id,
         selectedCondoId: condoId,
+        selectedCondoExpiresAt,
       });
     }
     return null;

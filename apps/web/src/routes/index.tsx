@@ -1,9 +1,10 @@
 import { PricingTable, SignOutButton } from "@clerk/react";
 import { api } from "@condo-manager/backend";
 import { Button } from "@condo-manager/ui";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery as useQueryWithStatus } from "convex-helpers/react";
+import { useMutation } from "convex/react";
 import type { GenericId } from "convex/values";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -15,18 +16,17 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { showList } = Route.useSearch();
-  const condos = useQuery(api.modules.condos.queries.listMine);
-  const settings = useQuery(api.modules.userSettings.mutations.getMine);
+  const condosQuery = useQueryWithStatus(api.modules.condos.queries.listMine);
+  const condos = useMemo(
+    () => (condosQuery.isSuccess ? condosQuery.data : []),
+    [condosQuery.data, condosQuery.isSuccess],
+  );
   const selectCondo = useMutation(
     api.modules.userSettings.mutations.selectCondo,
-  );
-  const clearSelectedCondo = useMutation(
-    api.modules.userSettings.mutations.clearSelectedCondo,
   );
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const [isSelecting, setIsSelecting] = useState(false);
-  const clearingCondoId = useRef<string | null>(null);
   const autoOpeningCondoId = useRef<string | null>(null);
 
   const openCondoRoute = useCallback(
@@ -42,68 +42,13 @@ function HomePage() {
   );
 
   useEffect(() => {
-    if (!condos || !settings) return;
-
-    if (showList) {
-      if (
-        settings.selectedCondoId &&
-        !condos.some((condo) => condo._id === settings.selectedCondoId) &&
-        clearingCondoId.current !== settings.selectedCondoId
-      ) {
-        clearingCondoId.current = settings.selectedCondoId;
-        void clearSelectedCondo().catch(() => {
-          setErrorMessage("Não foi possível atualizar a sua seleção guardada.");
-        });
-      }
+    if (!condosQuery.isSuccess || showList) return;
+    const defaultCondo = condos.find((condo) => condo.isDefault);
+    if (!defaultCondo || autoOpeningCondoId.current === defaultCondo._id)
       return;
-    }
-
-    if (condos.length === 1) {
-      const [onlyCondo] = condos;
-      if (settings.selectedCondoId === onlyCondo._id) {
-        void openCondoRoute(onlyCondo._id);
-      } else if (autoOpeningCondoId.current !== onlyCondo._id) {
-        autoOpeningCondoId.current = onlyCondo._id;
-        setErrorMessage("");
-        void selectCondo({ condoId: onlyCondo._id })
-          .then(() => openCondoRoute(onlyCondo._id))
-          .catch(() => {
-            setErrorMessage(
-              "Não foi possível abrir o condomínio. Tente novamente.",
-            );
-          });
-      }
-      return;
-    }
-
-    if (!settings.selectedCondoId) {
-      clearingCondoId.current = null;
-      return;
-    }
-
-    const selectedCondo = condos.find(
-      (condo) => condo._id === settings.selectedCondoId,
-    );
-    if (selectedCondo) {
-      void openCondoRoute(selectedCondo._id);
-      return;
-    }
-
-    if (clearingCondoId.current !== settings.selectedCondoId) {
-      clearingCondoId.current = settings.selectedCondoId;
-      void clearSelectedCondo().catch(() => {
-        setErrorMessage("Não foi possível atualizar a sua seleção guardada.");
-      });
-    }
-  }, [
-    clearSelectedCondo,
-    condos,
-    navigate,
-    openCondoRoute,
-    selectCondo,
-    settings,
-    showList,
-  ]);
+    autoOpeningCondoId.current = defaultCondo._id;
+    void openCondoRoute(defaultCondo._id);
+  }, [condos, condosQuery.isSuccess, openCondoRoute, showList]);
 
   async function openCondo(condoId: GenericId<"condos">) {
     setIsSelecting(true);
@@ -120,7 +65,8 @@ function HomePage() {
     }
   }
 
-  const isLoading = condos === undefined || settings === undefined;
+  const isLoading = condosQuery.isPending;
+  const queryError = condosQuery.isError ? condosQuery.error : undefined;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 py-10">
@@ -155,7 +101,11 @@ function HomePage() {
           </p>
         ) : null}
 
-        {isLoading ? (
+        {queryError ? (
+          <p className="rounded-2xl bg-red-50 p-6 text-red-700" role="alert">
+            Não foi possível carregar os seus condomínios. {queryError.message}
+          </p>
+        ) : isLoading ? (
           <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-neutral-600">
             A carregar os seus condomínios…
           </div>

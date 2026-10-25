@@ -6,7 +6,8 @@ import {
   Input,
   type FileUploadFile,
 } from "@condo-manager/ui";
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { useQuery as useQueryWithStatus } from "convex-helpers/react";
+import { useConvexAuth, useMutation } from "convex/react";
 import type { GenericId } from "convex/values";
 import type { ErrorBoundaryProps } from "expo-router";
 import { useRouter } from "expo-router";
@@ -17,10 +18,13 @@ import { useImageUpload } from "../../hooks/use-image-upload";
 
 export default function NewCondoScreen() {
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
-  const organizations = useQuery(
+  const organizationsQuery = useQueryWithStatus(
     api.authProvider.organizations.queries.getUserOrgs,
     isAuthenticated ? {} : "skip",
   );
+  const organizations = organizationsQuery.isSuccess
+    ? organizationsQuery.data
+    : [];
   const createCondo = useMutation(api.modules.condos.mutations.create);
   const selectCondo = useMutation(
     api.modules.userSettings.mutations.selectCondo,
@@ -166,6 +170,13 @@ export default function NewCondoScreen() {
           />
         </View>
 
+        {organizationsQuery.isError ? (
+          <Text accessibilityRole="alert" className="text-sm text-red-700">
+            Não foi possível carregar as organizações.{" "}
+            {organizationsQuery.error.message}
+          </Text>
+        ) : null}
+
         {organizations && organizations.length > 0 && selectedOrganizationId ? (
           <Dropdown
             className="w-full"
@@ -185,15 +196,15 @@ export default function NewCondoScreen() {
           <Text className="text-sm text-neutral-600">
             Não foi possível validar a sessão. Tente novamente.
           </Text>
-        ) : organizations?.length === 0 ? (
+        ) : organizationsQuery.isSuccess && organizations.length === 0 ? (
           <Text className="text-sm text-neutral-600">
             Não encontrámos uma organização associada à sua conta.
           </Text>
-        ) : (
+        ) : organizationsQuery.isPending ? (
           <Text className="text-sm text-neutral-600">
             A carregar organizações…
           </Text>
-        )}
+        ) : null}
 
         {errorMessage ? (
           <Text accessibilityRole="alert" className="text-sm text-red">

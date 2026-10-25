@@ -28,8 +28,11 @@ catalogs:
       specifier: ^6.0.4
       version: 6.1.0
     convex:
-      specifier: ^1.45.0
-      version: 1.45.0
+      specifier: ~1.46.0
+      version: 1.46.0
+    convex-helpers:
+      specifier: ^0.1.128
+      version: 0.1.129
     eslint:
       specifier: ^10.0.0
       version: 10.9.0
@@ -121,7 +124,10 @@ importers:
         version: 57.0.22(@babel/core@7.29.7(supports-color@8.1.1))(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(expo@57.0.27)(react-dom@19.2.8(react@19.2.8))(react-native-worklets@0.10.1(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(react-native@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.18)(react@19.2.8)(supports-color@8.1.1))(react@19.2.8)(supports-color@8.1.1))(react-native@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.18)(react@19.2.8)(supports-color@8.1.1))(react@19.2.8)
       convex:
         specifier: 'catalog:'
-        version: 1.45.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
+        version: 1.46.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
+      convex-helpers:
+        specifier: 'catalog:'
+        version: 0.1.129(@standard-schema/spec@1.1.0)(convex@1.46.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8))(react@19.2.8)(typescript@6.0.3)(zod@4.6.5)
       expo:
         specifier: ~57.0.27
         version: 57.0.27(@babel/core@7.29.7(supports-color@8.1.1))(@expo/dom-webview@57.0.1)(@expo/metro-runtime@57.0.16)(expo-router@57.0.25)(react-dom@19.2.8(react@19.2.8))(react-native-web@0.21.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-native-worklets@0.10.1(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(react-native@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.18)(react@19.2.8)(supports-color@8.1.1))(react@19.2.8)(supports-color@8.1.1))(react-native@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.18)(react@19.2.8)(supports-color@8.1.1))(react@19.2.8)(supports-color@8.1.1)(typescript@6.0.3)
@@ -230,7 +236,10 @@ importers:
         version: 1.170.41(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       convex:
         specifier: 'catalog:'
-        version: 1.45.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
+        version: 1.46.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
+      convex-helpers:
+        specifier: 'catalog:'
+        version: 0.1.129(@standard-schema/spec@1.1.0)(convex@1.46.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8))(react@19.2.8)(typescript@6.0.3)(zod@4.6.5)
       lucide-react:
         specifier: 'catalog:'
         version: 0.563.0(react@19.2.8)
@@ -406,7 +415,7 @@ importers:
         version: 3.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       convex:
         specifier: 'catalog:'
-        version: 1.45.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
+        version: 1.46.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@condo-manager/typescript-config':
         specifier: workspace:*
@@ -3814,8 +3823,30 @@ packages:
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
-  convex@1.45.0:
-    resolution: {integrity: sha512-AV3B56Ptu/14d76g3urBJ50dwpiZa6uJaLT84OWox5aCwZIJiuAamdjv3lLHDzs8vv5kC31anEZohhUe3qJ2bA==}
+  convex-helpers@0.1.129:
+    resolution: {integrity: sha512-8QJLbym0fKsf3tYcF2ZTX37NeYt/BkOFBjBwB2LR1fXUAajeYaTLV11gi/0IVOU/jCdH2j/VseHhHid1qQcqFw==}
+    hasBin: true
+    peerDependencies:
+      '@standard-schema/spec': ^1.0.0
+      convex: ^1.46.0
+      hono: ^4.0.5
+      react: ^17.0.2 || ^18.0.0 || ^19.0.0
+      typescript: ^5.5 || ^6.0.0 || ^7.0.0
+      zod: ^3.25.0 || ^4.0.0
+    peerDependenciesMeta:
+      '@standard-schema/spec':
+        optional: true
+      hono:
+        optional: true
+      react:
+        optional: true
+      typescript:
+        optional: true
+      zod:
+        optional: true
+
+  convex@1.46.0:
+    resolution: {integrity: sha512-dhBwDQTZDOhi5SUGAX17EWNehCdNq6/UFrSL0eLZuGfMkdsQbCVWVRZCzbZ5CF+/pgvoGxtApbEoTSipqL4JTw==}
     engines: {node: '>=20.0.0', npm: '>=7.0.0'}
     hasBin: true
     peerDependencies:
@@ -10263,7 +10294,16 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  convex@1.45.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8):
+  convex-helpers@0.1.129(@standard-schema/spec@1.1.0)(convex@1.46.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8))(react@19.2.8)(typescript@6.0.3)(zod@4.6.5):
+    dependencies:
+      convex: 1.46.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
+    optionalDependencies:
+      '@standard-schema/spec': 1.1.0
+      react: 19.2.8
+      typescript: 6.0.3
+      zod: 4.6.5
+
+  convex@1.46.0(@clerk/react@6.17.8(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8):
     dependencies:
       esbuild: 0.27.0
       prettier: 3.9.6

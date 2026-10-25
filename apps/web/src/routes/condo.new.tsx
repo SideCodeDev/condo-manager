@@ -7,7 +7,8 @@ import {
   Input,
   type FileUploadFile,
 } from "@condo-manager/ui";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery as useQueryWithStatus } from "convex-helpers/react";
+import { useMutation } from "convex/react";
 import type { GenericId } from "convex/values";
 import { useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -18,10 +19,13 @@ export const Route = createFileRoute("/condo/new")({
 });
 
 function RouteComponent() {
-  const organizations = useQuery(
+  const organizationsQuery = useQueryWithStatus(
     api.authProvider.organizations.queries.getUserOrgs,
     {},
   );
+  const organizations = organizationsQuery.isSuccess
+    ? organizationsQuery.data
+    : [];
   const createCondo = useMutation(api.modules.condos.mutations.create);
   const selectCondo = useMutation(
     api.modules.userSettings.mutations.selectCondo,
@@ -151,6 +155,13 @@ function RouteComponent() {
           />
         </section>
 
+        {organizationsQuery.isError ? (
+          <p className="text-sm text-red-700" role="alert">
+            Não foi possível carregar as organizações.{" "}
+            {organizationsQuery.error.message}
+          </p>
+        ) : null}
+
         {organizations &&
           organizations.length > 0 &&
           selectedOrganizationId && (
@@ -167,7 +178,7 @@ function RouteComponent() {
             />
           )}
 
-        {organizations?.length === 0 && (
+        {organizationsQuery.isSuccess && organizations.length === 0 && (
           <p className="text-sm text-neutral-600">
             Não encontrámos uma organização associada à sua conta.
           </p>

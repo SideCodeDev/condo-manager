@@ -13,7 +13,8 @@ catalog:
   "@types/react-dom": ^19.0.0
   "@rolldown/plugin-babel": ^0.2.3
   "@vitejs/plugin-react": ^6.0.4
-  convex: ^1.45.0
+  convex: ~1.46.0
+  convex-helpers: ^0.1.128
   expo-document-picker: ~14.0.8
   eslint: ^10.0.0
   lucide-react: ^0.563.0

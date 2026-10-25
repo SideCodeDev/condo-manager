@@ -1,5 +1,5 @@
 import { api } from "@condo-manager/backend";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery as useQueryWithStatus } from "convex-helpers/react";
 import type { GenericId } from "convex/values";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
@@ -11,34 +11,54 @@ export default function CondoScreen() {
     condoId: GenericId<"condos">;
   }>();
   const router = useRouter();
-  const condo = useQuery(
+  const condoQuery = useQueryWithStatus(
     api.modules.condos.queries.getById,
     condoId ? { condoId } : "skip",
-  );
-  const clearSelectedCondo = useMutation(
-    api.modules.userSettings.mutations.clearSelectedCondo,
   );
   const isReturningHome = useRef(false);
 
   useEffect(() => {
-    if (condo !== null || isReturningHome.current) return;
+    if (
+      !condoQuery.isSuccess ||
+      condoQuery.data !== null ||
+      isReturningHome.current
+    )
+      return;
     isReturningHome.current = true;
-    void clearSelectedCondo()
-      .catch(() => null)
-      .finally(() => router.replace("/"));
-  }, [clearSelectedCondo, condo, router]);
+    router.replace({ pathname: "/", params: { showList: "true" } });
+  }, [condoQuery, router]);
 
-  if (condo === undefined || condo === null) {
+  if (condoQuery.isPending) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-neutral-50 p-6">
         <Text className="text-center text-neutral-600">
-          {condo === undefined
-            ? "A carregar o condomínio…"
-            : "A regressar aos seus condomínios…"}
+          A carregar o condomínio…
         </Text>
       </SafeAreaView>
     );
   }
+
+  if (condoQuery.isError) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center bg-neutral-50 p-6">
+        <Text accessibilityRole="alert" className="text-center text-red-700">
+          Não foi possível carregar o condomínio. {condoQuery.error.message}
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (condoQuery.data === null) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center bg-neutral-50 p-6">
+        <Text className="text-center text-neutral-600">
+          A regressar aos seus condomínios…
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
+  const condo = condoQuery.data;
 
   return (
     <SafeAreaView className="flex-1 bg-neutral-50">

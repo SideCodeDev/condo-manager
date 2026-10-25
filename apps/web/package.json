@@ -13,6 +13,7 @@
     "@condo-manager/ui": "workspace:*",
     "@tanstack/react-router": "1.170.41",
     "convex": "catalog:",
+    "convex-helpers": "catalog:",
     "lucide-react": "catalog:",
     "lucide-react-native": "catalog:",
     "nativewind": "catalog:",
