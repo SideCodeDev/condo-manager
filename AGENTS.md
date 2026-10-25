@@ -1,169 +1,248 @@
 # Condo Manager — Agent Guide
 
-This is the repository's only `AGENTS.md` guide. It applies to the whole
-repository, including every app and package.
+This guide applies to the entire repository. Read it before changing code or
+configuration. `CLAUDE.md` includes this file; app-specific Copilot guidance is
+in `.github/instructions/`.
 
-## Scope
+## Working in this repository
 
-- Preserve unrelated user changes. Do not rewrite or remove existing work merely
-  to make a task easier.
-- Use `pnpm` exclusively. The pinned package manager is declared in the root
-  `package.json`.
+- Preserve unrelated user changes. Inspect `git status` and the relevant diff
+  before editing; do not reset, overwrite, or clean up work outside the request.
+- Use `pnpm` exclusively from the repository root. The package manager is pinned
+  to `pnpm@11.18.0` in the root `package.json`.
+- Keep changes focused. Follow existing patterns and shared configs instead of
+  introducing parallel abstractions or duplicated configuration.
+- Do not add or run tests unless the user asks you to test or verify the change.
+  When asked to verify, run the narrowest relevant checks and report what ran.
+- Consult official documentation for framework/library APIs when changing their
+  use. For Expo or React Native APIs, use documentation matching the Expo SDK
+  version in `apps/mobile/package.json`.
 
 ## Repository map
 
-- `apps/web`: the main React 19 + Vite application. Authentication,
-  organizations, and billing come from Clerk; it calls the shared Convex backend.
-- `apps/mobile`: the native-only Expo / React Native iOS and Android
-  application, which can connect to the same Convex backend. It uses Expo
-  Router, with route files in `src/app/` and providers in `_layout.tsx`.
-- `apps/website`: TanStack Start sales/marketing application.
-- `packages/backend`: the Convex project, including schema, functions, and HTTP
-  routes. Its Convex source lives in `packages/backend/convex/`.
-- `packages/ui`: cross-platform React Native UI, fonts, helpers, styles, and
-  Storybook, consumed by the Vite web apps and the Expo app. Keep it independent
-  of app routing, authentication, billing, and backend concerns.
-- `packages/eslint-config`: shared ESLint base plus React/Vite and TanStack
-  presets.
-- `packages/prettier-config`: shared Prettier configuration.
-- `packages/typescript-config`: shared TypeScript configurations.
-- `pnpm-workspace.yaml`: workspace membership and the centralized dependency
-  catalog. Put versions shared by multiple packages in the catalog.
+- `apps/web`: authenticated React 19 + Vite application. Uses TanStack Router,
+  Clerk, Convex, and `@condo-manager/ui`.
+- `apps/website`: sales and marketing application built with TanStack Start and
+  Clerk. It is separate from the authenticated product app.
+- `apps/mobile`: native-only iOS and Android application built with Expo SDK 57,
+  Expo Router, Clerk, Convex, and NativeWind. Mobile web is not a target.
+- `packages/backend`: Convex schema, functions, HTTP routes, Clerk projections,
+  and application data. Source is under `packages/backend/convex/`.
+- `packages/ui`: cross-platform React Native UI components, styles, Tailwind
+  tokens, fonts, hooks, utilities, and Storybook.
+- `packages/eslint-config`, `packages/prettier-config`, and
+  `packages/typescript-config`: shared repository tooling configuration.
+- `pnpm-workspace.yaml`: workspace membership, third-party dependency catalog,
+  and pnpm policy. Root `CLAUDE.md` and app/package READMEs provide setup
+  context; keep them accurate when architecture or setup changes.
 
-## Architecture rules
+## Architecture and data flow
 
 - Clerk is the source of truth for identities, organizations, memberships, and
-  billing subscriptions.
-- Convex stores the application data and local projections needed by the app.
-  Webhook handlers must be idempotent because delivery may be repeated or arrive
-  out of order.
-- The active organization preference is stored in Convex as
-  `userSettings.selectedClerkOrganizationId`. The mobile app's
-  `OrganizationGate` handles organization readiness and selection. Client-side
-  gates are not security boundaries.
-- Enforce organization membership and authorization in Convex functions. Never
-  rely only on a client-provided organization ID.
-- Normalize nullable third-party payload fields before passing them to Convex
-  validators: use `undefined` for absent `v.optional(...)` values rather than
-  `null`.
-- Prefer indexed Convex queries over unbounded filtering and keep public
-  functions thin; put trusted synchronization work in internal functions.
-- Do not add webhook-event persistence solely for logging or deduplication. Use
-  structured logs unless the product requirements explicitly change.
+  billing subscriptions. Convex stores application data and projections synced
+  from Clerk.
+- The Clerk webhook is `POST /clerk/webhook` in `packages/backend/convex/http.ts`.
+  It verifies webhook signatures and synchronizes supported user, organization,
+  membership, subscription, and subscription-item events. Keep synchronization
+  idempotent because events can be repeated or arrive out of order.
+- Authenticated clients pass Clerk auth to Convex using
+  `ConvexProviderWithClerk`. Convex functions must derive identity from the
+  authenticated context, typically through
+  `packages/backend/convex/authProvider/users/currentUser.ts`.
+- The mobile and web condo-selection flow currently stores
+  `userSettings.selectedCondoId`. The current code does not implement an
+  `OrganizationGate` or `selectedClerkOrganizationId`; organization and condo
+  selection are handled by the existing routes and queries. Inspect current
+  code before changing this flow, and do not treat client-side selection or
+  route guards as security boundaries.
+- Keep app routing, authentication, billing, and Convex logic out of
+  `packages/ui`. The shared UI package is consumed by apps, not the other way
+  around.
 
-## Generated code and external state
+## Security and backend rules
 
-- Do not manually edit files in `packages/backend/convex/_generated/`.
-- Do not run `convex dev`, `convex deploy`, Convex code generation, migrations,
-  webhook replays, or database cleanup unless the user explicitly asks for that
-  exact action.
+- Enforce identity, organization membership, condo membership, role checks, and
+  authorization in Convex functions. Never trust a client-provided organization,
+  condo, user, or asset ID without checking the caller's access to it.
+- Validate public function inputs with Convex validators. Keep public functions
+  focused on authenticated application operations and use internal functions for
+  trusted synchronization or server-only work.
+- Prefer indexed Convex queries to unbounded filtering. Add or use indexes in
+  the relevant table schema for lookup paths that need them.
+- Normalize nullable third-party values before passing them to Convex validators:
+  represent absent `v.optional(...)` values as `undefined`, not `null`.
+- Use structured logging through the backend logging helper. Do not persist
+  webhook events solely for logging or deduplication unless product requirements
+  explicitly change.
+- Never manually edit `packages/backend/convex/_generated/`. Do not run Convex
+  code generation, `convex dev`, `convex deploy`, migrations, webhook replays,
+  or database cleanup unless the user explicitly requests that exact action.
 - Never delete or reset Clerk or Convex data without explicit approval.
-- Never commit secrets. Refer only to environment variable names such as
-  `CLERK_SECRET_KEY` and `CLERK_WEBHOOK_SIGNING_SECRET`.
-- For Expo or React Native API changes, check the Expo SDK version in
-  `apps/mobile/package.json` and consult the matching versioned official Expo
-  documentation. For APIs outside Expo, consult their current official docs.
-- Install or change native dependencies through Expo's installer, invoked with
-  pnpm from the repository root: `pnpm --filter @condo-manager/mobile exec expo
-  install <package>`. Verify the package manifest and lockfile, and preserve
-  Expo SDK compatibility and the workspace dependency catalog.
-- The mobile app's `src/global.css` is imported by `src/app/_layout.tsx`, and
-  Metro's NativeWind integration is configured in `apps/mobile/metro.config.js`.
-  Preserve these integration points and the root layout's font loading.
-- Expo generates the `ios/` and `android/` native project directories when
-  needed. Do not create or hand-edit generated native directories; configure
-  native behavior through `app.json` or config plugins. Expo Go may not include
-  every native module, so use the development-build workflow when required.
+
+## Shared UI, styling, and components
+
+- Use base UI components from `@condo-manager/ui` and inspect its public exports
+  in `packages/ui/src/index.ts` before introducing another component. If no
+  existing base component fits, ask the user before creating a new reusable UI
+  primitive. Build app-specific interfaces by composing existing primitives.
+- Keep `packages/ui` platform-independent from app routing, authentication,
+  billing, and backend concerns. Export public APIs through the package entry
+  points. Use `.web` modules only when a platform-specific implementation is
+  required by the underlying platform.
+- Tailwind CSS v4 tokens in `packages/ui/src/styles.base.css` are the shared
+  source of truth for visual design across web and native. Do not create a
+  parallel TypeScript theme or duplicate token values in component styles.
+- Prefer `className` with Tailwind/NativeWind utilities for fixed visual styles.
+  Use `style` or `StyleSheet.create` only for computed runtime values or native
+  API integration, and keep those styles limited to those values. The shared
+  `Loader` retains its numeric `size` prop and runtime animation styles.
+- Use the same Tailwind class-based visual behavior on web, React Native Web, and
+  native React Native. Do not branch fixed visual styles by platform or pass
+  token colors through `color`, `backgroundColor`, or similar style props. For
+  SVG icons, including Lucide, use Tailwind text-color classes and state classes
+  through `className`; avoid conflicting icon `color` props.
+- Define the default DM Sans family once in the shared global styles: on `body`
+  for web and through the native text base rule for React Native. Do not repeat
+  font-family classes or styles on components unless a design intentionally
+  uses another typeface.
+- Add or update Storybook stories when a shared component's visible behavior,
+  public API, or variants change. Keep stories with the component under
+  `packages/ui/src/components/` and design-token stories under
+  `packages/ui/src/stories/`.
+- Preserve the platform file-upload behavior: native uses Expo Document Picker;
+  web uses the `.web` implementation. Keep the public file shape consistent.
+
+## App-specific guidance
+
+### `apps/web`
+
+- `src/main.tsx` composes Clerk, Convex, and TanStack Router providers. Keep
+  application-level provider setup there.
+- Define routes under `src/routes/`. `src/routeTree.gen.ts` is generated by the
+  TanStack Router plugin; do not edit it by hand.
+- The shared web stylesheet is imported once from `@condo-manager/ui/styles.css`.
+- Only expose client-safe settings through `VITE_*` variables. Never put Clerk
+  secret keys or webhook secrets in client configuration.
+
+### `apps/website`
+
+- Define TanStack Start routes under `src/routes/`. Treat
+  `src/routeTree.gen.ts` as generated and do not edit it by hand.
+- `src/routes/__root.tsx` owns the document shell, Clerk provider, and shared
+  stylesheet reference. `src/start.ts` configures Clerk request middleware and
+  CSRF protection for server functions; preserve these protections.
+- Enforce authorization in server functions and protected server routes. Signed-
+  in presentation state alone is not authorization.
+- `CLERK_SECRET_KEY` is server-only. Never expose it through a `VITE_*` variable
+  or commit it.
+
+### `apps/mobile`
+
+- Define screens and navigation in `src/app/` with Expo Router. Keep providers,
+  root navigation, font loading, and splash-screen lifecycle in
+  `src/app/_layout.tsx`.
+- Preserve NativeWind integration: Metro config enables NativeWind, and
+  `src/global.css` imports the shared native stylesheet. The root layout loads
+  the shared DM Sans font before rendering the app.
+- Do not assume an `OrganizationGate` exists. Check current route/component code
+  when changing organization or condo readiness and selection behavior.
+- Expo generates native `ios/` and `android/` directories as needed. Do not
+  create or hand-edit generated native projects; use `app.json` or config
+  plugins. Expo Go may not include all modules used by this app.
+- Install or change native dependencies with Expo's installer via pnpm from the
+  repository root: `pnpm --filter @condo-manager/mobile exec expo install
+<package>`. Check Expo SDK compatibility and the resulting manifest/lockfile.
 - Do not run EAS builds or submissions, change signing credentials, or publish
-  updates unless the user explicitly requests that external action.
+  updates unless explicitly requested.
 
-## Dependency and package conventions
+### `packages/backend`
 
-- Add a dependency to the package that imports it. Hoisting is not a substitute
-  for declaring direct dependencies.
-- Use `workspace:*` for internal `@condo-manager/*` packages.
-- Use `catalog:` for centrally managed third-party versions.
-- Keep the universal UI package free of app-specific routing, authentication,
-  billing, and Convex concerns. Export public APIs through `packages/ui` entry
-  points and include platform-specific files only where behavior must differ.
-- Use Tailwind CSS v4 tokens as the single source of truth for visual styling
-  across web and native mobile. Apply colors, typography, spacing, borders,
-  shadows, and other visual tokens with Tailwind/NativeWind class names; do not
-  add or use a parallel TypeScript `theme`/design-token folder or read color
-  values into component styles. Define or change shared tokens in the UI
-  package's Tailwind CSS theme, and consume them through classes on both
-  platforms.
-- Prefer Tailwind/NativeWind `className` for fixed visual styling across every
-  app and package. Use `style` props or `StyleSheet.create` only when a value is
-  genuinely computed at runtime or required by a native API, and keep those
-  styles limited to the dynamic/integration values. Do not duplicate fixed
-  Tailwind utilities or design-token values in style objects. The shared
-  `Loader` keeps its numeric `size` prop for dimensions and its runtime
-  animation styles.
-- Use the web Tailwind class-based styling model for all visual behavior in
-  React, React Native Web, and React Native. Do not branch visual styles by
-  platform or pass token colors through `color`, `backgroundColor`, or similar
-  props. For SVG icons, apply the matching Tailwind text-color class with
-  `className` so the icon uses the same color as its text; remove or avoid a
-  conflicting `color` prop. Keep hover, focus, active, and disabled colors in
-  Tailwind state classes, including when forwarding classes to child icons.
-- Set the app's default font once in the shared global stylesheet: on `body`
-  for `apps/web` and `apps/website`, and through the native global base rule
-  for React Native text. Font family is global; do not repeat `font-sans` or
-  `fontFamily` on individual components. Tailwind classes may still set font
-  size and weight. Add a local family override only when the design
-  intentionally requires a different typeface.
-- Add or update Storybook stories when a shared component's visible behavior or
-  public variants change.
-- Keep Expo/React Native dependency versions compatible with the Expo SDK in
-  `apps/mobile/package.json`. Use Expo's installer through pnpm for native
-  packages; do not bypass the workspace package manager.
-- Keep lint, TypeScript, and Prettier rules in their shared config packages.
-  App configs should only compose a shared preset with unavoidable framework
-  settings; do not copy common rules into individual apps. The Expo app should
-  retain Expo's TypeScript base config and add only app-specific options.
+- Define the Convex schema in `convex/schema.ts`; keep domain tables and
+  functions organized in `convex/modules/` and Clerk synchronization in
+  `convex/authProvider/`.
+- HTTP endpoints are registered in `convex/http.ts`. Verify third-party webhook
+  signatures before processing payloads and normalize optional fields at the
+  integration boundary.
+- Keep trusted Clerk API calls and synchronization in internal functions/actions.
+  Public functions should validate caller identity and access before reading or
+  mutating organization-scoped data.
+
+### `packages/ui`
+
+- Keep public component exports in `src/index.ts` and package exports in
+  `package.json`. Keep shared CSS entry points `styles.css` and
+  `styles.native.css` aligned with their consumers.
+- Define shared Tailwind tokens in `src/styles.base.css`. Preserve the web and
+  native stylesheet entry points and test both bundling paths when CSS imports or
+  platform-specific modules change.
+- The Expo app imports the native stylesheet via `apps/mobile/src/global.css`
+  and configures Metro in `apps/mobile/metro.config.js`; web apps import the web
+  stylesheet once at their entry/root route.
+
+## Dependencies and shared configuration
+
+- Declare every dependency in the package that imports it; workspace hoisting is
+  not a substitute for a direct dependency.
+- Use `workspace:*` for internal `@condo-manager/*` dependencies. Use
+  `catalog:` for third-party versions shared across packages, and keep
+  app-specific or SDK-constrained versions in the consuming package.
+- Keep the root pnpm lockfile authoritative. Do not use npm or yarn.
+- Keep common lint, TypeScript, and formatting rules in the shared config
+  packages. App configs should compose shared presets and contain only necessary
+  framework-specific settings. Preserve Expo's TypeScript base configuration.
+
+## Environment and external state
+
+- Use each `.env.example` as the source for variable names. Never commit secrets
+  or paste secret values into code, logs, or documentation. Document variable
+  names only.
+- Web and mobile client variables are public configuration. Keep Clerk secret
+  keys and webhook signing secrets server-side in the relevant Clerk/Convex
+  environment.
+- For Expo or React Native APIs, check the installed Expo SDK version and its
+  matching official documentation. Use current official documentation for
+  other changing external APIs.
+- Do not run deployment, publishing, credential, external data mutation, or
+  cleanup actions unless the user explicitly authorizes that exact action.
 
 ## Common commands
 
-Run commands from the repository root:
+Run these from the repository root. Use the narrowest relevant command.
 
 ```sh
 pnpm dev:web
 pnpm dev:website
 pnpm dev:backend
+pnpm dev:ui
 pnpm dev:ios
 pnpm dev:android
-pnpm dev:ui
+
 pnpm --filter @condo-manager/web build
+pnpm --filter @condo-manager/website build
+pnpm --filter @condo-manager/backend check-types
 pnpm --filter @condo-manager/ui check-types
 pnpm --filter @condo-manager/ui lint
+pnpm --filter @condo-manager/ui test-storybook
 pnpm --filter @condo-manager/ui storybook:build
 pnpm --filter @condo-manager/mobile lint
 pnpm --filter @condo-manager/mobile exec tsc --noEmit
 ```
 
-Prefer the narrowest relevant check while iterating, then run all checks affected
-by the change. A production build is not a substitute for focused tests.
-There is no root `dev:mobile` script; use `dev:ios` or `dev:android` (or run the
-mobile package's `start` script when you only need the Expo dev server).
+There is no root `dev:mobile` command; use `dev:ios`, `dev:android`, or the
+mobile package's `start` script. The website has a build script but no package-
+local lint/type-check script. The web app has a build script but no package-local
+lint script. Check package manifests before assuming other scripts exist.
 
-## Implementation style
+## Implementation quality
 
-- Keep components and functions small, direct, and named after their purpose.
-- Keep orchestration such as authentication and organization readiness in gates
-  or hooks, leaving page components focused on rendering features.
-- Reuse `@condo-manager/ui` before adding app-local primitives.
+- Keep components and functions small, direct, and named for their purpose.
+- Keep orchestration such as authentication and data readiness in providers,
+  hooks, or route-level boundaries; keep page components focused on rendering
+  and feature behavior.
 - Preserve strict TypeScript types. Avoid `any`, non-null assertions, and broad
-  type casts unless there is a documented boundary that requires one.
+  casts unless a documented integration boundary requires them.
 - Handle loading, empty, error, and unauthorized states explicitly.
-- Add tests for behavior with meaningful branching or regressions; do not test
-  implementation details.
-
-## Definition of done
-
-- Relevant type, lint, build, Storybook, and test checks pass, or any check that
-  could not be run is reported clearly.
-- Public package exports and dependency declarations are complete.
-- Security-sensitive paths validate identity, organization membership, and input
-  at the server boundary.
-- Documentation is updated when architecture, commands, or conventions change.
+- Add tests for meaningful behavior and regressions when requested; test behavior
+  rather than implementation details.
+- Update the relevant README when setup, architecture, commands, or external
+  configuration changes.

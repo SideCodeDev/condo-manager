@@ -35,9 +35,11 @@ single-project or SDK-specific versions in the package that uses them.
 Clerk is the source of truth for identities, organizations, memberships, and
 billing subscriptions. Convex stores application data and local projections.
 Enforce organization membership and authorization in Convex functions; never
-trust a client-provided organization ID by itself. The frontend organization
-gate reconciles the selected organization preference in
-`userSettings.selectedClerkOrganizationId` with the active Clerk session.
+trust a client-provided organization ID by itself. The web and mobile apps
+currently store the selected condo in `userSettings.selectedCondoId`. There is
+no `OrganizationGate` or `selectedClerkOrganizationId` implementation in the
+current code; organization and condo selection are handled by the existing
+routes and Convex queries.
 
 The Convex source is in `packages/backend/convex/`. Clerk webhooks synchronize
 users, organizations, memberships, and billing data. Handlers should remain
@@ -115,8 +117,11 @@ rules and agent-specific safety constraints.
 
 `@condo-manager/ui` provides cross-platform React Native components, Tailwind
 tokens, DM Sans font assets, hooks, and helpers for the web apps and the native app.
-Its public API is exported from `packages/ui/src/index.ts`; add/update stories
-when changing visible behavior or public variants.
+Use its base components before introducing a new UI component, and check the
+public API in `packages/ui/src/index.ts`. If no existing base component fits,
+ask before creating a new reusable UI primitive; compose existing primitives for
+app-specific interfaces. Add or update stories when changing visible behavior
+or public variants.
 
 Prefer Tailwind/NativeWind `className` for fixed visual styling across web and
 mobile. Keep `style` props or `StyleSheet.create` for values computed at runtime
@@ -139,3 +144,9 @@ The Expo app configures NativeWind through `apps/mobile/metro.config.js`, import
 `styles.native.css` from `apps/mobile/src/global.css`, and loads the shared DM
 Sans font in its root layout. Follow those existing integration points when
 adding another consumer.
+
+## Agent instructions
+
+Repository-wide development and architecture guidance is in [AGENTS.md](AGENTS.md).
+GitHub Copilot also has path-specific instructions under
+`.github/instructions/` for the website, web app, backend, and mobile app.
