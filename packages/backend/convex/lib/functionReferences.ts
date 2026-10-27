@@ -6,7 +6,7 @@ export const getUserOrgs = makeFunctionReference(
 ) as unknown as FunctionReference<
   "query",
   "public",
-  {},
+  Record<string, never>,
   {
     id: Id<"organizations">;
     clerkOrganizationId: string;
@@ -20,13 +20,14 @@ export const getAllCondoMemberships = makeFunctionReference(
 ) as unknown as FunctionReference<
   "query",
   "public",
-  {},
+  Record<string, never>,
   {
     _id: Id<"condoMember">;
     _creationTime: number;
     condoId: Id<"condos">;
     userId: Id<"users">;
     type: "member" | "admin";
+    unitId?: Id<"units">;
   }[]
 >;
 
