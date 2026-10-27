@@ -2,20 +2,23 @@ import { PricingTable, SignOutButton } from "@clerk/react";
 import { api } from "@condo-manager/backend";
 import { Button } from "@condo-manager/ui";
 import { useQuery as useQueryWithStatus } from "convex-helpers/react";
-import { useMutation } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import type { GenericId } from "convex/values";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { acceptCondoInvitation } from "../lib/condo-setup-api";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>) => ({
     showList: search.showList === true || search.showList === "true",
+    acceptCondoInvite:
+      search.acceptCondoInvite === true || search.acceptCondoInvite === "true",
   }),
   component: HomePage,
 });
 
 function HomePage() {
-  const { showList } = Route.useSearch();
+  const { showList, acceptCondoInvite } = Route.useSearch();
   const condosQuery = useQueryWithStatus(api.modules.condos.queries.listMine);
   const condos = useMemo(
     () => (condosQuery.isSuccess ? condosQuery.data : []),
@@ -24,16 +27,51 @@ function HomePage() {
   const selectCondo = useMutation(
     api.modules.userSettings.mutations.selectCondo,
   );
+  const acceptInvitation = useAction(acceptCondoInvitation);
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const [isSelecting, setIsSelecting] = useState(false);
   const autoOpeningCondoId = useRef<string | null>(null);
+  const isAcceptingInvitation = useRef(false);
+  const [invitationError, setInvitationError] = useState(false);
+
+  const completeInvitation = useCallback(async () => {
+    if (!acceptCondoInvite || isAcceptingInvitation.current) return;
+    isAcceptingInvitation.current = true;
+    setInvitationError(false);
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      try {
+        const condoId = await acceptInvitation({});
+        if (condoId) {
+          await navigate({ to: "/condo/$condoId", params: { condoId } });
+        } else {
+          await navigate({
+            to: "/",
+            search: { showList: true, acceptCondoInvite: false },
+            replace: true,
+          });
+        }
+        return;
+      } catch {
+        if (attempt < 4) {
+          await new Promise((resolve) => setTimeout(resolve, 800));
+          continue;
+        }
+        isAcceptingInvitation.current = false;
+        setInvitationError(true);
+      }
+    }
+  }, [acceptCondoInvite, acceptInvitation, navigate]);
+
+  useEffect(() => {
+    void completeInvitation();
+  }, [completeInvitation]);
 
   const openCondoRoute = useCallback(
     async (condoId: GenericId<"condos">) => {
       await navigate({
         to: "/",
-        search: { showList: true },
+        search: { showList: true, acceptCondoInvite: false },
         replace: true,
       });
       await navigate({ to: "/condo/$condoId", params: { condoId } });
@@ -81,6 +119,22 @@ function HomePage() {
       </header>
 
       <PricingTable for="organization" />
+
+      {invitationError ? (
+        <div
+          className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700"
+          role="alert"
+        >
+          Não foi possível ativar a associação. Tente novamente.
+          <Button
+            className="mt-3"
+            variant="secondary"
+            onPress={() => void completeInvitation()}
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      ) : null}
 
       <section className="flex flex-col gap-6">
         <div className="flex items-center justify-between gap-4">

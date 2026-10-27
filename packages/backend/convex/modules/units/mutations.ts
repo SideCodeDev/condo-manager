@@ -25,7 +25,11 @@ export const create = mutation({
         q.eq("condoId", args.condoId).eq("userId", user._id),
       )
       .unique();
-    if (!adminMembership || adminMembership.type !== "admin") {
+    if (
+      !adminMembership ||
+      adminMembership.type !== "admin" ||
+      adminMembership.active === false
+    ) {
       throw new ApplicationError("unauthorized");
     }
 
@@ -73,5 +77,59 @@ export const create = mutation({
       condoMemberCount: condoMemberIds.length,
     });
     return unitId;
+  },
+});
+
+export const createMany = mutation({
+  args: {
+    condoId: v.id("condos"),
+    units: v.array(
+      v.object({
+        floor: v.string(),
+        side: v.string(),
+        permillage: v.number(),
+        usageType: v.union(v.literal("residential"), v.literal("commercial")),
+      }),
+    ),
+  },
+  returns: v.array(v.id("units")),
+  handler: async (ctx, args) => {
+    const { user } = await getCurrentUser(ctx);
+    const condo = await ctx.db.get("condos", args.condoId);
+    if (!condo) throw new ApplicationError("condo_not_found");
+    const adminMembership = await ctx.db
+      .query("condoMember")
+      .withIndex("by_condo_and_user", (q) =>
+        q.eq("condoId", args.condoId).eq("userId", user._id),
+      )
+      .unique();
+    if (
+      !adminMembership ||
+      adminMembership.type !== "admin" ||
+      adminMembership.active === false
+    ) {
+      throw new ApplicationError("unauthorized");
+    }
+    for (const unit of args.units) {
+      if (
+        !unit.floor.trim() ||
+        !unit.side.trim() ||
+        unit.permillage < 0 ||
+        unit.permillage > 1000
+      ) {
+        throw new ApplicationError("invalid_unit");
+      }
+    }
+    return await Promise.all(
+      args.units.map((unit) =>
+        ctx.db.insert("units", {
+          condoId: args.condoId,
+          floor: unit.floor.trim(),
+          side: unit.side.trim(),
+          permillage: unit.permillage,
+          usageType: unit.usageType,
+        }),
+      ),
+    );
   },
 });

@@ -16,9 +16,23 @@ export const getAllMemberships = query({
   ),
   handler: async (ctx) => {
     const { user } = await getCurrentUser(ctx);
-    return await ctx.db
+    const memberships = await ctx.db
       .query("condoMember")
       .withIndex("by_user_id", (q) => q.eq("userId", user._id))
       .collect();
+    return memberships.flatMap((membership) =>
+      membership.userId && membership.active !== false
+        ? [
+            {
+              _id: membership._id,
+              _creationTime: membership._creationTime,
+              condoId: membership.condoId,
+              userId: membership.userId,
+              type: membership.type,
+              unitId: membership.unitId,
+            },
+          ]
+        : [],
+    );
   },
 });

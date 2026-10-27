@@ -63,7 +63,9 @@ export const getById = query({
         q.eq("condoId", condoId).eq("userId", user._id),
       )
       .first();
-    if (!membership) throw new ApplicationError("condo_not_found");
+    if (!membership || membership.active === false) {
+      throw new ApplicationError("condo_not_found");
+    }
     const condo = await ctx.db.get("condos", condoId);
     return condo ? withBackdropImage(ctx, condo) : null;
   },
