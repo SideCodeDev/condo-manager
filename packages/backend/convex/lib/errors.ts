@@ -21,6 +21,9 @@ export type ErrorCode =
   | "cannot_update_condo"
   | "condo_not_found"
   | "condo_membership_exists"
+  | "condo_member_not_found"
+  | "condo_member_already_assigned"
+  | "invalid_unit"
   | "uploaded_file_not_found"
   | "asset_type_mismatch"
   | "invalid_mime_type";

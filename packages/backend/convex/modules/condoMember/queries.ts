@@ -11,6 +11,7 @@ export const getAllMemberships = query({
       condoId: v.id("condos"),
       userId: v.id("users"),
       type: v.union(v.literal("member"), v.literal("admin")),
+      unitId: v.optional(v.id("units")),
     }),
   ),
   handler: async (ctx) => {
