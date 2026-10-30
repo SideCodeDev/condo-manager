@@ -1,11 +1,11 @@
 import { PricingTable, SignOutButton } from "@clerk/react";
 import { api } from "@condo-manager/backend";
 import { Button } from "@condo-manager/ui";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery as useQueryWithStatus } from "convex-helpers/react";
 import { useAction, useMutation } from "convex/react";
 import type { GenericId } from "convex/values";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { acceptCondoInvitation } from "../lib/condo-setup-api";
 
 export const Route = createFileRoute("/")({
@@ -36,6 +36,7 @@ function HomePage() {
   const [invitationError, setInvitationError] = useState(false);
 
   const completeInvitation = useCallback(async () => {
+    debugger;
     if (!acceptCondoInvite || isAcceptingInvitation.current) return;
     isAcceptingInvitation.current = true;
     setInvitationError(false);

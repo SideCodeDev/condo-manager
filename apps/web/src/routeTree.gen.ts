@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CondoCondoIdRouteImport } from './routes/condo.$condoId'
 import { Route as CondoNewRouteImport } from './routes/condo.new'
+import { Route as OrganizationActivateRouteImport } from './routes/organization.activate'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,49 @@ const CondoNewRoute = CondoNewRouteImport.update({
   path: '/condo/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizationActivateRoute = OrganizationActivateRouteImport.update({
+  id: '/organization/activate',
+  path: '/organization/activate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/condo/$condoId': typeof CondoCondoIdRoute
   '/condo/new': typeof CondoNewRoute
+  '/organization/activate': typeof OrganizationActivateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/condo/$condoId': typeof CondoCondoIdRoute
   '/condo/new': typeof CondoNewRoute
+  '/organization/activate': typeof OrganizationActivateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/condo/$condoId': typeof CondoCondoIdRoute
   '/condo/new': typeof CondoNewRoute
+  '/organization/activate': typeof OrganizationActivateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/condo/$condoId' | '/condo/new'
+  fullPaths: '/' | '/condo/$condoId' | '/condo/new' | '/organization/activate'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/condo/$condoId' | '/condo/new'
-  id: '__root__' | '/' | '/condo/$condoId' | '/condo/new'
+  to: '/' | '/condo/$condoId' | '/condo/new' | '/organization/activate'
+  id:
+    | '__root__'
+    | '/'
+    | '/condo/$condoId'
+    | '/condo/new'
+    | '/organization/activate'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CondoCondoIdRoute: typeof CondoCondoIdRoute
   CondoNewRoute: typeof CondoNewRoute
+  OrganizationActivateRoute: typeof OrganizationActivateRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +97,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CondoNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/organization/activate': {
+      id: '/organization/activate'
+      path: '/organization/activate'
+      fullPath: '/organization/activate'
+      preLoaderRoute: typeof OrganizationActivateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +111,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CondoCondoIdRoute: CondoCondoIdRoute,
   CondoNewRoute: CondoNewRoute,
+  OrganizationActivateRoute: OrganizationActivateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
