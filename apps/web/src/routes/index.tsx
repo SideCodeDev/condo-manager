@@ -36,7 +36,6 @@ function HomePage() {
   const [invitationError, setInvitationError] = useState(false);
 
   const completeInvitation = useCallback(async () => {
-    debugger;
     if (!acceptCondoInvite || isAcceptingInvitation.current) return;
     isAcceptingInvitation.current = true;
     setInvitationError(false);
