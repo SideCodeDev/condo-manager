@@ -12,6 +12,20 @@ const require = createRequire(import.meta.url)
 
 const config = defineConfig({
   resolve: {
+    extensions: [
+      '.web.mjs',
+      '.mjs',
+      '.js',
+      '.web.mts',
+      '.mts',
+      '.web.ts',
+      '.ts',
+      '.web.jsx',
+      '.jsx',
+      '.web.tsx',
+      '.tsx',
+      '.json',
+    ],
     tsconfigPaths: true,
     alias: [
       { find: /^react-native$/, replacement: require.resolve('react-native-web') },

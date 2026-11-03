@@ -36,7 +36,7 @@ export const upsertUser = internalMutation({
       .unique();
     const patch = {
       authProviderId,
-      email: email,
+      email: email.trim().toLowerCase(),
       firstName,
       lastName,
       imageUrl,

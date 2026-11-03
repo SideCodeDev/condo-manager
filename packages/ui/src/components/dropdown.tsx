@@ -99,7 +99,9 @@ function Dropdown<T>(props: DropdownProps<T>) {
     left: number;
     width: number;
   } | null>(null);
+  const isOpenRef = React.useRef(false);
   const triggerRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
+  const openedByPointerRef = React.useRef(false);
   const inputContainerRef = React.useRef<React.ElementRef<typeof View>>(null);
   const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const optionRefs = React.useRef<
@@ -150,6 +152,9 @@ function Dropdown<T>(props: DropdownProps<T>) {
   }, [isClosing, open, selectedValue]);
 
   const close = () => {
+    if (!isOpenRef.current) return;
+
+    isOpenRef.current = false;
     if (isWeb) {
       document.getElementById(anchorId)?.blur();
     } else {
@@ -167,6 +172,9 @@ function Dropdown<T>(props: DropdownProps<T>) {
   };
 
   const openDropdown = () => {
+    if (isOpenRef.current) return;
+
+    isOpenRef.current = true;
     if (closeTimer.current) clearTimeout(closeTimer.current);
     setIsClosing(false);
     setAnchorRect(null);
@@ -175,13 +183,27 @@ function Dropdown<T>(props: DropdownProps<T>) {
     setOpen(true);
   };
 
-  const toggleOpen = () => {
-    if (open) {
-      close();
-      return;
-    }
+  React.useEffect(() => {
+    if (!isWeb) return;
 
-    openDropdown();
+    const handlePointerDown = (event: PointerEvent) => {
+      const containerElement = document.getElementById(
+        `${inputProps.id}-container`,
+      );
+      openedByPointerRef.current = Boolean(
+        containerElement && event.composedPath().includes(containerElement),
+      );
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    return () =>
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+  }, [inputProps.id, isWeb]);
+
+  const shouldIgnoreOutsideClick = () => {
+    const shouldIgnore = openedByPointerRef.current;
+    openedByPointerRef.current = false;
+    return shouldIgnore;
   };
 
   React.useEffect(() => {
@@ -451,7 +473,13 @@ function Dropdown<T>(props: DropdownProps<T>) {
             onFocus={() => {
               if (!open) openDropdown();
             }}
-            onPress={toggleOpen}
+            onPressIn={() => {
+              if (!open) openDropdown();
+            }}
+            onPress={(event) => {
+              event.stopPropagation();
+              openDropdown();
+            }}
             ref={triggerRef}
           >
             <Text
@@ -480,6 +508,9 @@ function Dropdown<T>(props: DropdownProps<T>) {
           }
           container={container}
           onDismiss={close}
+          ignoreOutsideClickId={`${inputProps.id}-container`}
+          shouldIgnoreOutsideClick={shouldIgnoreOutsideClick}
+          isOpen={open}
         >
           <View
             accessibilityLabel={popupLabel}

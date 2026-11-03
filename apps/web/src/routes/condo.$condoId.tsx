@@ -1,5 +1,5 @@
 import { api } from "@condo-manager/backend";
-import type { Id } from "@condo-manager/backend/dataModel";
+import type { GenericId } from "convex/values";
 import { useQuery as useQueryWithStatus } from "convex-helpers/react";
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -14,7 +14,7 @@ function CondoPage() {
   const { condoId } = Route.useParams();
   // Convex validates this route value against the `condos` ID type on the server.
   const condoQuery = useQueryWithStatus(api.modules.condos.queries.getById, {
-    condoId: condoId as Id<"condos">,
+    condoId: condoId as GenericId<"condos">,
   });
   const navigate = useNavigate();
   const isReturningHome = useRef(false);
@@ -35,7 +35,11 @@ function CondoPage() {
     )
       return;
     isReturningHome.current = true;
-    void navigate({ to: "/", search: { showList: true }, replace: true });
+    void navigate({
+      to: "/",
+      search: { showList: true, acceptCondoInvite: false },
+      replace: true,
+    });
   }, [condoQuery, navigate]);
 
   if (condoQuery.isPending) {
@@ -85,7 +89,11 @@ function CondoPage() {
           <div className="grid gap-1 px-3.5 py-5">
             <div className="flex items-center gap-5">
               <GlassButton asChild className="size-8 p-1.5">
-                <Link to="/" search={{ showList: true }} replace>
+                <Link
+                  to="/"
+                  search={{ showList: true, acceptCondoInvite: false }}
+                  replace
+                >
                   <ArrowLeft />
                 </Link>
               </GlassButton>

@@ -11,6 +11,20 @@ const require = createRequire(import.meta.url);
 // https://vite.dev/config/
 export default defineConfig({
   resolve: {
+    extensions: [
+      ".web.mjs",
+      ".mjs",
+      ".js",
+      ".web.mts",
+      ".mts",
+      ".web.ts",
+      ".ts",
+      ".web.jsx",
+      ".jsx",
+      ".web.tsx",
+      ".tsx",
+      ".json",
+    ],
     alias: [
       { find: /^react-native$/, replacement: require.resolve("react-native-web") },
       { find: /^lucide-react-native$/, replacement: require.resolve("lucide-react") },

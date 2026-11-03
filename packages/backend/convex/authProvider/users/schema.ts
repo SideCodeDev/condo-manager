@@ -9,4 +9,6 @@ export const users = defineTable({
   imageUrl: v.optional(v.string()),
   updatedAt: v.number(),
   raw: v.optional(v.string()),
-}).index("by_auth_provider_id", ["authProviderId"]);
+})
+  .index("by_auth_provider_id", ["authProviderId"])
+  .index("by_email", ["email"]);

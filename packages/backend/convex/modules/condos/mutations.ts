@@ -59,6 +59,7 @@ export const create = mutation({
       condoId,
       userId: user._id,
       type: "admin",
+      active: true,
     });
     log.info("condo.created", {
       condoId,
@@ -89,7 +90,11 @@ export const update = mutation({
       )
       .first();
 
-    if (!condoMembership || condoMembership.type !== "admin")
+    if (
+      !condoMembership ||
+      condoMembership.type !== "admin" ||
+      condoMembership.active === false
+    )
       throw new ApplicationError("unauthorized");
     if (!args.name && !args.address && args.backdropImage === undefined)
       throw new ApplicationError("cannot_update_condo");

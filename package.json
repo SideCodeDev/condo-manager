@@ -8,8 +8,11 @@
   "keywords": [],
   "scripts": {
     "dev:web": "pnpm --filter @condo-manager/web dev",
+    "build:web": "pnpm --filter @condo-manager/web build",
     "dev:website": "pnpm --filter @condo-manager/website dev",
+    "build:website": "pnpm --filter @condo-manager/website build",
     "dev:ui": "pnpm --filter @condo-manager/ui storybook",
+    "build:ui": "pnpm --filter @condo-manager/ui build",
     "dev:android": "pnpm --filter @condo-manager/mobile android",
     "dev:ios": "pnpm --filter @condo-manager/mobile ios",
     "dev:backend": "pnpm --filter @condo-manager/backend dev"

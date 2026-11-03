@@ -50,7 +50,11 @@ export const selectCondo = mutation({
         q.eq("condoId", condoId).eq("userId", user._id),
       )
       .first();
-    if (!membership || !(await ctx.db.get("condos", condoId))) {
+    if (
+      !membership ||
+      membership.active === false ||
+      !(await ctx.db.get("condos", condoId))
+    ) {
       throw new ApplicationError("unauthorized");
     }
 

@@ -6,6 +6,9 @@ export type DropdownPortalProps = {
   children: ReactNode;
   contentStyle?: object;
   container?: Element | null;
+  ignoreOutsideClickId?: string;
+  shouldIgnoreOutsideClick?: () => boolean;
+  isOpen?: boolean;
   onDismiss: () => void;
 };
 
