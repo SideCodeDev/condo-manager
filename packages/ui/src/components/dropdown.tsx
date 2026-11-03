@@ -100,6 +100,7 @@ function Dropdown<T>(props: DropdownProps<T>) {
     width: number;
   } | null>(null);
   const triggerRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
+  const isTabNavigationRef = React.useRef(false);
   const inputContainerRef = React.useRef<React.ElementRef<typeof View>>(null);
   const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const optionRefs = React.useRef<
@@ -175,15 +176,6 @@ function Dropdown<T>(props: DropdownProps<T>) {
     setOpen(true);
   };
 
-  const toggleOpen = () => {
-    if (open) {
-      close();
-      return;
-    }
-
-    openDropdown();
-  };
-
   React.useEffect(() => {
     if (!open) return;
 
@@ -229,6 +221,24 @@ function Dropdown<T>(props: DropdownProps<T>) {
       }
     };
   }, [anchorId, isWeb, open]);
+
+  React.useEffect(() => {
+    if (!isWeb) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      isTabNavigationRef.current = event.key === "Tab";
+    };
+    const handlePointerDown = () => {
+      isTabNavigationRef.current = false;
+    };
+
+    document.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown, true);
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+    };
+  }, [isWeb]);
 
   React.useEffect(() => {
     if (!isWeb || !open || !anchorRect) return;
@@ -449,9 +459,9 @@ function Dropdown<T>(props: DropdownProps<T>) {
             disabled={isDisabled}
             nativeID={anchorId}
             onFocus={() => {
-              if (!open) openDropdown();
+              if (!open && isTabNavigationRef.current) openDropdown();
             }}
-            onPress={toggleOpen}
+            onPress={openDropdown}
             ref={triggerRef}
           >
             <Text
@@ -480,6 +490,7 @@ function Dropdown<T>(props: DropdownProps<T>) {
           }
           container={container}
           onDismiss={close}
+          ignoreOutsideClickId={`${inputProps.id}-container`}
         >
           <View
             accessibilityLabel={popupLabel}
