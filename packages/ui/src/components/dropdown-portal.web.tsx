@@ -9,25 +9,31 @@ function DropdownPortal({
   contentStyle,
   container,
   ignoreOutsideClickId,
+  shouldIgnoreOutsideClick,
+  isOpen = true,
   onDismiss,
 }: DropdownPortalProps) {
-  const contentRef = React.useRef<React.ElementRef<typeof View>>(null);
+  const contentId = React.useId();
+  const dismissRef = React.useRef(onDismiss);
+  const shouldIgnoreOutsideClickRef = React.useRef(shouldIgnoreOutsideClick);
+  dismissRef.current = onDismiss;
+  shouldIgnoreOutsideClickRef.current = shouldIgnoreOutsideClick;
 
   React.useEffect(() => {
+    if (!isOpen) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onDismiss();
+      if (event.key === "Escape") dismissRef.current();
     };
     const handleClick = (event: MouseEvent) => {
-      const trigger = ignoreOutsideClickId
-        ? document.getElementById(ignoreOutsideClickId)
-        : null;
-      if (
-        event.target instanceof Node &&
-        !trigger?.contains(event.target) &&
-        !contentRef.current?.contains(event.target)
-      ) {
-        onDismiss();
-      }
+      if (shouldIgnoreOutsideClickRef.current?.()) return;
+
+      const clickedInside = event.composedPath().some(
+        (target) =>
+          target instanceof Element &&
+          (target.id === contentId || target.id === ignoreOutsideClickId),
+      );
+      if (!clickedInside) dismissRef.current();
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -36,12 +42,15 @@ function DropdownPortal({
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("click", handleClick);
     };
-  }, [ignoreOutsideClickId, onDismiss]);
+  }, [contentId, ignoreOutsideClickId, isOpen]);
 
   return createPortal(
-    <View className="fixed inset-0 z-[1000]">
+    <View
+      className="fixed inset-0 z-[1000]"
+      pointerEvents={isOpen ? "auto" : "none"}
+    >
       <View className="absolute inset-0" />
-      <View ref={contentRef} style={contentStyle}>
+      <View nativeID={contentId} style={contentStyle}>
         {children}
       </View>
     </View>,

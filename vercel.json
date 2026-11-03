@@ -1,0 +1,61 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "website": {
+      "root": "apps/website"
+    },
+    "web": {
+      "root": "apps/web"
+    },
+    "ui": {
+      "root": "packages/ui",
+      "framework": "storybook",
+      "buildCommand": "pnpm storybook:build --output-dir dist",
+      "outputDirectory": "dist"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": {
+            "eq": "sidecode.pt"
+          }
+        }
+      ],
+      "destination": {
+        "service": "website"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": {
+            "eq": "app.sidecode.pt"
+          }
+        }
+      ],
+      "destination": {
+        "service": "web"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": {
+            "eq": "ui.sidecode.pt"
+          }
+        }
+      ],
+      "destination": {
+        "service": "ui"
+      }
+    }
+  ]
+}

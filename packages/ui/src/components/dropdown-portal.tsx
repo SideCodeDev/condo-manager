@@ -7,6 +7,8 @@ export type DropdownPortalProps = {
   contentStyle?: object;
   container?: Element | null;
   ignoreOutsideClickId?: string;
+  shouldIgnoreOutsideClick?: () => boolean;
+  isOpen?: boolean;
   onDismiss: () => void;
 };
 
