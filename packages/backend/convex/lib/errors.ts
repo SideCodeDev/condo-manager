@@ -29,4 +29,7 @@ export type ErrorCode =
   | "condo_invitation_not_accepted"
   | "uploaded_file_not_found"
   | "asset_type_mismatch"
-  | "invalid_mime_type";
+  | "invalid_mime_type"
+  | "invalid_occurrence"
+  | "invalid_occurrence_documents"
+  | "occurrence_not_found";
