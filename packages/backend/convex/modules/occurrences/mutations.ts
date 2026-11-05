@@ -21,6 +21,7 @@ async function requireCondoMembership(
   if (!membership || membership.active === false) {
     throw new ApplicationError("unauthorized");
   }
+  return membership;
 }
 
 async function validateDocuments(ctx: MutationCtx, documentIds: Id<"assets">[]) {
@@ -89,6 +90,9 @@ export const update = mutation({
     const occurrence = await ctx.db.get("occurrences", args.occurrenceId);
     if (!occurrence) throw new ApplicationError("occurrence_not_found");
     await requireCondoMembership(ctx, occurrence.condoId, user._id);
+    if (occurrence.createdByUserId !== user._id) {
+      throw new ApplicationError("unauthorized");
+    }
     validateText(args.title, args.description);
     await validateDocuments(ctx, args.documentIds);
     await ctx.db.patch("occurrences", occurrence._id, {
@@ -113,7 +117,17 @@ export const remove = mutation({
     const { user } = await getCurrentUser(ctx);
     const occurrence = await ctx.db.get("occurrences", occurrenceId);
     if (!occurrence) throw new ApplicationError("occurrence_not_found");
-    await requireCondoMembership(ctx, occurrence.condoId, user._id);
+    const membership = await requireCondoMembership(
+      ctx,
+      occurrence.condoId,
+      user._id,
+    );
+    if (
+      occurrence.createdByUserId !== user._id &&
+      membership.type !== "admin"
+    ) {
+      throw new ApplicationError("unauthorized");
+    }
     await ctx.db.delete("occurrences", occurrenceId);
     log.info("condo.occurrence.deleted", {
       occurrenceId,
