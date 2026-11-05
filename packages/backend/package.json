@@ -11,7 +11,8 @@
   "scripts": {
     "dev": "convex dev",
     "deploy": "convex deploy",
-    "check-types": "tsc -p tsconfig.json --noEmit"
+    "check-types": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@clerk/backend": "^3.16.10",
@@ -19,7 +20,10 @@
   },
   "devDependencies": {
     "@condo-manager/typescript-config": "workspace:*",
+    "@edge-runtime/vm": "^5.0.0",
     "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "convex-test": "^0.0.67",
+    "typescript": "catalog:",
+    "vitest": "^4.1.11"
   }
 }
