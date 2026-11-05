@@ -14,6 +14,15 @@ VITE_CLERK_PUBLISHABLE_KEY=
 VITE_CONVEX_URL=
 ```
 
+For the deployed app to sync development-instance Clerk sessions from the
+website, configure it as a satellite with `VITE_CLERK_IS_SATELLITE=true`,
+`VITE_CLERK_DOMAIN=app.condo.sidecode.pt`, and sign-in/sign-up URLs pointing to
+`https://condo.sidecode.pt/sign-in` and `/sign-up`. The website's
+`VITE_CLERK_ALLOWED_REDIRECT_ORIGINS` should include
+`https://app.condo.sidecode.pt`. Add `app.condo.sidecode.pt` as a satellite in
+the Clerk development instance. For local development, use the corresponding
+localhost origins and ports instead.
+
 Then start the app:
 
 ```sh

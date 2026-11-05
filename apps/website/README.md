@@ -35,6 +35,10 @@ the service root is already set to `apps/website`.
 Add `VITE_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` to the Vercel project
 for Production, Preview, and Development as needed. Configure the custom domain
 `condo.sidecode.pt` on the Vercel project and point its DNS records to Vercel.
+For Clerk development-instance session syncing with the app, set
+`VITE_CLERK_ALLOWED_REDIRECT_ORIGINS=https://app.condo.sidecode.pt` and add
+`app.condo.sidecode.pt` as a satellite domain in the Clerk development
+instance.
 TanStack Start's server routes and functions run as Vercel Functions through
 Nitro. Convex remains a separate backend deployment and must be configured in
 its own Convex deployment; it is not hosted by this Vercel service.

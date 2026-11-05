@@ -36,11 +36,11 @@ function HomePage() {
         </a>
         <nav aria-label="Navegação principal" className="flex items-center gap-3">
           <Show when="signed-out">
-            <SignInButton mode="modal">
-              <Button asChild size="sm" variant="ghost">
+            <Button asChild size="sm" variant="ghost">
+              <SignInButton mode="redirect">
                 <button type="button">Entrar</button>
-              </Button>
-            </SignInButton>
+              </SignInButton>
+            </Button>
           </Show>
           <Show when="signed-in">
             <Button asChild size="sm">
@@ -69,11 +69,11 @@ function HomePage() {
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <Show when="signed-out">
-              <SignInButton mode="modal">
-                <Button asChild>
+              <Button asChild>
+                <SignInButton mode="redirect">
                   <button type="button">Começar agora</button>
-                </Button>
-              </SignInButton>
+                </SignInButton>
+              </Button>
             </Show>
             <Show when="signed-in">
               <Button asChild>
