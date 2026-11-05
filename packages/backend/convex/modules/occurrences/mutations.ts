@@ -117,15 +117,8 @@ export const remove = mutation({
     const { user } = await getCurrentUser(ctx);
     const occurrence = await ctx.db.get("occurrences", occurrenceId);
     if (!occurrence) throw new ApplicationError("occurrence_not_found");
-    const membership = await requireCondoMembership(
-      ctx,
-      occurrence.condoId,
-      user._id,
-    );
-    if (
-      occurrence.createdByUserId !== user._id &&
-      membership.type !== "admin"
-    ) {
+    await requireCondoMembership(ctx, occurrence.condoId, user._id);
+    if (occurrence.createdByUserId !== user._id) {
       throw new ApplicationError("unauthorized");
     }
     await ctx.db.delete("occurrences", occurrenceId);
