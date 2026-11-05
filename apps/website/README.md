@@ -24,6 +24,21 @@ pnpm --filter @condo-manager/website build
 `CLERK_SECRET_KEY` is server-only and must never be exposed through a
 `VITE_*` variable or committed.
 
+## Vercel deployment
+
+The root `vercel.json` deploys this app as the `website` Vercel Service and
+routes `condo.sidecode.pt` to it. In the Vercel project settings, select the
+**Services** framework so Vercel builds the services declared in that file.
+Connect the repository with its root directory set to the repository root;
+the service root is already set to `apps/website`.
+
+Add `VITE_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` to the Vercel project
+for Production, Preview, and Development as needed. Configure the custom domain
+`condo.sidecode.pt` on the Vercel project and point its DNS records to Vercel.
+TanStack Start's server routes and functions run as Vercel Functions through
+Nitro. Convex remains a separate backend deployment and must be configured in
+its own Convex deployment; it is not hosted by this Vercel service.
+
 ## App structure
 
 - Routes live in `src/routes/`; `src/routes/__root.tsx` provides the document

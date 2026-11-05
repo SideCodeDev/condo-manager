@@ -3,6 +3,7 @@ import { createRequire } from 'node:module'
 import path from 'node:path'
 
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import { nitro } from 'nitro/vite'
 
 import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -49,6 +50,7 @@ const config = defineConfig({
   plugins: [
     tailwindcss(),
     tanstackStart(),
+    nitro(),
     viteReact(),
     babel({ presets: [reactCompilerPreset()] }),
   ],
